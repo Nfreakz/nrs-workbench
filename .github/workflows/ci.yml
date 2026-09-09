@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - '**'
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,7 +16,8 @@ defaults:
 
 jobs:
   windows-build-and-smoke:
-    # Project policy: CI must run only on a repository-scoped local self-hosted Windows x64 runner.
+    # Security policy: this public repository never runs pull_request events on the
+    # repository-scoped self-hosted runner. Only trusted pushes or manual runs execute locally.
     runs-on: [self-hosted, Windows, X64]
     timeout-minutes: 20
     steps:
