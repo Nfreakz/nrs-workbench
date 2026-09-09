@@ -6,12 +6,11 @@
 
 **Local developer control center for Git repositories and GitHub Actions self-hosted runners on Windows.**
 
-> **Status:** v0.15.1 is the first **NRS Workbench** public-preview candidate. It keeps the audited runner/repository feature set from v0.14.3, adds the final public product identity and icon, and adopts the project's source-available noncommercial licensing model before the first public release.
-
+> **Status:** v0.15.2 is the current public-preview development candidate. It keeps the audited runner/repository safety baseline, polishes the dark WPF controls and expands Statistics with a current local Git repository snapshot.
 
 ## Public preview readiness
 
-The public-preview gate combines a dependency-free Git smoke-test executable, source audit, Windows CI, tag-driven release automation, community templates, privacy/testing/architecture documentation and repository hardening. v0.15.1 adds no new Git write behavior.
+The public-preview gate combines a dependency-free Git smoke-test executable, source audit, Windows CI, tag-driven release automation, community templates, privacy/testing/architecture documentation and repository hardening. v0.15.2 adds no new Git write behavior.
 
 Repository remotes are sanitized before display so embedded HTTP(S)/SSH user-info credentials are not exposed. Diff preview disables external diff and text-conversion helpers, untracked-file preview skips reparse points, and folder scanning does not follow junctions/symlinked directories.
 
@@ -65,8 +64,7 @@ The admin launch is useful when controlling runners installed as Windows service
 
 Version 0.10 adds a native Windows notification-area icon without external runtime packages. When enabled in **Configuración**, minimizing or closing the main window keeps NRS Workbench active in the tray. The tray menu exposes the current runner summary plus quick actions to reopen the UI, refresh state, start/stop all runners and exit explicitly.
 
-The footer signature **Neo RS** opens the **Acerca de** window, which shows the running application version, .NET runtime, Windows version, local data path and PolyForm Noncommercial licensing information. These features are local only and do not add telemetry or account access.
-
+The footer signature **Neo RS** opens the **Acerca de** window, which shows the running application version, .NET runtime, Windows version, local data path and PolyForm Noncommercial licensing information. The About window also includes a discreet voluntary-support link to Neo RS. These features are local only and do not add telemetry or account access.
 
 ## Operational health and notifications
 
@@ -75,7 +73,6 @@ Version 0.11 adds a compact **SALUD** signal to the main dashboard. It is delibe
 Desktop notifications are optional and local. They can report READY → BUSY job starts, BUSY → READY job completion, and runner ERROR/UNREGISTERED transitions. By default notifications are only shown when none of NRS Workbench's windows is active, avoiding duplicate noise while the user is already watching the dashboard. Notification preferences are stored in `%LOCALAPPDATA%\NRSWorkbench\settings.json`.
 
 The notification-area icon is also kept available while desktop notifications are enabled, even when close-to-tray behavior itself is disabled. No external push service, telemetry or account integration is used.
-
 
 ## Repositories module
 
@@ -91,7 +88,7 @@ The first quick actions are intentionally conservative:
 
 Version 0.13 adds a guarded **Commit** workflow. The user selects the files to include, reviews a local textual diff, enters the message, and confirms before Git is allowed to stage or commit anything. `Commit & Push` is only available when the branch has an upstream and the remote is not ahead.
 
-Selective commits use `git add -A -- <selected paths>` and then create one normal Git commit. If Git already contains staged files outside the selected set, NRS Workbench blocks the operation rather than silently including them. Conflicts also block commits. Files with both staged and unstaged changes are explicitly warned because selecting that file stages its current complete content.
+Selective commits use `git add -A -- <selected paths>` and then create one normal Git commit. If Git already contains staged files outside the user's selected set, NRS Workbench blocks the operation rather than silently including them. Conflicts also block commits. Files with both staged and unstaged changes are explicitly warned because selecting that file stages its current complete content.
 
 Branch switching and a higher-level Sync workflow remain deferred. NRS Workbench does not read or store Git credentials or GitHub tokens for these local operations; authentication remains the responsibility of the user's existing Git setup.
 
@@ -119,6 +116,8 @@ To protect against duplicated/copied diagnostics, v0.7.5 extracts stable identit
 
 Version 0.9.0 adds runner reliability and 24-hour trend signals to the audited local activity dashboard. It shows the last 14 days of activity plus jobs today, jobs in the last 24 hours, jobs/day, first and last observed job, history coverage and the peak activity day. These metrics are derived only from the local `Worker_*.log` history available on the machine; they are not presented as a complete GitHub account history.
 
+Version 0.15.2 adds a separate **repository state snapshot** to the same Statistics view: repository count, clean/dirty state, ahead/behind status, attention state, clean/synchronised percentages, most recent local commit and repository with the most current working-tree changes. Repository snapshot values describe the present local Git state and deliberately do **not** change with the runner-history period filter.
+
 Results are intentionally conservative: NRS Workbench only marks a job as successful, failed or cancelled when a terminal job result is identifiable in the worker diagnostic log. Generic `ERR` lines are **not** treated as failed jobs because GitHub Runner diagnostics can contain recoverable transport or retry errors. Runs without a trustworthy terminal result remain **Sin clasificar** and are excluded from the success-rate denominator.
 
 The statistics are the scope of the **locally retained diagnostic history**, not a guaranteed lifetime total from GitHub. No GitHub API token is needed. A future optional API integration can add workflow-run-level counts and reconcile the local history without replacing the offline statistics path.
@@ -137,6 +136,16 @@ See `LICENSE` for the versioned license reference and required notice, and `COMM
 
 Because the public license restricts commercial use, NRS Workbench is described as **source-available**, not OSI-approved open source.
 
+## Support NRS Workbench
+
+If NRS Workbench is useful to you and you want to support its continued development, you can support **Neo RS** voluntarily through Buy Me a Coffee:
+
+**https://buymeacoffee.com/neors**
+
+Support is entirely optional. It does **not** grant commercial-use rights, alter the PolyForm Noncommercial public license or replace a separate commercial license where one is required.
+
+GitHub's native Sponsor/Funding button is configured through `.github/FUNDING.yml`.
+
 ## Disclaimer
 
 This project is independent and is not affiliated with or endorsed by GitHub, Inc. GitHub and GitHub Actions are trademarks of GitHub, Inc.
@@ -144,7 +153,6 @@ This project is independent and is not affiliated with or endorsed by GitHub, In
 ## Local development note
 
 `RUN_ME_FIRST.cmd` is intended for local test builds on Windows. It elevates once and, before compiling, closes only the current checkout's matching `NRSWorkbench.exe` process (and matching legacy `GitHubWorkspaceManager.exe` / `RunnerManager.exe` outputs during migration). This prevents the previous test instance from locking `NRS.Workbench.Core.dll` during rebuilds.
-
 
 ### Reliability and trend
 
@@ -154,7 +162,6 @@ The statistics dashboard distinguishes two different ideas:
 - **Technical reliability** = OK / (OK + failed). Cancelled jobs are shown separately instead of being treated as technical failures.
 
 The 24-hour trend compares technical reliability in the last 24 hours with the previous 24 hours. It is only shown when both windows contain at least three classified technical jobs.
-
 
 ## Autoría
 
