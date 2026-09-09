@@ -10,8 +10,8 @@ permissions:
 
 jobs:
   release-win-x64:
-    # Project policy: releases must run only on the dedicated local self-hosted runner.
-    runs-on: [self-hosted, Windows, X64, nrs-workbench]
+    # Project policy: releases must run only on a repository-scoped local self-hosted Windows x64 runner.
+    runs-on: [self-hosted, Windows, X64]
     timeout-minutes: 30
     steps:
       - name: Checkout
