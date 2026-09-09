@@ -10,15 +10,19 @@ permissions:
 
 jobs:
   release-win-x64:
-    runs-on: windows-latest
+    # Project policy: releases must run only on the dedicated local self-hosted runner.
+    runs-on: [self-hosted, Windows, X64, nrs-workbench]
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
+      - name: Verify local release toolchain
+        shell: pwsh
+        run: |
+          dotnet --info
+          git --version
+          gh --version
 
       - name: Build
         run: dotnet build .\NRSWorkbench.sln -c Release
