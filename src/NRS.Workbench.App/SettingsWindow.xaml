@@ -1,7 +1,7 @@
 <Window x:Class="NRS.Workbench.App.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Configuración" Icon="/Assets/NRSWorkbench.ico" Width="700" Height="650" ResizeMode="NoResize"
+        Title="Configuración" Icon="/Assets/NRSWorkbench.ico" Width="700" Height="740" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
     <Grid Background="{StaticResource BgBrush}" Margin="24">
@@ -24,7 +24,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" Margin="0,0,0,8">
@@ -69,6 +69,24 @@
                         </WrapPanel>
                         <CheckBox x:Name="NotifyOnlyWhenHiddenCheck" Content="Mostrar avisos solo cuando NRS Workbench no está en primer plano" Foreground="{StaticResource TextBrush}" Margin="20,9,0,0"/>
                     </StackPanel>
+                </Border>
+
+                <Border Grid.Row="5" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="Portabilidad" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
+                            <TextBlock Text="Exporta rutas y preferencias para mover NRS Workbench a otro PC. No incluye credenciales, tokens ni archivos internos de los runners."
+                                       Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="Exportar..." Style="{StaticResource ToolbarButton}" Padding="10,6" Click="Export_Click"/>
+                            <Button Content="Importar..." Style="{StaticResource ToolbarButton}" Padding="10,6" Margin="8,0,0,0" Click="Import_Click"/>
+                        </StackPanel>
+                    </Grid>
                 </Border>
             </Grid>
         </Border>
