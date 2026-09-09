@@ -59,6 +59,8 @@
         </Border>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button Content="☕ Apoyar desarrollo" Style="{StaticResource ToolbarButton}" Click="Support_Click"
+                    ToolTip="Apoyo voluntario a Neo RS. No concede derechos de uso comercial."/>
             <Button Content="Abrir datos" Style="{StaticResource ToolbarButton}" Click="OpenData_Click"/>
             <Button Content="Copiar información" Style="{StaticResource ToolbarButton}" Click="CopyInfo_Click"/>
             <Button Content="Cerrar" Style="{StaticResource PrimaryToolbarButton}" Margin="0" Click="Close_Click"/>
