@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NRS.Workbench.App\NRS.Workbench.App.csproj" />
+    <ProjectReference Include="..\..\src\NRS.Workbench.Core\NRS.Workbench.Core.csproj" />
+  </ItemGroup>
+</Project>

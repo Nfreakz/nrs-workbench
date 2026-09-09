@@ -1,0 +1,81 @@
+<Window x:Class="NRS.Workbench.App.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Configuración" Icon="/Assets/NRSWorkbench.ico" Width="700" Height="650" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
+    <Grid Background="{StaticResource BgBrush}" Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,18">
+            <TextBlock Text="Configuración" FontSize="26" FontWeight="Bold"/>
+            <TextBlock Text="Configura runners, notificaciones y comportamiento del NRS Workbench." Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource PanelCard}" Padding="18">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Ubicaciones de runners" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="Una raíz por línea. El escaneo dentro de cada raíz es superficial." Style="{StaticResource MutedLabel}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Detectar automáticamente" Style="{StaticResource ToolbarButton}" Margin="0" Padding="10,6" Click="Detect_Click"/>
+                </Grid>
+
+                <TextBox x:Name="RootsText" Grid.Row="1" Height="108" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                         Padding="10" Margin="0,0,0,18"/>
+
+                <Grid Grid.Row="2" Margin="0,0,0,18">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="175"/></Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,18,0">
+                        <TextBlock Text="Patrón de carpetas" Style="{StaticResource MutedLabel}"/>
+                        <TextBox x:Name="PatternText" Padding="9" Margin="0,6,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Refresco (segundos)" Style="{StaticResource MutedLabel}"/>
+                        <TextBox x:Name="RefreshText" Padding="9" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <Border Grid.Row="3" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12">
+                    <StackPanel>
+                        <CheckBox x:Name="ConfirmBusyCheck" Content="Confirmar antes de parar un runner BUSY" Foreground="{StaticResource TextBrush}"/>
+                        <CheckBox x:Name="KeepInTrayCheck" Content="Mantener NRS Workbench en la bandeja al cerrar o minimizar" Foreground="{StaticResource TextBrush}" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="4" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Notificaciones" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="NotificationsEnabledCheck" Content="Activar notificaciones de escritorio" Foreground="{StaticResource TextBrush}"/>
+                        <WrapPanel Margin="20,9,0,0">
+                            <CheckBox x:Name="NotifyJobStartedCheck" Content="Job iniciado" Foreground="{StaticResource TextBrush}" Margin="0,0,22,0"/>
+                            <CheckBox x:Name="NotifyJobCompletedCheck" Content="Job finalizado" Foreground="{StaticResource TextBrush}" Margin="0,0,22,0"/>
+                            <CheckBox x:Name="NotifyRunnerIssuesCheck" Content="Errores del runner" Foreground="{StaticResource TextBrush}"/>
+                        </WrapPanel>
+                        <CheckBox x:Name="NotifyOnlyWhenHiddenCheck" Content="Mostrar avisos solo cuando NRS Workbench no está en primer plano" Foreground="{StaticResource TextBrush}" Margin="20,9,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button Content="Cancelar" Style="{StaticResource ToolbarButton}" Click="Cancel_Click"/>
+            <Button Content="Guardar" Style="{StaticResource PrimaryToolbarButton}" Margin="0" Click="Save_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

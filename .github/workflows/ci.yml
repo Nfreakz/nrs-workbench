@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-build-and-smoke:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup Git identity for smoke tests
+        shell: pwsh
+        run: |
+          git config --global user.name "NRS Workbench CI"
+          git config --global user.email "nrs-workbench-ci@example.invalid"
+
+      - name: Restore
+        run: dotnet restore .\NRSWorkbench.sln
+
+      - name: Build
+        run: dotnet build .\NRSWorkbench.sln -c Release --no-restore
+
+      - name: Git safety smoke tests
+        run: dotnet run --project .\tests\NRS.Workbench.SmokeTests\NRS.Workbench.SmokeTests.csproj -c Release
+
+      - name: Public source audit
+        shell: pwsh
+        run: .\scripts\public-audit.ps1

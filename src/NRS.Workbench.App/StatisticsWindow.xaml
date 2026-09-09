@@ -1,0 +1,369 @@
+<Window x:Class="NRS.Workbench.App.StatisticsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="clr-namespace:NRS.Workbench.Core.Models;assembly=NRS.Workbench.Core"
+        Title="Estadísticas · NRS Workbench" Icon="/Assets/NRSWorkbench.ico"
+        Width="1440" Height="900" MinWidth="1060" MinHeight="720"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Window.Resources>
+        <Style x:Key="StatsMetricCard" TargetType="Border">
+            <Setter Property="Background" Value="#0E1B2A"/>
+            <Setter Property="BorderBrush" Value="#29425F"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="13,11"/>
+            <Setter Property="Margin" Value="0,0,9,0"/>
+            <Setter Property="MinHeight" Value="68"/>
+        </Style>
+        <Style x:Key="MetricLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style x:Key="MetricValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+        <Style x:Key="StatsCombo" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="#EAF3FD"/>
+            <Setter Property="Background" Value="#11243A"/>
+            <Setter Property="BorderBrush" Value="#2B4767"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="9,5"/>
+            <Setter Property="MinWidth" Value="150"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="198"/>
+            <RowDefinition Height="0.82*"/>
+            <RowDefinition Height="1.05*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Width="48" Height="48" CornerRadius="13" Background="#143A63" BorderBrush="#2F6FAF" BorderThickness="1">
+                    <TextBlock Text="&#xE9D2;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="#79BBFF"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel Margin="13,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="Estadísticas" FontSize="27" FontWeight="Bold"/>
+                    <TextBlock Text="Alcance e historial local de los self-hosted runners" Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,3,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Periodo" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ComboBox x:Name="PeriodCombo" Style="{StaticResource StatsCombo}"
+                          ItemsSource="{Binding PeriodOptions}" SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
+                          SelectionChanged="PeriodCombo_SelectionChanged"/>
+                <Button Style="{StaticResource ToolbarButton}" Command="{Binding RefreshCommand}" Margin="9,0,0,0">
+                    <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE72C;"/><TextBlock Text="Actualizar"/></StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- KPI cards -->
+        <UniformGrid Grid.Row="1" Columns="7" Margin="0,0,0,12">
+            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="JOBS LOCALES" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding TotalRuns}" Style="{StaticResource MetricValue}"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#217A4B"><StackPanel><TextBlock Text="OK" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SucceededRuns}" Style="{StaticResource MetricValue}" Foreground="#55E39A"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#8D3942"><StackPanel><TextBlock Text="FALLOS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding FailedRuns}" Style="{StaticResource MetricValue}" Foreground="#FF7A84"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#725B1A"><StackPanel><TextBlock Text="CANCELADAS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding CancelledRuns}" Style="{StaticResource MetricValue}" Foreground="#F5C451"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="SIN CLASIFICAR" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding UnknownRuns}" Style="{StaticResource MetricValue}" Foreground="#A8B5C4"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#2E689D"><StackPanel><TextBlock Text="EN CURSO" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding ActiveRuns}" Style="{StaticResource MetricValue}" Foreground="#67B3FF"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" Margin="0"><StackPanel><TextBlock Text="TASA DE ÉXITO" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SuccessRate}" Style="{StaticResource MetricValue}" Foreground="#55E39A"/></StackPanel></Border>
+        </UniformGrid>
+
+        <!-- Scope summary -->
+        <Border Grid.Row="2" Style="{StaticResource PanelCard}" Padding="13,9" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Tiempo acumulado: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding TotalDuration}" FontWeight="SemiBold"/>
+                    <TextBlock Text="   ·   Duración media: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding AverageDuration}" FontWeight="SemiBold"/>
+                    <TextBlock Text="   ·   Fiabilidad técnica: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding ReliabilityRate}" FontWeight="SemiBold" Foreground="#63E6A0" ToolTip="OK / (OK + fallos). Las cancelaciones se muestran aparte."/>
+                    <TextBlock Text="   ·   Cancelación: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding CancellationRate}" FontWeight="SemiBold" Foreground="#F5C451"/>
+                    <TextBlock Text="   ·   Runners con actividad: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding RunnersWithActivity}" FontWeight="SemiBold"/>
+                    <TextBlock Text="   ·   Último job: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding LastRun}" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding AuditText}" Foreground="#8EA7C0" FontSize="10.5" HorizontalAlignment="Right"/>
+                    <TextBlock Text="Conteo por job local · la tasa de éxito excluye resultados desconocidos" Foreground="#647C95" FontSize="9.5" HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Activity dashboard -->
+        <Grid Grid.Row="3" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.55*"/>
+                <ColumnDefinition Width="0.95*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,12,0">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <Border Grid.Row="0" Background="#0F1D2D" Padding="14,9">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Actividad · últimos 14 días" Style="{StaticResource SectionTitle}" FontSize="14"/>
+                                <TextBlock Text="Jobs locales procesados por día" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse Width="7" Height="7" Fill="#48A9FF" Margin="0,0,6,0"/>
+                                <TextBlock Text="actividad relativa" Foreground="#7892AC" FontSize="10"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding DailyActivity}" Margin="12,8,12,6">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="1"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="3,0" ToolTip="{Binding Tooltip}">
+                                    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                    <ProgressBar Grid.Row="0" Minimum="0" Maximum="100" Value="{Binding RelativeHeight, Mode=OneWay}" Orientation="Vertical"
+                                                 Width="18" HorizontalAlignment="Center" Foreground="#48A9FF" Background="#14283D" BorderThickness="0"/>
+                                    <TextBlock Grid.Row="1" Text="{Binding TotalRuns}" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                                    <TextBlock Grid.Row="2" Text="{Binding DayLabel}" Foreground="#7892AC" FontSize="9" HorizontalAlignment="Center" Margin="0,1,0,0"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource PanelCard}" ClipToBounds="True">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <Border Grid.Row="0" Background="#0F1D2D" Padding="14,9">
+                        <StackPanel>
+                            <TextBlock Text="Alcance del historial" Style="{StaticResource SectionTitle}" FontSize="14"/>
+                            <TextBlock Text="Cuánto trabajo local representa el periodo analizado" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Grid Grid.Row="1" Margin="14,10">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="*"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Grid.Column="0">
+                            <TextBlock Text="HOY" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{Binding RunsToday}" FontSize="19" FontWeight="Bold" Foreground="#67B3FF" Margin="0,3,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="1">
+                            <TextBlock Text="ÚLTIMAS 24 H" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{Binding RunsLast24Hours}" FontSize="19" FontWeight="Bold" Margin="0,3,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="2">
+                            <TextBlock Text="JOBS / DÍA" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{Binding JobsPerDay}" FontSize="19" FontWeight="Bold" Margin="0,3,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,8,0,0">
+                            <TextBlock Text="COBERTURA" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{Binding Coverage}" FontSize="13" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,8,0,0">
+                            <TextBlock Text="PRIMER JOB" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{Binding FirstRun}" FontSize="11" FontWeight="SemiBold" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,8,0,0">
+                            <TextBlock Text="PICO" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{Binding PeakDay}" FontSize="11" FontWeight="SemiBold" Foreground="#F5C451" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,8,0,0">
+                            <TextBlock Text="FIABILIDAD" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{Binding ReliabilityRate}" FontSize="13" FontWeight="SemiBold" Foreground="#63E6A0" Margin="0,3,0,0"
+                                       ToolTip="OK / (OK + fallos). Las cancelaciones no penalizan esta métrica."/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,8,0,0">
+                            <TextBlock Text="TEND. 24 H" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{Binding Trend24h}" FontSize="12" FontWeight="SemiBold" Margin="0,3,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#8EA7C0"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Trend24hKind}" Value="Up"><Setter Property="Foreground" Value="#63E6A0"/></DataTrigger>
+                                            <DataTrigger Binding="{Binding Trend24hKind}" Value="Down"><Setter Property="Foreground" Value="#FF808B"/></DataTrigger>
+                                            <DataTrigger Binding="{Binding Trend24hKind}" Value="Flat"><Setter Property="Foreground" Value="#67B3FF"/></DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,8,0,0">
+                            <TextBlock Text="MÁS CARGA" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{Binding MostActiveRunner}" FontSize="11" FontWeight="SemiBold" Foreground="#67B3FF" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Per runner -->
+        <Border Grid.Row="4" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,12">
+            <Grid>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <Border Grid.Row="0" Background="#0F1D2D" Padding="14,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="Resumen por runner" Style="{StaticResource SectionTitle}" FontSize="14"/>
+                        <TextBlock Grid.Column="1" Text="Qué ha trabajado cada runner y con qué resultado" Foreground="{StaticResource MutedBrush}" FontSize="10.5" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+                <DataGrid Grid.Row="1" ItemsSource="{Binding ByRunner}" RowHeight="39" ColumnHeaderHeight="34" AlternationCount="2" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="RUNNER" Binding="{Binding RunnerAlias}" Width="105"/>
+                        <DataGridTextColumn Header="REPOSITORIO" Binding="{Binding GitHubTarget}" Width="1.35*" MinWidth="200"/>
+                        <DataGridTextColumn Header="JOBS" Binding="{Binding TotalRuns}" Width="60"/>
+                        <DataGridTextColumn Header="OK" Binding="{Binding SucceededRuns}" Width="52"/>
+                        <DataGridTextColumn Header="FALLOS" Binding="{Binding FailedRuns}" Width="62"/>
+                        <DataGridTextColumn Header="CANCEL." Binding="{Binding CancelledRuns}" Width="68"/>
+                        <DataGridTextColumn Header="SIN CLAS." Binding="{Binding UnknownRuns}" Width="72"/>
+                        <DataGridTemplateColumn Header="AHORA" Width="66">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ActiveDisplay}" FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock"><Setter Property="Foreground" Value="#657B91"/><Style.Triggers><DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="Foreground" Value="#F5C451"/></DataTrigger></Style.Triggers></Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="FIAB." Width="76">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ReliabilityDisplay}" FontWeight="SemiBold" ToolTip="{Binding ReliabilityLabel}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#8EA7C0"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ReliabilityKind}" Value="High"><Setter Property="Foreground" Value="#63E6A0"/></DataTrigger>
+                                                    <DataTrigger Binding="{Binding ReliabilityKind}" Value="Medium"><Setter Property="Foreground" Value="#F5C451"/></DataTrigger>
+                                                    <DataTrigger Binding="{Binding ReliabilityKind}" Value="Low"><Setter Property="Foreground" Value="#FF808B"/></DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="TEND. 24H" Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Trend24hDisplay}" FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#7892AC"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Trend24hKind}" Value="Up"><Setter Property="Foreground" Value="#63E6A0"/></DataTrigger>
+                                                    <DataTrigger Binding="{Binding Trend24hKind}" Value="Down"><Setter Property="Foreground" Value="#FF808B"/></DataTrigger>
+                                                    <DataTrigger Binding="{Binding Trend24hKind}" Value="Flat"><Setter Property="Foreground" Value="#67B3FF"/></DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="CARGA" Binding="{Binding WorkloadShareDisplay}" Width="70"/>
+                        <DataGridTextColumn Header="TIEMPO" Binding="{Binding TotalDurationDisplay}" Width="96"/>
+                        <DataGridTextColumn Header="MEDIA" Binding="{Binding AverageDurationDisplay}" Width="82"/>
+                        <DataGridTextColumn Header="ÚLTIMO JOB" Binding="{Binding LastRunDisplay}" Width="126"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Recent history -->
+        <Border Grid.Row="5" Style="{StaticResource PanelCard}" ClipToBounds="True">
+            <Grid>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <Border Grid.Row="0" Background="#0F1D2D" Padding="14,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="Historial de jobs" Style="{StaticResource SectionTitle}" FontSize="14"/>
+                        <TextBlock Grid.Column="1" Text="Hasta 500 jobs del periodo seleccionado" Foreground="{StaticResource MutedBrush}" FontSize="10.5" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+                <DataGrid Grid.Row="1" ItemsSource="{Binding RecentRuns}" RowHeight="38" ColumnHeaderHeight="34" AlternationCount="2" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="FECHA" Binding="{Binding StartedAtDisplay}" Width="145"/>
+                        <DataGridTextColumn Header="RUNNER" Binding="{Binding RunnerAlias}" Width="105"/>
+                        <DataGridTextColumn Header="REPOSITORIO" Binding="{Binding GitHubTarget}" Width="1.1*" MinWidth="210"/>
+                        <DataGridTextColumn Header="JOB" Binding="{Binding JobDisplay}" Width="1.4*" MinWidth="230"/>
+                        <DataGridTemplateColumn Header="RESULTADO" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="OutcomeBadge" Background="#2A3442" BorderBrush="#536273" BorderThickness="1" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
+                                        <TextBlock x:Name="OutcomeText" Text="{Binding OutcomeDisplay}" FontSize="9.5" FontWeight="Bold" Foreground="#D8E1EA"/>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Succeeded}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#123A27"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#258653"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#63E6A0"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Failed}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#451E25"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#9C404B"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#FF808B"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Cancelled}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#463A17"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#9B7A26"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#F5C451"/></DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="DURACIÓN" Binding="{Binding DurationDisplay}" Width="105"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="6" Margin="2,11,2,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="8" Height="8" Fill="#3DDC84" Margin="0,1,7,0"/>
+                    <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}"/>
+                </StackPanel>
+                <ProgressBar Minimum="0" Maximum="100" Value="{Binding ScanProgress, Mode=OneWay}" Height="4" Width="380"
+                             HorizontalAlignment="Left" Margin="15,7,0,0" Foreground="#48A9FF" Background="#14283D"
+                             BorderThickness="0">
+                    <ProgressBar.Style>
+                        <Style TargetType="ProgressBar">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ProgressBar.Style>
+                </ProgressBar>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                <TextBlock Text="Fuente: _diag/Worker_*.log · deduplicación conservadora solo con identidad estable"
+                           Foreground="#647C95" FontSize="10.5" VerticalAlignment="Center"/>
+                <TextBlock Text="  ·  " Foreground="#3D5873" VerticalAlignment="Center"/>
+                <TextBlock FontFamily="Segoe Script" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="Acerca de · Neo RS">
+                    <Hyperlink Click="About_Click" Foreground="#5EA7E8" TextDecorations="{x:Null}">Neo RS</Hyperlink>
+                </TextBlock>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

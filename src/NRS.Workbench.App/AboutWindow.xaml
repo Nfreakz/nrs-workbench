@@ -1,0 +1,67 @@
+<Window x:Class="NRS.Workbench.App.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Acerca de · NRS Workbench" Icon="/Assets/NRSWorkbench.ico" Width="650" Height="520" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
+    <Grid Background="{StaticResource BgBrush}" Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+            <Border Width="64" Height="64" CornerRadius="17" Background="#071725" BorderBrush="#2F6FAF" BorderThickness="1" ClipToBounds="True">
+                <Image Source="/Assets/NRSWorkbench.png" Stretch="Uniform" Margin="3"/>
+            </Border>
+            <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="NRS Workbench" FontSize="28" FontWeight="Bold"/>
+                <TextBlock x:Name="VersionText" Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="1,4,0,0"/>
+            </StackPanel>
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource PanelCard}" Padding="18" Margin="0,22,0,14">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Centro local de control para runners y repositorios Git" FontSize="15" FontWeight="SemiBold"/>
+                    <TextBlock Text="Control local, logs, progreso estimado y estadísticas auditadas sin telemetría ni servicios externos obligatorios."
+                               Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,7,20,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="Neo RS" FontFamily="Segoe Script" FontSize="22" FontWeight="SemiBold" Foreground="#5EA7E8" HorizontalAlignment="Right"/>
+                    <TextBlock Text="creado por" Foreground="#6E879F" FontSize="10" HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Style="{StaticResource PanelCard}" Padding="18">
+            <Grid>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Información" Style="{StaticResource SectionTitle}"/>
+                <Grid Grid.Row="1" Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Licencia" Style="{StaticResource MutedLabel}"/><TextBlock Grid.Row="0" Grid.Column="1" Text="PolyForm Noncommercial 1.0.0"/>
+                    <TextBlock Grid.Row="1" Text="Runtime" Style="{StaticResource MutedLabel}"/><TextBlock x:Name="RuntimeText" Grid.Row="1" Grid.Column="1"/>
+                    <TextBlock Grid.Row="2" Text="Sistema" Style="{StaticResource MutedLabel}"/><TextBlock x:Name="SystemText" Grid.Row="2" Grid.Column="1" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Row="3" Text="Datos locales" Style="{StaticResource MutedLabel}"/><TextBlock x:Name="DataPathText" Grid.Row="3" Grid.Column="1" TextTrimming="CharacterEllipsis"/>
+                </Grid>
+                <Separator Grid.Row="2" Margin="0,15" Background="#263D5A"/>
+                <TextBlock Grid.Row="3" TextWrapping="Wrap" Foreground="{StaticResource MutedBrush}">
+                    Este proyecto es independiente y no está afiliado ni respaldado por GitHub, Inc. GitHub y GitHub Actions son marcas de GitHub, Inc.
+                </TextBlock>
+                <TextBlock Grid.Row="4" Text="Source-available · Uso no comercial. El uso comercial requiere una licencia separada de Neo RS. No almacena tokens de GitHub ni lee credenciales del runner."
+                           Foreground="#6F879F" TextWrapping="Wrap" VerticalAlignment="Bottom" Margin="0,14,0,0"/>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button Content="Abrir datos" Style="{StaticResource ToolbarButton}" Click="OpenData_Click"/>
+            <Button Content="Copiar información" Style="{StaticResource ToolbarButton}" Click="CopyInfo_Click"/>
+            <Button Content="Cerrar" Style="{StaticResource PrimaryToolbarButton}" Margin="0" Click="Close_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

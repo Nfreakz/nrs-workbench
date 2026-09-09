@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AssemblyName>NRSWorkbench</AssemblyName>
+    <RootNamespace>NRS.Workbench.App</RootNamespace>
+    <ApplicationIcon>Assets\NRSWorkbench.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets\NRSWorkbench.ico" />
+    <Resource Include="Assets\NRSWorkbench.png" />
+    <Resource Include="Assets\NRSWorkbenchFull.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NRS.Workbench.Core\NRS.Workbench.Core.csproj" />
+  </ItemGroup>
+</Project>
