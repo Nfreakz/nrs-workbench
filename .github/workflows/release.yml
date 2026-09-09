@@ -8,6 +8,11 @@ on:
 permissions:
   contents: write
 
+defaults:
+  run:
+    # Local runner policy: use built-in Windows PowerShell, not pwsh/PowerShell 7.
+    shell: powershell
+
 jobs:
   release-win-x64:
     # Project policy: releases must run only on a repository-scoped local self-hosted Windows x64 runner.
@@ -15,14 +20,12 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Verify local release toolchain
-        shell: pwsh
         run: |
           dotnet --info
           git --version
-          gh --version
 
       - name: Build
         run: dotnet build .\NRSWorkbench.sln -c Release
@@ -31,22 +34,42 @@ jobs:
         run: dotnet run --project .\tests\NRS.Workbench.SmokeTests\NRS.Workbench.SmokeTests.csproj -c Release
 
       - name: Public source audit
-        shell: pwsh
         run: .\scripts\public-audit.ps1
 
       - name: Publish portable win-x64
-        shell: pwsh
         run: .\scripts\publish-win-x64.ps1
 
       - name: Package
-        shell: pwsh
         run: |
           $name = "NRSWorkbench-$env:GITHUB_REF_NAME-win-x64.zip"
           Compress-Archive -Path .\dist\win-x64\* -DestinationPath $name -Force
-          "PACKAGE=$name" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "PACKAGE=$name" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
-      - name: Create GitHub release
-        shell: pwsh
+      - name: Create GitHub prerelease and upload package
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release create "$env:GITHUB_REF_NAME" "$env:PACKAGE" --generate-notes --title "NRS Workbench $env:GITHUB_REF_NAME"
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          $headers = @{
+            Authorization = "Bearer $env:GITHUB_TOKEN"
+            Accept = 'application/vnd.github+json'
+            'X-GitHub-Api-Version' = '2022-11-28'
+          }
+          $body = @{
+            tag_name = $env:GITHUB_REF_NAME
+            name = "NRS Workbench $env:GITHUB_REF_NAME"
+            generate_release_notes = $true
+            prerelease = $true
+          } | ConvertTo-Json
+          $release = Invoke-RestMethod -Method Post `
+            -Uri "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases" `
+            -Headers $headers `
+            -ContentType 'application/json' `
+            -Body $body
+          $uploadUrl = $release.upload_url -replace '\{\?name,label\}$', ''
+          $assetName = [System.Uri]::EscapeDataString($env:PACKAGE)
+          Invoke-RestMethod -Method Post `
+            -Uri "$uploadUrl?name=$assetName" `
+            -Headers $headers `
+            -ContentType 'application/zip' `
+            -InFile $env:PACKAGE | Out-Null
