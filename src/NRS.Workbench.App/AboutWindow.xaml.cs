@@ -8,6 +8,7 @@ namespace NRS.Workbench.App;
 
 public partial class AboutWindow : Window
 {
+    private const string SupportUrl = "https://buymeacoffee.com/neors";
     private readonly SettingsService _settings = new();
 
     public AboutWindow()
@@ -20,6 +21,19 @@ public partial class AboutWindow : Window
         RuntimeText.Text = RuntimeInformation.FrameworkDescription;
         SystemText.Text = RuntimeInformation.OSDescription;
         DataPathText.Text = _settings.SettingsDirectory;
+    }
+
+    private void Support_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(SupportUrl) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Could not open support page", ex);
+            MessageBox.Show("No se pudo abrir la página de apoyo.", "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private void OpenData_Click(object sender, RoutedEventArgs e)
