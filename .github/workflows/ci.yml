@@ -21,6 +21,19 @@ jobs:
     runs-on: [self-hosted, Windows, X64]
     timeout-minutes: 20
     steps:
+      - name: Ensure local Git is on PATH
+        run: |
+          if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+            $gitCmd = 'C:\Program Files\Git\cmd'
+            $gitExe = Join-Path $gitCmd 'git.exe'
+            if (-not (Test-Path $gitExe)) {
+              throw "Git is required but was not found in PATH or at $gitExe"
+            }
+            $gitCmd | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            $env:PATH = "$gitCmd;$env:PATH"
+          }
+          git --version
+
       - name: Checkout
         uses: actions/checkout@v5
 
