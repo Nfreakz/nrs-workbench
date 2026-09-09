@@ -9,6 +9,8 @@ public sealed class StatisticsViewModel : ObservableObject
 {
     private readonly IRunnerStatisticsService _statistics;
     private readonly Func<IReadOnlyList<RunnerInfo>> _runnersProvider;
+    private readonly IGitService _git;
+    private readonly SettingsService _settings;
     private StatisticsPeriodOption _selectedPeriod;
     private bool _isLoading;
     private string _statusText = "Preparando estadísticas...";
@@ -38,9 +40,22 @@ public sealed class StatisticsViewModel : ObservableObject
     private string _scanDetail = string.Empty;
     private string _auditText = "Worker logs: — · Jobs únicos: — · Duplicados: — · Con ID: —";
 
+    private int _repositoryTotalCount;
+    private int _repositoryCleanCount;
+    private int _repositoryChangesCount;
+    private int _repositoryAheadCount;
+    private int _repositoryBehindCount;
+    private int _repositoryAttentionCount;
+    private string _repositoryCleanRate = "—";
+    private string _repositorySyncRate = "—";
+    private string _repositoryLastCommit = "—";
+    private string _repositoryMostChanged = "—";
+    private string _repositoryStatusText = "Preparando inventario Git local...";
+
     public ObservableCollection<RunnerStatisticsRow> ByRunner { get; } = [];
     public ObservableCollection<JobRunRecord> RecentRuns { get; } = [];
     public ObservableCollection<DailyActivityPoint> DailyActivity { get; } = [];
+    public ObservableCollection<GitRepositoryInfo> RepositoryRows { get; } = [];
 
     public IReadOnlyList<StatisticsPeriodOption> PeriodOptions { get; } =
     [
@@ -84,12 +99,30 @@ public sealed class StatisticsViewModel : ObservableObject
     public string ScanDetail { get => _scanDetail; private set => SetProperty(ref _scanDetail, value); }
     public string AuditText { get => _auditText; private set => SetProperty(ref _auditText, value); }
 
+    public int RepositoryTotalCount { get => _repositoryTotalCount; private set => SetProperty(ref _repositoryTotalCount, value); }
+    public int RepositoryCleanCount { get => _repositoryCleanCount; private set => SetProperty(ref _repositoryCleanCount, value); }
+    public int RepositoryChangesCount { get => _repositoryChangesCount; private set => SetProperty(ref _repositoryChangesCount, value); }
+    public int RepositoryAheadCount { get => _repositoryAheadCount; private set => SetProperty(ref _repositoryAheadCount, value); }
+    public int RepositoryBehindCount { get => _repositoryBehindCount; private set => SetProperty(ref _repositoryBehindCount, value); }
+    public int RepositoryAttentionCount { get => _repositoryAttentionCount; private set => SetProperty(ref _repositoryAttentionCount, value); }
+    public string RepositoryCleanRate { get => _repositoryCleanRate; private set => SetProperty(ref _repositoryCleanRate, value); }
+    public string RepositorySyncRate { get => _repositorySyncRate; private set => SetProperty(ref _repositorySyncRate, value); }
+    public string RepositoryLastCommit { get => _repositoryLastCommit; private set => SetProperty(ref _repositoryLastCommit, value); }
+    public string RepositoryMostChanged { get => _repositoryMostChanged; private set => SetProperty(ref _repositoryMostChanged, value); }
+    public string RepositoryStatusText { get => _repositoryStatusText; private set => SetProperty(ref _repositoryStatusText, value); }
+
     public AsyncRelayCommand RefreshCommand { get; }
 
-    public StatisticsViewModel(IRunnerStatisticsService statistics, Func<IReadOnlyList<RunnerInfo>> runnersProvider)
+    public StatisticsViewModel(
+        IRunnerStatisticsService statistics,
+        Func<IReadOnlyList<RunnerInfo>> runnersProvider,
+        IGitService git,
+        SettingsService settings)
     {
         _statistics = statistics;
         _runnersProvider = runnersProvider;
+        _git = git;
+        _settings = settings;
         _selectedPeriod = PeriodOptions[0];
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
     }
@@ -101,6 +134,8 @@ public sealed class StatisticsViewModel : ObservableObject
         ScanProgress = 0;
         ScanDetail = "Preparando historial local...";
         StatusText = "Analizando historial local de Worker logs...";
+        RepositoryStatusText = "Actualizando inventario Git local...";
+
         try
         {
             var runners = _runnersProvider();
@@ -109,6 +144,10 @@ public sealed class StatisticsViewModel : ObservableObject
             // historical scan is still reading files.
             ActiveRuns = runners.Count(x => x.State == RunnerState.Busy);
             RunnersWithActivity = ActiveRuns;
+
+            // Repository status is an independent current-state snapshot. It does
+            // not inherit the runner-history period filter and runs in parallel.
+            var repositoryRefresh = RefreshRepositorySnapshotAsync();
 
             var progress = new Progress<StatisticsScanProgress>(value =>
             {
@@ -159,6 +198,8 @@ public sealed class StatisticsViewModel : ObservableObject
             RecentRuns.Clear();
             foreach (var run in snapshot.RecentRuns) RecentRuns.Add(run);
 
+            await repositoryRefresh;
+
             ScanProgress = 100;
             ScanDetail = snapshot.TotalRuns == 0
                 ? "Historial analizado."
@@ -178,6 +219,104 @@ public sealed class StatisticsViewModel : ObservableObject
         {
             IsLoading = false;
         }
+    }
+
+    private async Task RefreshRepositorySnapshotAsync()
+    {
+        try
+        {
+            var paths = _settings.Load().RepositoryPaths
+                .Where(Directory.Exists)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (paths.Count == 0)
+            {
+                ApplyRepositorySnapshot([]);
+                RepositoryStatusText = "Sin repositorios configurados.";
+                return;
+            }
+
+            using var gate = new SemaphoreSlim(4, 4);
+            var tasks = paths.Select(async path =>
+            {
+                await gate.WaitAsync();
+                try
+                {
+                    return await _git.InspectAsync(path);
+                }
+                catch (Exception ex)
+                {
+                    AppLogger.Error($"Could not inspect repository '{path}' for statistics", ex);
+                    return new GitRepositoryInfo
+                    {
+                        Name = new DirectoryInfo(path).Name,
+                        Path = path,
+                        State = GitRepositoryState.Error,
+                        ErrorMessage = ex.Message
+                    };
+                }
+                finally
+                {
+                    gate.Release();
+                }
+            }).ToArray();
+
+            var rows = (await Task.WhenAll(tasks))
+                .OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            ApplyRepositorySnapshot(rows);
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Repository statistics refresh failed", ex);
+            RepositoryStatusText = "No se pudo actualizar el estado de los repositorios.";
+        }
+    }
+
+    private void ApplyRepositorySnapshot(IReadOnlyList<GitRepositoryInfo> rows)
+    {
+        RepositoryRows.Clear();
+        foreach (var row in rows) RepositoryRows.Add(row);
+
+        RepositoryTotalCount = rows.Count;
+        RepositoryCleanCount = rows.Count(x => x.State == GitRepositoryState.Clean);
+        RepositoryChangesCount = rows.Count(x => x.IsDirty);
+        RepositoryAheadCount = rows.Count(x => x.Ahead > 0);
+        RepositoryBehindCount = rows.Count(x => x.Behind > 0);
+        RepositoryAttentionCount = rows.Count(x => x.State is GitRepositoryState.Diverged or GitRepositoryState.Conflict or GitRepositoryState.Error);
+
+        RepositoryCleanRate = rows.Count == 0
+            ? "—"
+            : $"{RepositoryCleanCount * 100d / rows.Count:0.#}%";
+
+        var withRemote = rows.Where(x => x.HasRemote && x.State != GitRepositoryState.Error).ToList();
+        var synchronized = withRemote.Count(x => x.Ahead == 0 && x.Behind == 0 && x.ConflictCount == 0);
+        RepositorySyncRate = withRemote.Count == 0
+            ? "—"
+            : $"{synchronized * 100d / withRemote.Count:0.#}%";
+
+        var latest = rows
+            .Where(x => x.LastCommitDate is not null)
+            .OrderByDescending(x => x.LastCommitDate)
+            .FirstOrDefault();
+        RepositoryLastCommit = latest?.LastCommitDate is null
+            ? "—"
+            : $"{latest.Name} · {latest.LastCommitDate.Value.LocalDateTime:dd/MM HH:mm}";
+
+        var mostChanged = rows
+            .Where(x => x.ChangeCount > 0)
+            .OrderByDescending(x => x.ChangeCount)
+            .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault();
+        RepositoryMostChanged = mostChanged is null
+            ? "—"
+            : $"{mostChanged.Name} · {mostChanged.ChangeCount} cambio{(mostChanged.ChangeCount == 1 ? string.Empty : "s")}";
+
+        RepositoryStatusText = rows.Count == 0
+            ? "Sin repositorios configurados."
+            : $"{rows.Count} repos · {RepositoryCleanCount} clean · {RepositoryChangesCount} con cambios · {RepositoryAttentionCount} con atención";
     }
 }
 

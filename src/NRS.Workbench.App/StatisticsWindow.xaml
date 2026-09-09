@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:models="clr-namespace:NRS.Workbench.Core.Models;assembly=NRS.Workbench.Core"
         Title="Estadísticas · NRS Workbench" Icon="/Assets/NRSWorkbench.ico"
-        Width="1440" Height="900" MinWidth="1060" MinHeight="720"
+        Width="1440" Height="980" MinWidth="1060" MinHeight="760"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}"
         UseLayoutRounding="True" SnapsToDevicePixels="True">
@@ -17,6 +17,15 @@
             <Setter Property="Margin" Value="0,0,9,0"/>
             <Setter Property="MinHeight" Value="68"/>
         </Style>
+        <Style x:Key="RepoMetricCard" TargetType="Border">
+            <Setter Property="Background" Value="#0C1A29"/>
+            <Setter Property="BorderBrush" Value="#29425F"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="9"/>
+            <Setter Property="Padding" Value="11,8"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="MinHeight" Value="54"/>
+        </Style>
         <Style x:Key="MetricLabel" TargetType="TextBlock">
             <Setter Property="FontSize" Value="9"/>
             <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
@@ -27,13 +36,125 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin" Value="0,4,0,0"/>
         </Style>
+        <Style x:Key="RepoMetricValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,3,0,0"/>
+        </Style>
+
+        <!-- Fully templated ComboBox so Windows' light native chrome never leaks through. -->
+        <Style x:Key="StatsComboItem" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="#EAF3FD"/>
+            <Setter Property="Background" Value="#0F1D2D"/>
+            <Setter Property="Padding" Value="11,7"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="ItemChrome"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemChrome" Property="Background" Value="#163451"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemChrome" Property="Background" Value="#1B4B76"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="StatsCombo" TargetType="ComboBox">
             <Setter Property="Foreground" Value="#EAF3FD"/>
             <Setter Property="Background" Value="#11243A"/>
             <Setter Property="BorderBrush" Value="#2B4767"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="9,5"/>
             <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="Padding" Value="11,6,34,6"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource StatsComboItem}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="DropDownToggle"
+                                          Focusable="False"
+                                          ClickMode="Press"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="ComboChrome"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="8">
+                                            <Grid>
+                                                <TextBlock Text="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"
+                                                           Foreground="#EAF3FD"
+                                                           Margin="11,0,34,0"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           IsHitTestVisible="False"/>
+                                                <Border Width="30" HorizontalAlignment="Right" Background="#0D1C2D" CornerRadius="0,7,7,0"
+                                                        IsHitTestVisible="False">
+                                                    <TextBlock Text="⌄" Foreground="#8FB3D8" FontSize="18"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                               Margin="0,-4,0,0"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ComboChrome" Property="Background" Value="#163451"/>
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4B79A6"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4F91CB"/>
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter TargetName="ComboChrome" Property="Opacity" Value="0.45"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   PopupAnimation="Fade">
+                                <Border Background="#0F1D2D"
+                                        BorderBrush="#31577D"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Margin="0,4,0,0"
+                                        MinWidth="150">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled"
+                                                  MaxHeight="280"
+                                                  CanContentScroll="True">
+                                        <StackPanel IsItemsHost="True"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
@@ -42,9 +163,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="198"/>
-            <RowDefinition Height="0.82*"/>
-            <RowDefinition Height="1.05*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="190"/>
+            <RowDefinition Height="0.78*"/>
+            <RowDefinition Height="0.95*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -58,12 +180,13 @@
                 </Border>
                 <StackPanel Margin="13,0,0,0" VerticalAlignment="Center">
                     <TextBlock Text="Estadísticas" FontSize="27" FontWeight="Bold"/>
-                    <TextBlock Text="Alcance e historial local de los self-hosted runners" Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,3,0,0"/>
+                    <TextBlock Text="Runners e inventario Git local · historial fiable y estado actual"
+                               Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,3,0,0"/>
                 </StackPanel>
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="Periodo" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBlock Text="Periodo runners" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
                 <ComboBox x:Name="PeriodCombo" Style="{StaticResource StatsCombo}"
                           ItemsSource="{Binding PeriodOptions}" SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
                           SelectionChanged="PeriodCombo_SelectionChanged"/>
@@ -73,7 +196,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- KPI cards -->
+        <!-- Runner KPI cards -->
         <UniformGrid Grid.Row="1" Columns="7" Margin="0,0,0,12">
             <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="JOBS LOCALES" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding TotalRuns}" Style="{StaticResource MetricValue}"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#217A4B"><StackPanel><TextBlock Text="OK" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SucceededRuns}" Style="{StaticResource MetricValue}" Foreground="#55E39A"/></StackPanel></Border>
@@ -84,8 +207,59 @@
             <Border Style="{StaticResource StatsMetricCard}" Margin="0"><StackPanel><TextBlock Text="TASA DE ÉXITO" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SuccessRate}" Style="{StaticResource MetricValue}" Foreground="#55E39A"/></StackPanel></Border>
         </UniformGrid>
 
-        <!-- Scope summary -->
-        <Border Grid.Row="2" Style="{StaticResource PanelCard}" Padding="13,9" Margin="0,0,0,12">
+        <!-- Repository snapshot -->
+        <Border Grid.Row="2" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,12">
+            <Grid>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <Border Grid.Row="0" Background="#0F1D2D" Padding="14,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Repositorios · estado actual" Style="{StaticResource SectionTitle}" FontSize="13.5"/>
+                            <TextBlock Text="  ·  no depende del filtro de periodo" Foreground="#647C95" FontSize="10.5" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding RepositoryStatusText}" Foreground="#7892AC" FontSize="10.5" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <UniformGrid Grid.Row="1" Columns="6" Margin="12,10,12,7">
+                    <Border Style="{StaticResource RepoMetricCard}"><StackPanel><TextBlock Text="REPOS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryTotalCount}" Style="{StaticResource RepoMetricValue}" Foreground="#67B3FF"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#217A4B"><StackPanel><TextBlock Text="CLEAN" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryCleanCount}" Style="{StaticResource RepoMetricValue}" Foreground="#55E39A"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#725B1A"><StackPanel><TextBlock Text="CON CAMBIOS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryChangesCount}" Style="{StaticResource RepoMetricValue}" Foreground="#F5C451"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#2E689D"><StackPanel><TextBlock Text="AHEAD" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAheadCount}" Style="{StaticResource RepoMetricValue}" Foreground="#67B3FF"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#3C5870"><StackPanel><TextBlock Text="BEHIND" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryBehindCount}" Style="{StaticResource RepoMetricValue}" Foreground="#A9C6E0"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" Margin="0" BorderBrush="#8D3942"><StackPanel><TextBlock Text="ATENCIÓN" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAttentionCount}" Style="{StaticResource RepoMetricValue}" Foreground="#FF7A84"/></StackPanel></Border>
+                </UniformGrid>
+
+                <Grid Grid.Row="2" Margin="14,0,14,9">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.75*"/>
+                        <ColumnDefinition Width="0.9*"/>
+                        <ColumnDefinition Width="1.35*"/>
+                        <ColumnDefinition Width="1.35*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Text="Limpios: " Foreground="#647C95" FontSize="10.5"/>
+                        <TextBlock Text="{Binding RepositoryCleanRate}" Foreground="#63E6A0" FontSize="10.5" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <TextBlock Text="Sincronizados: " Foreground="#647C95" FontSize="10.5"/>
+                        <TextBlock Text="{Binding RepositorySyncRate}" Foreground="#67B3FF" FontSize="10.5" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <TextBlock Text="Último commit: " Foreground="#647C95" FontSize="10.5"/>
+                        <TextBlock Text="{Binding RepositoryLastCommit}" Foreground="#AFC3D8" FontSize="10.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                        <TextBlock Text="Más cambios: " Foreground="#647C95" FontSize="10.5"/>
+                        <TextBlock Text="{Binding RepositoryMostChanged}" Foreground="#F5C451" FontSize="10.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Runner scope summary -->
+        <Border Grid.Row="3" Style="{StaticResource PanelCard}" Padding="13,9" Margin="0,0,0,12">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal">
@@ -110,7 +284,7 @@
         </Border>
 
         <!-- Activity dashboard -->
-        <Grid Grid.Row="3" Margin="0,0,0,12">
+        <Grid Grid.Row="4" Margin="0,0,0,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.55*"/>
                 <ColumnDefinition Width="0.95*"/>
@@ -134,9 +308,7 @@
                     </Border>
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding DailyActivity}" Margin="12,8,12,6">
                         <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Rows="1"/>
-                            </ItemsPanelTemplate>
+                            <ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -222,7 +394,7 @@
         </Grid>
 
         <!-- Per runner -->
-        <Border Grid.Row="4" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,12">
+        <Border Grid.Row="5" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,12">
             <Grid>
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                 <Border Grid.Row="0" Background="#0F1D2D" Padding="14,10">
@@ -232,7 +404,8 @@
                         <TextBlock Grid.Column="1" Text="Qué ha trabajado cada runner y con qué resultado" Foreground="{StaticResource MutedBrush}" FontSize="10.5" VerticalAlignment="Center"/>
                     </Grid>
                 </Border>
-                <DataGrid Grid.Row="1" ItemsSource="{Binding ByRunner}" RowHeight="39" ColumnHeaderHeight="34" AlternationCount="2" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding ByRunner}" RowHeight="39" ColumnHeaderHeight="34" AlternationCount="2"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="RUNNER" Binding="{Binding RunnerAlias}" Width="105"/>
                         <DataGridTextColumn Header="REPOSITORIO" Binding="{Binding GitHubTarget}" Width="1.35*" MinWidth="200"/>
@@ -298,7 +471,7 @@
         </Border>
 
         <!-- Recent history -->
-        <Border Grid.Row="5" Style="{StaticResource PanelCard}" ClipToBounds="True">
+        <Border Grid.Row="6" Style="{StaticResource PanelCard}" ClipToBounds="True">
             <Grid>
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                 <Border Grid.Row="0" Background="#0F1D2D" Padding="14,10">
@@ -308,7 +481,8 @@
                         <TextBlock Grid.Column="1" Text="Hasta 500 jobs del periodo seleccionado" Foreground="{StaticResource MutedBrush}" FontSize="10.5" VerticalAlignment="Center"/>
                     </Grid>
                 </Border>
-                <DataGrid Grid.Row="1" ItemsSource="{Binding RecentRuns}" RowHeight="38" ColumnHeaderHeight="34" AlternationCount="2" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding RecentRuns}" RowHeight="38" ColumnHeaderHeight="34" AlternationCount="2"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="FECHA" Binding="{Binding StartedAtDisplay}" Width="145"/>
                         <DataGridTextColumn Header="RUNNER" Binding="{Binding RunnerAlias}" Width="105"/>
@@ -334,7 +508,7 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Row="6" Margin="2,11,2,0">
+        <Grid Grid.Row="7" Margin="2,11,2,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
@@ -348,16 +522,14 @@
                         <Style TargetType="ProgressBar">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsLoading}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ProgressBar.Style>
                 </ProgressBar>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
-                <TextBlock Text="Fuente: _diag/Worker_*.log · deduplicación conservadora solo con identidad estable"
+                <TextBlock Text="Runners: _diag/Worker_*.log · repos: estado Git local"
                            Foreground="#647C95" FontSize="10.5" VerticalAlignment="Center"/>
                 <TextBlock Text="  ·  " Foreground="#3D5873" VerticalAlignment="Center"/>
                 <TextBlock FontFamily="Segoe Script" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="Acerca de · Neo RS">

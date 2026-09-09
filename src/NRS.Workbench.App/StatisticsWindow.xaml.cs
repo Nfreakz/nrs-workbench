@@ -20,8 +20,11 @@ public partial class StatisticsWindow : Window
             WindowThemeService.ApplyDarkTitleBar(this);
             FitToWorkArea();
         };
-        _viewModel = new StatisticsViewModel(statistics, runnersProvider);
+
+        var settings = new SettingsService();
+        _viewModel = new StatisticsViewModel(statistics, runnersProvider, new GitService(), settings);
         DataContext = _viewModel;
+
         Loaded += async (_, _) =>
         {
             _loaded = true;
