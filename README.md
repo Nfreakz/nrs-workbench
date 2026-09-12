@@ -6,11 +6,11 @@
 
 **Local developer control center for Git repositories and GitHub Actions self-hosted runners on Windows.**
 
-> **Status:** v0.15.2 is the current public-preview development candidate. It keeps the audited runner/repository safety baseline, polishes the dark WPF controls and expands Statistics with a current local Git repository snapshot.
+> **Status:** v0.16.0 is the current public-preview development candidate. It adds portable configuration transfer between PCs while keeping the audited runner/repository safety baseline and the current local Git repository snapshot in Statistics.
 
 ## Public preview readiness
 
-The public-preview gate combines a dependency-free Git smoke-test executable, source audit, Windows CI, tag-driven release automation, community templates, privacy/testing/architecture documentation and repository hardening. v0.15.2 adds no new Git write behavior.
+The public-preview gate combines a dependency-free Git smoke-test executable, source audit, Windows CI, tag-driven release automation, community templates, privacy/testing/architecture documentation and repository hardening. v0.16.0 adds no new Git repository write behavior.
 
 Repository remotes are sanitized before display so embedded HTTP(S)/SSH user-info credentials are not exposed. Diff preview disables external diff and text-conversion helpers, untracked-file preview skips reparse points, and folder scanning does not follow junctions/symlinked directories.
 
@@ -34,6 +34,7 @@ See `docs/TESTING.md`, `docs/PRIVACY.md`, `docs/ARCHITECTURE.md`, `docs/RELEASIN
 - Inspect local runner metadata and `_diag` logs without exposing credentials.
 - Show live BUSY-job progress from local worker diagnostics; numeric percentages are only shown when a comparable completed local execution exists.
 - Summarize the locally retained execution history: total jobs, successes, failures, cancellations, unclassified runs, success rate, accumulated runtime and per-runner scope.
+- Export and import portable NRS Workbench preferences and local paths without copying runner credentials or tokens.
 - Keep GitHub API integration optional.
 - Store configuration in `%LOCALAPPDATA%\NRSWorkbench`.
 - Keep the manager available from the Windows system tray with quick runner actions.
@@ -96,6 +97,14 @@ Branch switching and a higher-level Sync workflow remain deferred. NRS Workbench
 
 The public product and executable are **NRS Workbench** / `NRSWorkbench.exe`. Public .NET namespaces are `NRS.Workbench.*`. Local data is stored under `%LOCALAPPDATA%\NRSWorkbench`. On first launch, if the new settings file does not yet exist, NRS Workbench copies the legacy `%LOCALAPPDATA%\RunnerManager\settings.json` once so existing runner roots, repository paths and preferences are preserved. The legacy file is left untouched.
 
+### Portable configuration transfer
+
+Version 0.16 adds **Exportar** and **Importar** controls in **Configuración**. The portable JSON contains the supported NRS Workbench preferences plus configured runner roots and repository paths. It uses an explicit allow-list and does not read or serialize runner registration credentials, tokens, `_diag` content or other internal runner files.
+
+Imported values are loaded into the Settings form for review first. They are only persisted after pressing **Guardar**. Paths that do not exist on the destination PC are reported so runner roots or repository locations can be corrected before applying the configuration.
+
+Local paths are not authentication secrets, but they can reveal usernames, drive letters or private folder names. Treat the exported JSON as a local migration file and review it before publishing or sharing it outside machines you trust.
+
 ## Job progress
 
 NRS Workbench does not fabricate a percentage. While a runner is BUSY it parses the local `_diag/Worker_*.log` stream and shows the current detected phase immediately. If previous completed worker logs contain a matching step sequence, the manager derives a local duration profile and displays an **estimated** percentage and remaining time.
@@ -127,6 +136,8 @@ On the first statistics load, NRS Workbench shows an `X/Y Worker logs` scan indi
 ## Security
 
 NRS Workbench reads `.runner`, `.service` and `_diag` only for operational metadata. It intentionally does not read or display runner credential files.
+
+Because this repository is public, persistent self-hosted CI intentionally does not run `pull_request` events. The local runner is used only for trusted branch pushes and explicit manual workflow runs, preventing code submitted from an external fork from being executed automatically on the physical runner machine.
 
 ## License
 
