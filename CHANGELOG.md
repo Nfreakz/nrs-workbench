@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.16.0] - 2026-09-13
+
+### Added
+- Adds portable configuration export/import from **Configuración** for runner roots, repository paths and user preferences.
+- Imported configuration is loaded into the form for review and is not persisted until the user explicitly presses **Guardar**.
+- Missing runner/repository paths are reported after import so a configuration copied from another PC can be adjusted before saving.
+- Adds smoke coverage for portable configuration round-tripping, schema validation and secret-file exclusion.
+
+### Security / privacy
+- Portable configuration uses an explicit allow-list of supported settings. Runner registration files, credentials, tokens and diagnostic files are never read or serialized by the transfer feature.
+- Imported files are limited to 1 MB and must identify themselves as an NRS Workbench schema version currently supported by the app.
+- Export/import UI explicitly warns that local filesystem paths themselves may reveal usernames or folder names and exported JSON should not be published blindly.
+- Public-repository CI no longer executes `pull_request` events on the persistent self-hosted runner. Local CI is restricted to trusted pushes and explicit manual runs.
+- CI now ensures the normal Windows Git installation path is available to jobs even when the runner process inherited an older `PATH` before Git was installed.
+
+### Changed
+- Removes stale hard-coded v0.15.1 text from the local build launcher.
+- No Git repository write behavior changed; the existing guarded Fetch/Pull/Push/Commit rules remain in place.
+
+## [0.15.2] - 2026-09-09
+
+### Added
+- Adds a current repository-state snapshot to **Estadísticas** with repository count, clean/dirty state, ahead/behind attention signals, clean/synchronised percentages, most recent local commit and repository with the most current changes.
+- Adds voluntary Buy Me a Coffee support through the About window, README and GitHub Funding metadata without changing commercial-use licensing rights.
+
+### Improved
+- Polishes dark-theme controls, including scrollbars and the Statistics ComboBox.
+- Makes the self-hosted release workflow asset upload reliable and idempotent using GitHub's REST upload endpoint, with no dependency on `gh.exe`.
+- Keeps the audited Git safety baseline and existing smoke-test gate unchanged.
+
 ## [0.15.1] - 2026-09-09
 
 ### Licensing
@@ -55,7 +85,7 @@
 - Adds a dependency-free `RunnerManager.SmokeTests` executable that exercises the real Git service against temporary local repositories/remotes.
 - Adds Windows CI and tag-driven portable release workflows.
 - Adds `public-audit.ps1`, `.editorconfig`, Code of Conduct, issue/PR templates and architecture/privacy/testing/release documentation.
-- Sanitizes repository remote URLs before display so embedded HTTP(S)/SSH credentials are not exposed.
+- Sanitizes repository remote URLs before display so embedded HTTP(S)/SSH user-info credentials are not exposed.
 - Redacts embedded HTTP(S) user-info and GitHub token-shaped secrets from application diagnostics and Git command error messages.
 - Reconstructs GitHub browser URLs without remote user-info.
 - Disables external diff and textconv helpers in diff preview.
