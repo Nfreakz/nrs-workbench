@@ -1,7 +1,7 @@
 <Window x:Class="NRS.Workbench.App.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Configuración" Icon="/Assets/NRSWorkbench.ico" Width="700" Height="740" ResizeMode="NoResize"
+        Title="Configuración" Icon="/Assets/NRSWorkbench.ico" Width="700" Height="760" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
     <Grid Background="{StaticResource BgBrush}" Margin="24">
@@ -79,7 +79,7 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Margin="0,0,16,0">
                             <TextBlock Text="Portabilidad" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
-                            <TextBlock Text="Exporta rutas y preferencias para mover NRS Workbench a otro PC. No incluye credenciales, tokens ni archivos internos de los runners."
+                            <TextBlock Text="Exporta rutas y preferencias para mover NRS Workbench a otro PC. No incluye credenciales, tokens ni archivos internos de los runners. El archivo sí contiene rutas locales; revísalo antes de compartirlo."
                                        Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="0,4,0,0"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
