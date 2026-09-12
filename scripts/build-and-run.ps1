@@ -24,7 +24,7 @@ if (-not (Test-IsAdministrator)) {
 
 Clear-Host
 Write-Host '=========================================================='
-Write-Host '  NRS Workbench v0.15.1 - Build & Run'
+Write-Host '  NRS Workbench - Build & Run'
 Write-Host '=========================================================='
 Write-Host ''
 Write-Host 'Carpeta detectada:'
@@ -76,7 +76,7 @@ try {
     }
 
     Write-Host ''
-    Write-Host 'Compilando NRS Workbench v0.15.1...'
+    Write-Host 'Compilando NRS Workbench...'
     Write-Host ''
 
     & dotnet build $sln -c Release
