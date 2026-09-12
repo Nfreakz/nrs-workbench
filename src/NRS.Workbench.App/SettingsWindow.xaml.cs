@@ -94,7 +94,7 @@ public partial class SettingsWindow : Window
         {
             _settingsService.ExportPortableSettings(_workingSettings, dialog.FileName);
             MessageBox.Show(
-                "Configuración exportada.\n\nEl archivo contiene rutas y preferencias, pero no credenciales, tokens ni archivos internos de los runners.",
+                "Configuración exportada.\n\nEl archivo contiene rutas y preferencias, pero no credenciales, tokens ni archivos internos de los runners.\n\nLas rutas locales pueden revelar nombres de carpetas o de usuario. Revísalo antes de compartir el archivo.",
                 "Exportar configuración",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
