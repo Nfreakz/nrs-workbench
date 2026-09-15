@@ -124,6 +124,23 @@ public partial class SettingsWindow : Window
         try
         {
             var imported = _settingsService.ReadPortableSettings(dialog.FileName);
+            var automaticNotes = new List<string>();
+
+            var missingRunnerRootsBeforeRepair = imported.RunnerRoots.Count(path => !Directory.Exists(path));
+            if (imported.RunnerRoots.Count > 0 && missingRunnerRootsBeforeRepair == imported.RunnerRoots.Count)
+            {
+                var detectedRoots = _settingsService.DetectRunnerRoots(imported.FolderPattern);
+                if (detectedRoots.Count > 0)
+                {
+                    imported.RunnerRoots = detectedRoots.ToList();
+                    automaticNotes.Add($"Runners ajustados automáticamente a este PC: {string.Join(", ", detectedRoots)}.");
+                }
+            }
+
+            var repairedRepositories = TryRepairImportedRepositoryPaths(imported);
+            if (repairedRepositories > 0)
+                automaticNotes.Add($"Repositorios reparados automáticamente por cambio de unidad: {repairedRepositories}.");
+
             _workingSettings = imported;
             ApplySettingsToForm(_workingSettings);
 
@@ -131,10 +148,14 @@ public partial class SettingsWindow : Window
             var missingRepositories = imported.RepositoryPaths.Count(path => !Directory.Exists(path));
             var pathNote = missingRunnerRoots == 0 && missingRepositories == 0
                 ? "Todas las rutas importadas existen en este PC."
-                : $"Rutas no encontradas en este PC: {missingRunnerRoots} de runners y {missingRepositories} de repositorios. Puedes usar ‘Detectar automáticamente’ para ajustar los runners.";
+                : $"Rutas no encontradas en este PC: {missingRunnerRoots} de runners y {missingRepositories} de repositorios.";
+
+            var automaticNote = automaticNotes.Count == 0
+                ? string.Empty
+                : string.Join(Environment.NewLine, automaticNotes) + Environment.NewLine + Environment.NewLine;
 
             MessageBox.Show(
-                $"Configuración cargada para revisar.\n\n{pathNote}\n\nPulsa Guardar para aplicarla o Cancelar para descartarla.",
+                $"Configuración cargada para revisar.\n\n{automaticNote}{pathNote}\n\nPulsa Guardar para aplicarla o Cancelar para descartarla.",
                 "Importar configuración",
                 MessageBoxButton.OK,
                 missingRunnerRoots == 0 && missingRepositories == 0 ? MessageBoxImage.Information : MessageBoxImage.Warning);
@@ -147,6 +168,90 @@ public partial class SettingsWindow : Window
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
+    }
+
+    private static int TryRepairImportedRepositoryPaths(RunnerSettings settings)
+    {
+        var driveRoots = new List<string>();
+        foreach (var drive in DriveInfo.GetDrives())
+        {
+            try
+            {
+                if (!drive.IsReady) continue;
+                if (drive.DriveType is not (DriveType.Fixed or DriveType.Removable)) continue;
+                driveRoots.Add(drive.RootDirectory.FullName);
+            }
+            catch
+            {
+                // A drive can disappear while the import dialog is open. Skip it.
+            }
+        }
+
+        var repaired = 0;
+        for (var index = 0; index < settings.RepositoryPaths.Count; index++)
+        {
+            var originalPath = settings.RepositoryPaths[index];
+            if (Directory.Exists(originalPath)) continue;
+
+            string? sourceRoot;
+            try
+            {
+                sourceRoot = Path.GetPathRoot(Path.GetFullPath(originalPath));
+            }
+            catch
+            {
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(sourceRoot)) continue;
+
+            string relativePath;
+            try
+            {
+                relativePath = Path.GetRelativePath(sourceRoot, originalPath);
+            }
+            catch
+            {
+                continue;
+            }
+
+            if (Path.IsPathRooted(relativePath) ||
+                relativePath.Equals("..", StringComparison.Ordinal) ||
+                relativePath.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+                continue;
+
+            var matches = new List<string>();
+            foreach (var driveRoot in driveRoots)
+            {
+                if (string.Equals(driveRoot, sourceRoot, StringComparison.OrdinalIgnoreCase)) continue;
+
+                string candidate;
+                try
+                {
+                    candidate = Path.GetFullPath(Path.Combine(driveRoot, relativePath));
+                }
+                catch
+                {
+                    continue;
+                }
+
+                if (!Directory.Exists(candidate)) continue;
+                var gitMarker = Path.Combine(candidate, ".git");
+                if (!Directory.Exists(gitMarker) && !File.Exists(gitMarker)) continue;
+
+                if (!matches.Contains(candidate, StringComparer.OrdinalIgnoreCase))
+                    matches.Add(candidate);
+            }
+
+            if (matches.Count != 1) continue;
+            settings.RepositoryPaths[index] = matches[0];
+            repaired++;
+        }
+
+        settings.RepositoryPaths = settings.RepositoryPaths
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        return repaired;
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
