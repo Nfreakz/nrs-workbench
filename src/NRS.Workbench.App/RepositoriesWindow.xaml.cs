@@ -42,7 +42,7 @@ public partial class RepositoriesWindow : Window
                 .Where(branch => !string.Equals(branch, repository.Branch, StringComparison.Ordinal)).ToList();
             if (branches.Count == 0)
             {
-                MessageBox.Show(this, "No hay otras ramas locales en este repositorio.", "Cambiar rama", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(this, UiLanguage.Choose("No hay otras ramas locales en este repositorio.", "There are no other local branches in this repository."), UiLanguage.Choose("Cambiar rama", "Switch branch"), MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
@@ -56,7 +56,7 @@ public partial class RepositoriesWindow : Window
             var window = new Window
             {
                 Owner = this,
-                Title = "Cambiar rama local",
+                Title = UiLanguage.Choose("Cambiar rama local", "Switch local branch"),
                 Width = 470,
                 Height = 210,
                 ResizeMode = ResizeMode.NoResize,
@@ -67,21 +67,21 @@ public partial class RepositoriesWindow : Window
             var content = new System.Windows.Controls.StackPanel { Margin = new Thickness(24) };
             content.Children.Add(new System.Windows.Controls.TextBlock { Text = $"{repository.Name}  ·  {repository.Branch}", FontWeight = FontWeights.SemiBold });
             content.Children.Add(picker);
-            var confirm = new System.Windows.Controls.Button { Content = "Revisar cambio", Width = 130, HorizontalAlignment = HorizontalAlignment.Right };
+            var confirm = new System.Windows.Controls.Button { Content = UiLanguage.Choose("Revisar cambio", "Review switch"), Width = 130, HorizontalAlignment = HorizontalAlignment.Right };
             confirm.Click += (_, _) => window.DialogResult = true;
             content.Children.Add(confirm);
             window.Content = content;
             window.SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(window);
             if (window.ShowDialog() != true || picker.SelectedItem is not string target) return;
 
-            if (!_dialogs.Confirm($"Repositorio: {repository.Name}\nRama actual: {repository.Branch}\nNueva rama local: {target}\n\nNo se descargará ni fusionará nada. ¿Cambiar de rama?", "Confirmar cambio de rama")) return;
+            if (!_dialogs.Confirm(UiLanguage.Choose($"Repositorio: {repository.Name}\nRama actual: {repository.Branch}\nNueva rama local: {target}\n\nNo se descargará ni fusionará nada. ¿Cambiar de rama?", $"Repository: {repository.Name}\nCurrent branch: {repository.Branch}\nNew local branch: {target}\n\nNothing will be downloaded or merged. Switch branch?"), UiLanguage.Choose("Confirmar cambio de rama", "Confirm branch switch"))) return;
             await _git.SwitchLocalBranchAsync(repository, target);
             await _viewModel.RefreshAsync();
         }
         catch (Exception ex)
         {
             AppLogger.Error("Could not switch local branch", ex);
-            _dialogs.ShowError(ex.Message, "Cambiar rama");
+            _dialogs.ShowError(ex.Message, UiLanguage.Choose("Cambiar rama", "Switch branch"));
             await _viewModel.RefreshAsync();
         }
     }
@@ -90,7 +90,7 @@ public partial class RepositoriesWindow : Window
     {
         using var dialog = new System.Windows.Forms.FolderBrowserDialog
         {
-            Description = "Selecciona la carpeta raíz de un repositorio Git",
+            Description = UiLanguage.Choose("Selecciona la carpeta raíz de un repositorio Git", "Select the root folder of a Git repository"),
             UseDescriptionForTitle = true,
             ShowNewFolderButton = false
         };
@@ -102,7 +102,7 @@ public partial class RepositoriesWindow : Window
     {
         using var dialog = new System.Windows.Forms.FolderBrowserDialog
         {
-            Description = "Selecciona una carpeta que contenga tus repositorios. Se escanearán hasta 3 niveles.",
+            Description = UiLanguage.Choose("Selecciona una carpeta que contenga tus repositorios. Se escanearán hasta 3 niveles.", "Select a folder containing your repositories. Up to three levels will be scanned."),
             UseDescriptionForTitle = true,
             ShowNewFolderButton = false
         };

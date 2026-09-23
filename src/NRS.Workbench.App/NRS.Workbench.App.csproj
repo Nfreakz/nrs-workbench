@@ -14,6 +14,7 @@
     <Resource Include="Assets\NRSWorkbench.ico" />
     <Resource Include="Assets\NRSWorkbench.png" />
     <Resource Include="Assets\NRSWorkbenchFull.png" />
+    <Resource Include="Localization\en.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NRS.Workbench.Core\NRS.Workbench.Core.csproj" />

@@ -1,8 +1,9 @@
 <Window x:Class="NRS.Workbench.App.StatisticsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:NRS.Workbench.App.Services"
         xmlns:models="clr-namespace:NRS.Workbench.Core.Models;assembly=NRS.Workbench.Core"
-        Title="Estadísticas · NRS Workbench" Icon="/Assets/NRSWorkbench.ico"
+        Title="{local:Tr Source='Estadísticas · NRS Workbench'}" Icon="/Assets/NRSWorkbench.ico"
         Width="1440" Height="980" MinWidth="1060" MinHeight="760"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}"
@@ -179,32 +180,32 @@
                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel Margin="13,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="Estadísticas" FontSize="27" FontWeight="Bold"/>
-                    <TextBlock Text="Runners e inventario Git local · historial fiable y estado actual"
+                    <TextBlock Text="{local:Tr Source='Estadísticas'}" FontSize="27" FontWeight="Bold"/>
+                    <TextBlock Text="{local:Tr Source='Runners e inventario Git local · historial fiable y estado actual'}"
                                Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,3,0,0"/>
                 </StackPanel>
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="Periodo runners" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBlock Text="{local:Tr Source='Periodo runners'}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
                 <ComboBox x:Name="PeriodCombo" Style="{StaticResource StatsCombo}"
                           ItemsSource="{Binding PeriodOptions}" SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
                           SelectionChanged="PeriodCombo_SelectionChanged"/>
                 <Button Style="{StaticResource ToolbarButton}" Command="{Binding RefreshCommand}" Margin="9,0,0,0">
-                    <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE72C;"/><TextBlock Text="Actualizar"/></StackPanel>
+                    <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE72C;"/><TextBlock Text="{local:Tr Source='Actualizar'}"/></StackPanel>
                 </Button>
             </StackPanel>
         </Grid>
 
         <!-- Runner KPI cards -->
         <UniformGrid Grid.Row="1" Columns="7" Margin="0,0,0,12">
-            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="JOBS LOCALES" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding TotalRuns}" Style="{StaticResource MetricValue}"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='JOBS LOCALES'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding TotalRuns}" Style="{StaticResource MetricValue}"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#217A4B"><StackPanel><TextBlock Text="OK" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SucceededRuns}" Style="{StaticResource MetricValue}" Foreground="#55E39A"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#8D3942"><StackPanel><TextBlock Text="FALLOS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding FailedRuns}" Style="{StaticResource MetricValue}" Foreground="#FF7A84"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#725B1A"><StackPanel><TextBlock Text="CANCELADAS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding CancelledRuns}" Style="{StaticResource MetricValue}" Foreground="#F5C451"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="SIN CLASIFICAR" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding UnknownRuns}" Style="{StaticResource MetricValue}" Foreground="#A8B5C4"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#2E689D"><StackPanel><TextBlock Text="EN CURSO" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding ActiveRuns}" Style="{StaticResource MetricValue}" Foreground="#67B3FF"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" Margin="0"><StackPanel><TextBlock Text="TASA DE ÉXITO" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SuccessRate}" Style="{StaticResource MetricValue}" Foreground="#55E39A"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#8D3942"><StackPanel><TextBlock Text="{local:Tr Source='FALLOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding FailedRuns}" Style="{StaticResource MetricValue}" Foreground="#FF7A84"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#725B1A"><StackPanel><TextBlock Text="{local:Tr Source='CANCELADAS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding CancelledRuns}" Style="{StaticResource MetricValue}" Foreground="#F5C451"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='SIN CLASIFICAR'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding UnknownRuns}" Style="{StaticResource MetricValue}" Foreground="#A8B5C4"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#2E689D"><StackPanel><TextBlock Text="{local:Tr Source='EN CURSO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding ActiveRuns}" Style="{StaticResource MetricValue}" Foreground="#67B3FF"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" Margin="0"><StackPanel><TextBlock Text="{local:Tr Source='TASA DE ÉXITO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SuccessRate}" Style="{StaticResource MetricValue}" Foreground="#55E39A"/></StackPanel></Border>
         </UniformGrid>
 
         <!-- Repository snapshot -->
@@ -215,8 +216,8 @@
                     <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Repositorios · estado actual" Style="{StaticResource SectionTitle}" FontSize="13.5"/>
-                            <TextBlock Text="  ·  no depende del filtro de periodo" Foreground="#647C95" FontSize="10.5" VerticalAlignment="Center"/>
+                            <TextBlock Text="{local:Tr Source='Repositorios · estado actual'}" Style="{StaticResource SectionTitle}" FontSize="13.5"/>
+                            <TextBlock Text="{local:Tr Source='  ·  no depende del filtro de periodo'}" Foreground="#647C95" FontSize="10.5" VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Grid.Column="1" Text="{Binding RepositoryStatusText}" Foreground="#7892AC" FontSize="10.5" VerticalAlignment="Center"/>
                     </Grid>
@@ -225,10 +226,10 @@
                 <UniformGrid Grid.Row="1" Columns="6" Margin="12,10,12,7">
                     <Border Style="{StaticResource RepoMetricCard}"><StackPanel><TextBlock Text="REPOS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryTotalCount}" Style="{StaticResource RepoMetricValue}" Foreground="#67B3FF"/></StackPanel></Border>
                     <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#217A4B"><StackPanel><TextBlock Text="CLEAN" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryCleanCount}" Style="{StaticResource RepoMetricValue}" Foreground="#55E39A"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#725B1A"><StackPanel><TextBlock Text="CON CAMBIOS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryChangesCount}" Style="{StaticResource RepoMetricValue}" Foreground="#F5C451"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#725B1A"><StackPanel><TextBlock Text="{local:Tr Source='CON CAMBIOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryChangesCount}" Style="{StaticResource RepoMetricValue}" Foreground="#F5C451"/></StackPanel></Border>
                     <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#2E689D"><StackPanel><TextBlock Text="AHEAD" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAheadCount}" Style="{StaticResource RepoMetricValue}" Foreground="#67B3FF"/></StackPanel></Border>
                     <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#3C5870"><StackPanel><TextBlock Text="BEHIND" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryBehindCount}" Style="{StaticResource RepoMetricValue}" Foreground="#A9C6E0"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" Margin="0" BorderBrush="#8D3942"><StackPanel><TextBlock Text="ATENCIÓN" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAttentionCount}" Style="{StaticResource RepoMetricValue}" Foreground="#FF7A84"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" Margin="0" BorderBrush="#8D3942"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAttentionCount}" Style="{StaticResource RepoMetricValue}" Foreground="#FF7A84"/></StackPanel></Border>
                 </UniformGrid>
 
                 <Grid Grid.Row="2" Margin="14,0,14,9">
@@ -239,19 +240,19 @@
                         <ColumnDefinition Width="1.35*"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <TextBlock Text="Limpios: " Foreground="#647C95" FontSize="10.5"/>
+                        <TextBlock Text="{local:Tr Source='Limpios: '}" Foreground="#647C95" FontSize="10.5"/>
                         <TextBlock Text="{Binding RepositoryCleanRate}" Foreground="#63E6A0" FontSize="10.5" FontWeight="SemiBold"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <TextBlock Text="Sincronizados: " Foreground="#647C95" FontSize="10.5"/>
+                        <TextBlock Text="{local:Tr Source='Sincronizados: '}" Foreground="#647C95" FontSize="10.5"/>
                         <TextBlock Text="{Binding RepositorySyncRate}" Foreground="#67B3FF" FontSize="10.5" FontWeight="SemiBold"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
-                        <TextBlock Text="Último commit: " Foreground="#647C95" FontSize="10.5"/>
+                        <TextBlock Text="{local:Tr Source='Último commit: '}" Foreground="#647C95" FontSize="10.5"/>
                         <TextBlock Text="{Binding RepositoryLastCommit}" Foreground="#AFC3D8" FontSize="10.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                     <StackPanel Grid.Column="3" Orientation="Horizontal">
-                        <TextBlock Text="Más cambios: " Foreground="#647C95" FontSize="10.5"/>
+                        <TextBlock Text="{local:Tr Source='Más cambios: '}" Foreground="#647C95" FontSize="10.5"/>
                         <TextBlock Text="{Binding RepositoryMostChanged}" Foreground="#F5C451" FontSize="10.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                 </Grid>
@@ -263,22 +264,22 @@
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Tiempo acumulado: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='Tiempo acumulado: '}" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding TotalDuration}" FontWeight="SemiBold"/>
-                    <TextBlock Text="   ·   Duración media: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='   ·   Duración media: '}" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding AverageDuration}" FontWeight="SemiBold"/>
-                    <TextBlock Text="   ·   Fiabilidad técnica: " Foreground="{StaticResource MutedBrush}"/>
-                    <TextBlock Text="{Binding ReliabilityRate}" FontWeight="SemiBold" Foreground="#63E6A0" ToolTip="OK / (OK + fallos). Las cancelaciones se muestran aparte."/>
-                    <TextBlock Text="   ·   Cancelación: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='   ·   Fiabilidad técnica: '}" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding ReliabilityRate}" FontWeight="SemiBold" Foreground="#63E6A0" ToolTip="{local:Tr Source='OK / (OK + fallos). Las cancelaciones se muestran aparte.'}"/>
+                    <TextBlock Text="{local:Tr Source='   ·   Cancelación: '}" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding CancellationRate}" FontWeight="SemiBold" Foreground="#F5C451"/>
-                    <TextBlock Text="   ·   Runners con actividad: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='   ·   Runners con actividad: '}" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding RunnersWithActivity}" FontWeight="SemiBold"/>
-                    <TextBlock Text="   ·   Último job: " Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='   ·   Último job: '}" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding LastRun}" FontWeight="SemiBold"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <TextBlock Text="{Binding AuditText}" Foreground="#8EA7C0" FontSize="10.5" HorizontalAlignment="Right"/>
-                    <TextBlock Text="Conteo por job local · la tasa de éxito excluye resultados desconocidos" Foreground="#647C95" FontSize="9.5" HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                    <TextBlock Text="{local:Tr Source='Conteo por job local · la tasa de éxito excluye resultados desconocidos'}" Foreground="#647C95" FontSize="9.5" HorizontalAlignment="Right" Margin="0,2,0,0"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -297,12 +298,12 @@
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <StackPanel>
-                                <TextBlock Text="Actividad · últimos 14 días" Style="{StaticResource SectionTitle}" FontSize="14"/>
-                                <TextBlock Text="Jobs locales procesados por día" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Text="{local:Tr Source='Actividad · últimos 14 días'}" Style="{StaticResource SectionTitle}" FontSize="14"/>
+                                <TextBlock Text="{local:Tr Source='Jobs locales procesados por día'}" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="0,2,0,0"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                 <Ellipse Width="7" Height="7" Fill="#48A9FF" Margin="0,0,6,0"/>
-                                <TextBlock Text="actividad relativa" Foreground="#7892AC" FontSize="10"/>
+                                <TextBlock Text="{local:Tr Source='actividad relativa'}" Foreground="#7892AC" FontSize="10"/>
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -330,8 +331,8 @@
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                     <Border Grid.Row="0" Background="#0F1D2D" Padding="14,9">
                         <StackPanel>
-                            <TextBlock Text="Alcance del historial" Style="{StaticResource SectionTitle}" FontSize="14"/>
-                            <TextBlock Text="Cuánto trabajo local representa el periodo analizado" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="0,2,0,0"/>
+                            <TextBlock Text="{local:Tr Source='Alcance del historial'}" Style="{StaticResource SectionTitle}" FontSize="14"/>
+                            <TextBlock Text="{local:Tr Source='Cuánto trabajo local representa el periodo analizado'}" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="0,2,0,0"/>
                         </StackPanel>
                     </Border>
                     <Grid Grid.Row="1" Margin="14,10">
@@ -339,38 +340,38 @@
                         <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="*"/><RowDefinition Height="*"/></Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Grid.Column="0">
-                            <TextBlock Text="HOY" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{local:Tr Source='HOY'}" Style="{StaticResource MetricLabel}"/>
                             <TextBlock Text="{Binding RunsToday}" FontSize="19" FontWeight="Bold" Foreground="#67B3FF" Margin="0,3,0,0"/>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1">
-                            <TextBlock Text="ÚLTIMAS 24 H" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{local:Tr Source='ÚLTIMAS 24 H'}" Style="{StaticResource MetricLabel}"/>
                             <TextBlock Text="{Binding RunsLast24Hours}" FontSize="19" FontWeight="Bold" Margin="0,3,0,0"/>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="2">
-                            <TextBlock Text="JOBS / DÍA" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{local:Tr Source='JOBS / DÍA'}" Style="{StaticResource MetricLabel}"/>
                             <TextBlock Text="{Binding JobsPerDay}" FontSize="19" FontWeight="Bold" Margin="0,3,0,0"/>
                         </StackPanel>
 
                         <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,8,0,0">
-                            <TextBlock Text="COBERTURA" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{local:Tr Source='COBERTURA'}" Style="{StaticResource MetricLabel}"/>
                             <TextBlock Text="{Binding Coverage}" FontSize="13" FontWeight="SemiBold" Margin="0,3,0,0"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,8,0,0">
-                            <TextBlock Text="PRIMER JOB" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{local:Tr Source='PRIMER JOB'}" Style="{StaticResource MetricLabel}"/>
                             <TextBlock Text="{Binding FirstRun}" FontSize="11" FontWeight="SemiBold" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,8,0,0">
-                            <TextBlock Text="PICO" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{local:Tr Source='PICO'}" Style="{StaticResource MetricLabel}"/>
                             <TextBlock Text="{Binding PeakDay}" FontSize="11" FontWeight="SemiBold" Foreground="#F5C451" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
 
                         <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,8,0,0">
-                            <TextBlock Text="FIABILIDAD" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{local:Tr Source='FIABILIDAD'}" Style="{StaticResource MetricLabel}"/>
                             <TextBlock Text="{Binding ReliabilityRate}" FontSize="13" FontWeight="SemiBold" Foreground="#63E6A0" Margin="0,3,0,0"
-                                       ToolTip="OK / (OK + fallos). Las cancelaciones no penalizan esta métrica."/>
+                                       ToolTip="{local:Tr Source='OK / (OK + fallos). Las cancelaciones no penalizan esta métrica.'}"/>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,8,0,0">
-                            <TextBlock Text="TEND. 24 H" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{local:Tr Source='TEND. 24 H'}" Style="{StaticResource MetricLabel}"/>
                             <TextBlock Text="{Binding Trend24h}" FontSize="12" FontWeight="SemiBold" Margin="0,3,0,0">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -385,7 +386,7 @@
                             </TextBlock>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,8,0,0">
-                            <TextBlock Text="MÁS CARGA" Style="{StaticResource MetricLabel}"/>
+                            <TextBlock Text="{local:Tr Source='MÁS CARGA'}" Style="{StaticResource MetricLabel}"/>
                             <TextBlock Text="{Binding MostActiveRunner}" FontSize="11" FontWeight="SemiBold" Foreground="#67B3FF" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
                     </Grid>
@@ -400,21 +401,21 @@
                 <Border Grid.Row="0" Background="#0F1D2D" Padding="14,10">
                     <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <TextBlock Text="Resumen por runner" Style="{StaticResource SectionTitle}" FontSize="14"/>
-                        <TextBlock Grid.Column="1" Text="Qué ha trabajado cada runner y con qué resultado" Foreground="{StaticResource MutedBrush}" FontSize="10.5" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Tr Source='Resumen por runner'}" Style="{StaticResource SectionTitle}" FontSize="14"/>
+                        <TextBlock Grid.Column="1" Text="{local:Tr Source='Qué ha trabajado cada runner y con qué resultado'}" Foreground="{StaticResource MutedBrush}" FontSize="10.5" VerticalAlignment="Center"/>
                     </Grid>
                 </Border>
                 <DataGrid Grid.Row="1" ItemsSource="{Binding ByRunner}" RowHeight="39" ColumnHeaderHeight="34" AlternationCount="2"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="RUNNER" Binding="{Binding RunnerAlias}" Width="105"/>
-                        <DataGridTextColumn Header="REPOSITORIO" Binding="{Binding GitHubTarget}" Width="1.35*" MinWidth="200"/>
+                        <DataGridTextColumn Header="{local:Tr Source='REPOSITORIO'}" Binding="{Binding GitHubTarget}" Width="1.35*" MinWidth="200"/>
                         <DataGridTextColumn Header="JOBS" Binding="{Binding TotalRuns}" Width="60"/>
                         <DataGridTextColumn Header="OK" Binding="{Binding SucceededRuns}" Width="52"/>
-                        <DataGridTextColumn Header="FALLOS" Binding="{Binding FailedRuns}" Width="62"/>
-                        <DataGridTextColumn Header="CANCEL." Binding="{Binding CancelledRuns}" Width="68"/>
-                        <DataGridTextColumn Header="SIN CLAS." Binding="{Binding UnknownRuns}" Width="72"/>
-                        <DataGridTemplateColumn Header="AHORA" Width="66">
+                        <DataGridTextColumn Header="{local:Tr Source='FALLOS'}" Binding="{Binding FailedRuns}" Width="62"/>
+                        <DataGridTextColumn Header="{local:Tr Source='CANCEL.'}" Binding="{Binding CancelledRuns}" Width="68"/>
+                        <DataGridTextColumn Header="{local:Tr Source='SIN CLAS.'}" Binding="{Binding UnknownRuns}" Width="72"/>
+                        <DataGridTemplateColumn Header="{local:Tr Source='AHORA'}" Width="66">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding ActiveDisplay}" FontWeight="SemiBold">
@@ -425,7 +426,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="FIAB." Width="76">
+                        <DataGridTemplateColumn Header="{local:Tr Source='FIAB.'}" Width="76">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding ReliabilityDisplay}" FontWeight="SemiBold" ToolTip="{Binding ReliabilityLabel}">
@@ -443,7 +444,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="TEND. 24H" Width="100">
+                        <DataGridTemplateColumn Header="{local:Tr Source='TEND. 24H'}" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Trend24hDisplay}" FontWeight="SemiBold">
@@ -461,10 +462,10 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="CARGA" Binding="{Binding WorkloadShareDisplay}" Width="70"/>
-                        <DataGridTextColumn Header="TIEMPO" Binding="{Binding TotalDurationDisplay}" Width="96"/>
-                        <DataGridTextColumn Header="MEDIA" Binding="{Binding AverageDurationDisplay}" Width="82"/>
-                        <DataGridTextColumn Header="ÚLTIMO JOB" Binding="{Binding LastRunDisplay}" Width="126"/>
+                        <DataGridTextColumn Header="{local:Tr Source='CARGA'}" Binding="{Binding WorkloadShareDisplay}" Width="70"/>
+                        <DataGridTextColumn Header="{local:Tr Source='TIEMPO'}" Binding="{Binding TotalDurationDisplay}" Width="96"/>
+                        <DataGridTextColumn Header="{local:Tr Source='MEDIA'}" Binding="{Binding AverageDurationDisplay}" Width="82"/>
+                        <DataGridTextColumn Header="{local:Tr Source='ÚLTIMO JOB'}" Binding="{Binding LastRunDisplay}" Width="126"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
@@ -477,18 +478,18 @@
                 <Border Grid.Row="0" Background="#0F1D2D" Padding="14,10">
                     <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <TextBlock Text="Historial de jobs" Style="{StaticResource SectionTitle}" FontSize="14"/>
-                        <TextBlock Grid.Column="1" Text="Hasta 500 jobs del periodo seleccionado" Foreground="{StaticResource MutedBrush}" FontSize="10.5" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Tr Source='Historial de jobs'}" Style="{StaticResource SectionTitle}" FontSize="14"/>
+                        <TextBlock Grid.Column="1" Text="{local:Tr Source='Hasta 500 jobs del periodo seleccionado'}" Foreground="{StaticResource MutedBrush}" FontSize="10.5" VerticalAlignment="Center"/>
                     </Grid>
                 </Border>
                 <DataGrid Grid.Row="1" ItemsSource="{Binding RecentRuns}" RowHeight="38" ColumnHeaderHeight="34" AlternationCount="2"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="FECHA" Binding="{Binding StartedAtDisplay}" Width="145"/>
+                        <DataGridTextColumn Header="{local:Tr Source='FECHA'}" Binding="{Binding StartedAtDisplay}" Width="145"/>
                         <DataGridTextColumn Header="RUNNER" Binding="{Binding RunnerAlias}" Width="105"/>
-                        <DataGridTextColumn Header="REPOSITORIO" Binding="{Binding GitHubTarget}" Width="1.1*" MinWidth="210"/>
+                        <DataGridTextColumn Header="{local:Tr Source='REPOSITORIO'}" Binding="{Binding GitHubTarget}" Width="1.1*" MinWidth="210"/>
                         <DataGridTextColumn Header="JOB" Binding="{Binding JobDisplay}" Width="1.4*" MinWidth="230"/>
-                        <DataGridTemplateColumn Header="RESULTADO" Width="120">
+                        <DataGridTemplateColumn Header="{local:Tr Source='RESULTADO'}" Width="120">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border x:Name="OutcomeBadge" Background="#2A3442" BorderBrush="#536273" BorderThickness="1" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
@@ -502,7 +503,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="DURACIÓN" Binding="{Binding DurationDisplay}" Width="105"/>
+                        <DataGridTextColumn Header="{local:Tr Source='DURACIÓN'}" Binding="{Binding DurationDisplay}" Width="105"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
@@ -529,10 +530,10 @@
                 </ProgressBar>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
-                <TextBlock Text="Runners: _diag/Worker_*.log · repos: estado Git local"
+                <TextBlock Text="{local:Tr Source='Runners: _diag/Worker_*.log · repos: estado Git local'}"
                            Foreground="#647C95" FontSize="10.5" VerticalAlignment="Center"/>
                 <TextBlock Text="  ·  " Foreground="#3D5873" VerticalAlignment="Center"/>
-                <TextBlock FontFamily="Segoe Script" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="Acerca de · Neo RS">
+                <TextBlock FontFamily="Segoe Script" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="{local:Tr Source='Acerca de · Neo RS'}">
                     <Hyperlink Click="About_Click" Foreground="#5EA7E8" TextDecorations="{x:Null}">Neo RS</Hyperlink>
                 </TextBlock>
             </StackPanel>

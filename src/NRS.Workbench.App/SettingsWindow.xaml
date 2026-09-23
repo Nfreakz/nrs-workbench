@@ -1,7 +1,8 @@
 <Window x:Class="NRS.Workbench.App.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Configuración" Icon="/Assets/NRSWorkbench.ico" Width="700" Height="760" ResizeMode="NoResize"
+        xmlns:local="clr-namespace:NRS.Workbench.App.Services"
+        Title="{local:Tr Source='Configuración'}" Icon="/Assets/NRSWorkbench.ico" Width="700" Height="820" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
     <Grid Background="{StaticResource BgBrush}" Margin="24">
@@ -12,8 +13,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="0,0,0,18">
-            <TextBlock Text="Configuración" FontSize="26" FontWeight="Bold"/>
-            <TextBlock Text="Configura runners, notificaciones y comportamiento del NRS Workbench." Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
+            <TextBlock Text="{local:Tr Source='Configuración'}" FontSize="26" FontWeight="Bold"/>
+            <TextBlock Text="{local:Tr Source='Configura runners, notificaciones y comportamiento del NRS Workbench.'}" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
         </StackPanel>
 
         <Border Grid.Row="1" Style="{StaticResource PanelCard}" Padding="18">
@@ -25,15 +26,16 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" Margin="0,0,0,8">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                     <StackPanel>
-                        <TextBlock Text="Ubicaciones de runners" Style="{StaticResource SectionTitle}"/>
-                        <TextBlock Text="Una raíz por línea. El escaneo dentro de cada raíz es superficial." Style="{StaticResource MutedLabel}" Margin="0,2,0,0"/>
+                        <TextBlock Text="{local:Tr Source='Ubicaciones de runners'}" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="{local:Tr Source='Una raíz por línea. El escaneo dentro de cada raíz es superficial.'}" Style="{StaticResource MutedLabel}" Margin="0,2,0,0"/>
                     </StackPanel>
-                    <Button Grid.Column="1" Content="Detectar automáticamente" Style="{StaticResource ToolbarButton}" Margin="0" Padding="10,6" Click="Detect_Click"/>
+                    <Button Grid.Column="1" Content="{local:Tr Source='Detectar automáticamente'}" Style="{StaticResource ToolbarButton}" Margin="0" Padding="10,6" Click="Detect_Click"/>
                 </Grid>
 
                 <TextBox x:Name="RootsText" Grid.Row="1" Height="108" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
@@ -42,49 +44,58 @@
                 <Grid Grid.Row="2" Margin="0,0,0,18">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="175"/></Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Margin="0,0,18,0">
-                        <TextBlock Text="Patrón de carpetas" Style="{StaticResource MutedLabel}"/>
+                        <TextBlock Text="{local:Tr Source='Patrón de carpetas'}" Style="{StaticResource MutedLabel}"/>
                         <TextBox x:Name="PatternText" Padding="9" Margin="0,6,0,0"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1">
-                        <TextBlock Text="Refresco (segundos)" Style="{StaticResource MutedLabel}"/>
+                        <TextBlock Text="{local:Tr Source='Refresco (segundos)'}" Style="{StaticResource MutedLabel}"/>
                         <TextBox x:Name="RefreshText" Padding="9" Margin="0,6,0,0"/>
                     </StackPanel>
                 </Grid>
 
                 <Border Grid.Row="3" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12">
                     <StackPanel>
-                        <CheckBox x:Name="ConfirmBusyCheck" Content="Confirmar antes de parar un runner BUSY" Foreground="{StaticResource TextBrush}"/>
-                        <CheckBox x:Name="KeepInTrayCheck" Content="Mantener NRS Workbench en la bandeja al cerrar o minimizar" Foreground="{StaticResource TextBrush}" Margin="0,10,0,0"/>
+                        <CheckBox x:Name="ConfirmBusyCheck" Content="{local:Tr Source='Confirmar antes de parar un runner BUSY'}" Foreground="{StaticResource TextBrush}"/>
+                        <CheckBox x:Name="KeepInTrayCheck" Content="{local:Tr Source='Mantener NRS Workbench en la bandeja al cerrar o minimizar'}" Foreground="{StaticResource TextBrush}" Margin="0,10,0,0"/>
                     </StackPanel>
                 </Border>
 
                 <Border Grid.Row="4" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
                     <StackPanel>
-                        <TextBlock Text="Notificaciones" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,0,0,8"/>
-                        <CheckBox x:Name="NotificationsEnabledCheck" Content="Activar notificaciones de escritorio" Foreground="{StaticResource TextBrush}"/>
+                        <TextBlock Text="{local:Tr Source='Notificaciones'}" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="NotificationsEnabledCheck" Content="{local:Tr Source='Activar notificaciones de escritorio'}" Foreground="{StaticResource TextBrush}"/>
                         <WrapPanel Margin="20,9,0,0">
-                            <CheckBox x:Name="NotifyJobStartedCheck" Content="Job iniciado" Foreground="{StaticResource TextBrush}" Margin="0,0,22,0"/>
-                            <CheckBox x:Name="NotifyJobCompletedCheck" Content="Job finalizado" Foreground="{StaticResource TextBrush}" Margin="0,0,22,0"/>
-                            <CheckBox x:Name="NotifyRunnerIssuesCheck" Content="Errores del runner" Foreground="{StaticResource TextBrush}"/>
+                            <CheckBox x:Name="NotifyJobStartedCheck" Content="{local:Tr Source='Job iniciado'}" Foreground="{StaticResource TextBrush}" Margin="0,0,22,0"/>
+                            <CheckBox x:Name="NotifyJobCompletedCheck" Content="{local:Tr Source='Job finalizado'}" Foreground="{StaticResource TextBrush}" Margin="0,0,22,0"/>
+                            <CheckBox x:Name="NotifyRunnerIssuesCheck" Content="{local:Tr Source='Errores del runner'}" Foreground="{StaticResource TextBrush}"/>
                         </WrapPanel>
-                        <CheckBox x:Name="NotifyOnlyWhenHiddenCheck" Content="Mostrar avisos solo cuando NRS Workbench no está en primer plano" Foreground="{StaticResource TextBrush}" Margin="20,9,0,0"/>
+                        <CheckBox x:Name="NotifyOnlyWhenHiddenCheck" Content="{local:Tr Source='Mostrar avisos solo cuando NRS Workbench no está en primer plano'}" Foreground="{StaticResource TextBrush}" Margin="20,9,0,0"/>
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="5" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
+                <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0,12,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{local:Tr Source='Idioma'}" Style="{StaticResource MutedLabel}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                    <ComboBox x:Name="LanguageChoice" Width="170" SelectedValuePath="Tag">
+                        <ComboBoxItem Content="Español" Tag="es"/>
+                        <ComboBoxItem Content="English" Tag="en"/>
+                    </ComboBox>
+                    <TextBlock Text="{local:Tr Source='Se aplica al reiniciar la aplicación.'}" Style="{StaticResource MutedLabel}" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                </StackPanel>
+
+                <Border Grid.Row="6" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="Portabilidad" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
-                            <TextBlock Text="Exporta rutas y preferencias para mover NRS Workbench a otro PC. No incluye credenciales, tokens ni archivos internos de los runners. El archivo sí contiene rutas locales; revísalo antes de compartirlo."
+                            <TextBlock Text="{local:Tr Source='Portabilidad'}" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
+                            <TextBlock Text="{local:Tr Source='Exporta rutas y preferencias para mover NRS Workbench a otro PC. No incluye credenciales, tokens ni archivos internos de los runners. El archivo sí contiene rutas locales; revísalo antes de compartirlo.'}"
                                        Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="0,4,0,0"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button Content="Exportar..." Style="{StaticResource ToolbarButton}" Padding="10,6" Click="Export_Click"/>
-                            <Button Content="Importar..." Style="{StaticResource ToolbarButton}" Padding="10,6" Margin="8,0,0,0" Click="Import_Click"/>
+                            <Button Content="{local:Tr Source='Exportar...'}" Style="{StaticResource ToolbarButton}" Padding="10,6" Click="Export_Click"/>
+                            <Button Content="{local:Tr Source='Importar...'}" Style="{StaticResource ToolbarButton}" Padding="10,6" Margin="8,0,0,0" Click="Import_Click"/>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -92,8 +103,8 @@
         </Border>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
-            <Button Content="Cancelar" Style="{StaticResource ToolbarButton}" Click="Cancel_Click"/>
-            <Button Content="Guardar" Style="{StaticResource PrimaryToolbarButton}" Margin="0" Click="Save_Click"/>
+            <Button Content="{local:Tr Source='Cancelar'}" Style="{StaticResource ToolbarButton}" Click="Cancel_Click"/>
+            <Button Content="{local:Tr Source='Guardar'}" Style="{StaticResource PrimaryToolbarButton}" Margin="0" Click="Save_Click"/>
         </StackPanel>
     </Grid>
 </Window>

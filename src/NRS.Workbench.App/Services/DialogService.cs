@@ -18,13 +18,13 @@ public sealed class DialogService : IDialogService
     public DialogService(SettingsService settingsService) => _settingsService = settingsService;
 
     public bool Confirm(string message, string title) =>
-        MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
+        MessageBox.Show(UiLanguage.Text(message), UiLanguage.Text(title), MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
 
     public void ShowError(string message, string title = "NRS Workbench") =>
-        MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBox.Show(UiLanguage.Text(message), UiLanguage.Text(title), MessageBoxButton.OK, MessageBoxImage.Error);
 
     public void ShowInfo(string message, string title = "NRS Workbench") =>
-        MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show(UiLanguage.Text(message), UiLanguage.Text(title), MessageBoxButton.OK, MessageBoxImage.Information);
 
     public bool EditSettings(Window owner)
     {

@@ -16,8 +16,8 @@ public sealed class GitService : IGitService
     public async Task<string> GetVersionAsync()
     {
         var result = await RunAsync(Environment.CurrentDirectory, ["--version"], allowFailure: true);
-        if (result.ExitCode != 0) return "Git no disponible";
-        return string.IsNullOrWhiteSpace(result.StdOut) ? "Git detectado" : result.StdOut.Trim();
+        if (result.ExitCode != 0) return UiLanguage.Choose("Git no disponible", "Git unavailable");
+        return string.IsNullOrWhiteSpace(result.StdOut) ? UiLanguage.Choose("Git detectado", "Git detected") : result.StdOut.Trim();
     }
 
     public async Task<GitRepositoryInfo> InspectAsync(string repositoryPath)
@@ -28,7 +28,7 @@ public sealed class GitService : IGitService
         if (!Directory.Exists(path))
         {
             info.State = GitRepositoryState.Error;
-            info.ErrorMessage = "La carpeta no existe.";
+            info.ErrorMessage = UiLanguage.Choose("La carpeta no existe.", "The folder does not exist.");
             return info;
         }
 
@@ -36,7 +36,7 @@ public sealed class GitService : IGitService
         if (top.ExitCode != 0)
         {
             info.State = GitRepositoryState.Error;
-            info.ErrorMessage = "La carpeta no es un repositorio Git válido.";
+            info.ErrorMessage = UiLanguage.Choose("La carpeta no es un repositorio Git válido.", "The folder is not a valid Git repository.");
             return info;
         }
 
@@ -117,9 +117,9 @@ public sealed class GitService : IGitService
     {
         EnsureRepositoryUsable(repository);
         var commitMessage = (message ?? string.Empty).Trim();
-        if (string.IsNullOrWhiteSpace(commitMessage)) throw new InvalidOperationException("Escribe un mensaje de commit.");
-        if (repository.ConflictCount > 0) throw new InvalidOperationException("Commit bloqueado: el repositorio contiene conflictos sin resolver.");
-        if (selectedChanges.Count == 0) throw new InvalidOperationException("Selecciona al menos un archivo para el commit.");
+        if (string.IsNullOrWhiteSpace(commitMessage)) throw new InvalidOperationException(UiLanguage.Choose("Escribe un mensaje de commit.", "Enter a commit message."));
+        if (repository.ConflictCount > 0) throw new InvalidOperationException(UiLanguage.Choose("Commit bloqueado: el repositorio contiene conflictos sin resolver.", "Commit blocked: the repository has unresolved conflicts."));
+        if (selectedChanges.Count == 0) throw new InvalidOperationException(UiLanguage.Choose("Selecciona al menos un archivo para el commit.", "Select at least one file to commit."));
 
         var currentChanges = await GetChangesAsync(repository);
         var selectedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -136,8 +136,8 @@ public sealed class GitService : IGitService
         if (stagedOutsideSelection.Count > 0)
         {
             var preview = string.Join("\r\n", stagedOutsideSelection.Take(8).Select(x => "• " + x));
-            if (stagedOutsideSelection.Count > 8) preview += $"\r\n• … y {stagedOutsideSelection.Count - 8} más";
-            throw new InvalidOperationException("Hay cambios ya staged que no están seleccionados. Para evitar incluirlos por accidente, el commit se ha bloqueado.\r\n\r\n" + preview);
+            if (stagedOutsideSelection.Count > 8) preview += UiLanguage.Choose($"\r\n• … y {stagedOutsideSelection.Count - 8} más", $"\r\n• … and {stagedOutsideSelection.Count - 8} more");
+            throw new InvalidOperationException(UiLanguage.Choose("Hay cambios ya staged que no están seleccionados. Para evitar incluirlos por accidente, el commit se ha bloqueado.\r\n\r\n", "Other staged changes were not selected. The commit is blocked to avoid including them by accident.\r\n\r\n") + preview);
         }
 
         // Stage only paths that still need staging. A fully staged rename produced by
@@ -169,7 +169,7 @@ public sealed class GitService : IGitService
         }
 
         var stagedCheck = await RunAsync(repository.Path, ["diff", "--cached", "--quiet"], allowFailure: true);
-        if (stagedCheck.ExitCode == 0) throw new InvalidOperationException("Los archivos seleccionados no producen ningún cambio para commitear.");
+        if (stagedCheck.ExitCode == 0) throw new InvalidOperationException(UiLanguage.Choose("Los archivos seleccionados no producen ningún cambio para commitear.", "The selected files have no changes to commit."));
 
         await RunAsync(repository.Path, ["commit", "-m", commitMessage], allowFailure: false);
     }
@@ -177,25 +177,25 @@ public sealed class GitService : IGitService
     public async Task FetchAsync(GitRepositoryInfo repository)
     {
         EnsureRepositoryUsable(repository);
-        if (!repository.HasRemote) throw new InvalidOperationException("Este repositorio no tiene remote 'origin'.");
+        if (!repository.HasRemote) throw new InvalidOperationException(UiLanguage.Choose("Este repositorio no tiene remote 'origin'.", "This repository has no 'origin' remote."));
         await RunAsync(repository.Path, ["fetch", "--prune"], allowFailure: false);
     }
 
     public async Task PullFastForwardAsync(GitRepositoryInfo repository)
     {
         EnsureRepositoryUsable(repository);
-        if (!repository.HasUpstream) throw new InvalidOperationException("La rama actual no tiene upstream configurado.");
-        if (repository.IsDirty) throw new InvalidOperationException("Pull bloqueado: hay cambios locales sin commit. Guarda, descarta o haz commit primero.");
-        if (repository.Ahead > 0 && repository.Behind > 0) throw new InvalidOperationException("Pull automático bloqueado: la rama ha divergido. Resuelve la estrategia manualmente.");
+        if (!repository.HasUpstream) throw new InvalidOperationException(UiLanguage.Choose("La rama actual no tiene upstream configurado.", "The current branch has no configured upstream."));
+        if (repository.IsDirty) throw new InvalidOperationException(UiLanguage.Choose("Pull bloqueado: hay cambios locales sin commit. Guarda, descarta o haz commit primero.", "Pull blocked: there are uncommitted local changes. Save, discard or commit them first."));
+        if (repository.Ahead > 0 && repository.Behind > 0) throw new InvalidOperationException(UiLanguage.Choose("Pull automático bloqueado: la rama ha divergido. Resuelve la estrategia manualmente.", "Automatic pull blocked: the branch has diverged. Choose a strategy manually."));
         await RunAsync(repository.Path, ["pull", "--ff-only"], allowFailure: false);
     }
 
     public async Task PushAsync(GitRepositoryInfo repository)
     {
         EnsureRepositoryUsable(repository);
-        if (!repository.HasUpstream) throw new InvalidOperationException("La rama actual no tiene upstream configurado.");
-        if (repository.Behind > 0) throw new InvalidOperationException("Push bloqueado: el remoto contiene commits que todavía no tienes localmente.");
-        if (repository.Ahead <= 0) throw new InvalidOperationException("No hay commits locales pendientes de push.");
+        if (!repository.HasUpstream) throw new InvalidOperationException(UiLanguage.Choose("La rama actual no tiene upstream configurado.", "The current branch has no configured upstream."));
+        if (repository.Behind > 0) throw new InvalidOperationException(UiLanguage.Choose("Push bloqueado: el remoto contiene commits que todavía no tienes localmente.", "Push blocked: the remote has commits missing locally."));
+        if (repository.Ahead <= 0) throw new InvalidOperationException(UiLanguage.Choose("No hay commits locales pendientes de push.", "There are no local commits to push."));
         await RunAsync(repository.Path, ["push"], allowFailure: false);
     }
 
@@ -210,19 +210,19 @@ public sealed class GitService : IGitService
     public async Task SwitchLocalBranchAsync(GitRepositoryInfo repository, string branch)
     {
         EnsureRepositoryUsable(repository);
-        if (string.IsNullOrWhiteSpace(branch)) throw new InvalidOperationException("Selecciona una rama local.");
+        if (string.IsNullOrWhiteSpace(branch)) throw new InvalidOperationException(UiLanguage.Choose("Selecciona una rama local.", "Select a local branch."));
 
         // The displayed snapshot may be stale. Reinspect immediately before any Git write.
         var current = await InspectAsync(repository.Path);
         if (current.State == GitRepositoryState.Error || current.IsDirty || current.ConflictCount > 0)
-            throw new InvalidOperationException("Cambio de rama bloqueado: el repositorio tiene cambios locales o conflictos.");
+            throw new InvalidOperationException(UiLanguage.Choose("Cambio de rama bloqueado: el repositorio tiene cambios locales o conflictos.", "Branch switch blocked: the repository has local changes or conflicts."));
         if (!string.Equals(current.Branch, repository.Branch, StringComparison.Ordinal))
-            throw new InvalidOperationException("La rama actual ha cambiado. Actualiza el repositorio y vuelve a intentarlo.");
+            throw new InvalidOperationException(UiLanguage.Choose("La rama actual ha cambiado. Actualiza el repositorio y vuelve a intentarlo.", "The current branch has changed. Refresh the repository and try again."));
         if (string.Equals(branch, current.Branch, StringComparison.Ordinal)) return;
 
         var branches = await GetLocalBranchesAsync(current);
         if (!branches.Contains(branch, StringComparer.Ordinal))
-            throw new InvalidOperationException("La rama seleccionada ya no existe como rama local.");
+            throw new InvalidOperationException(UiLanguage.Choose("La rama seleccionada ya no existe como rama local.", "The selected local branch no longer exists."));
 
         // An exact validated ref prevents a branch name from being interpreted as a Git option.
         await RunAsync(current.Path, ["switch", "--", branch], allowFailure: false);

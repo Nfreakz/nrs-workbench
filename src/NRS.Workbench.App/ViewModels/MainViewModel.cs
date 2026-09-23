@@ -16,8 +16,8 @@ public sealed class MainViewModel : ObservableObject
     private readonly IDialogService _dialogs;
     private readonly SemaphoreSlim _refreshGate = new(1, 1);
     private RunnerInfo? _selectedRunner;
-    private string _logText = "Selecciona un runner para ver el log.";
-    private string _statusText = "Inicializando...";
+    private string _logText = UiLanguage.Choose("Selecciona un runner para ver el log.", "Select a runner to view its log.");
+    private string _statusText = UiLanguage.Choose("Inicializando...", "Initializing...");
     private DateTimeOffset _lastUpdated;
 
     public ObservableCollection<RunnerInfo> Runners { get; } = [];
@@ -27,9 +27,9 @@ public sealed class MainViewModel : ObservableObject
     public int StoppedCount => Runners.Count(x => x.State == RunnerState.Stopped);
     public int ErrorCount => Runners.Count(x => x.State is RunnerState.Error or RunnerState.Unregistered);
     public int IssueCount => StoppedCount + ErrorCount;
-    public string HealthLabel => TotalCount == 0 ? "SIN DATOS" : ErrorCount > 0 ? "ALERTA" : StoppedCount > 0 ? "ATENCIÓN" : "OK";
+    public string HealthLabel => TotalCount == 0 ? UiLanguage.Choose("SIN DATOS", "NO DATA") : ErrorCount > 0 ? UiLanguage.Choose("ALERTA", "ALERT") : StoppedCount > 0 ? UiLanguage.Text("ATENCIÓN") : "OK";
     public string HealthKind => TotalCount == 0 ? "Unknown" : ErrorCount > 0 ? "Alert" : StoppedCount > 0 ? "Warning" : "Healthy";
-    public string HealthDetail => TotalCount == 0 ? "0 runners" : IssueCount == 0 ? $"{TotalCount} operativos" : $"{IssueCount} con atención";
+    public string HealthDetail => TotalCount == 0 ? "0 runners" : IssueCount == 0 ? UiLanguage.Choose($"{TotalCount} operativos", $"{TotalCount} operational") : UiLanguage.Choose($"{IssueCount} con atención", $"{IssueCount} need attention");
 
     public RunnerInfo? SelectedRunner
     {
@@ -85,7 +85,7 @@ public sealed class MainViewModel : ObservableObject
         try
         {
             var selectedPath = SelectedRunner?.FolderPath;
-            StatusText = "Actualizando runners...";
+            StatusText = UiLanguage.Choose("Actualizando runners...", "Refreshing runners...");
             var rows = await Task.Run(_discovery.Discover);
 
             Runners.Clear();
@@ -94,14 +94,16 @@ public sealed class MainViewModel : ObservableObject
                 string.Equals(x.FolderPath, selectedPath, StringComparison.OrdinalIgnoreCase)) ?? Runners.FirstOrDefault();
 
             _lastUpdated = DateTimeOffset.Now;
-            StatusText = rows.Count == 0 ? "No se han detectado runners · revisa Configuración > Detectar automáticamente" : $"Sistema listo · {rows.Count} runner{(rows.Count == 1 ? "" : "s")} detectado{(rows.Count == 1 ? "" : "s")}";
+            StatusText = rows.Count == 0
+                ? UiLanguage.Choose("No se han detectado runners · revisa Configuración > Detectar automáticamente", "No runners detected · check Settings > Detect automatically")
+                : UiLanguage.Choose($"Sistema listo · {rows.Count} runner{(rows.Count == 1 ? "" : "s")} detectado{(rows.Count == 1 ? "" : "s")}", $"System ready · {rows.Count} runner{(rows.Count == 1 ? "" : "s")} detected");
             RaiseCounts();
             RaiseCommandStates();
         }
         catch (Exception ex)
         {
             AppLogger.Error("Refresh failed", ex);
-            StatusText = "Error al actualizar runners";
+            StatusText = UiLanguage.Choose("Error al actualizar runners", "Could not refresh runners");
         }
         finally { _refreshGate.Release(); }
     }
@@ -116,27 +118,27 @@ public sealed class MainViewModel : ObservableObject
     private async Task StartSelectedAsync()
     {
         if (SelectedRunner is null) return;
-        await ExecuteAction(() => _control.StartAsync(SelectedRunner), $"Iniciando {SelectedRunner.Alias}...");
+        await ExecuteAction(() => _control.StartAsync(SelectedRunner), UiLanguage.Choose($"Iniciando {SelectedRunner.Alias}...", $"Starting {SelectedRunner.Alias}..."));
     }
 
     private async Task StopSelectedAsync()
     {
         if (SelectedRunner is null || !CanStop(SelectedRunner)) return;
         if (!ConfirmBusy(SelectedRunner)) return;
-        await ExecuteAction(() => _control.StopAsync(SelectedRunner), $"Parando {SelectedRunner.Alias}...");
+        await ExecuteAction(() => _control.StopAsync(SelectedRunner), UiLanguage.Choose($"Parando {SelectedRunner.Alias}...", $"Stopping {SelectedRunner.Alias}..."));
     }
 
     private async Task RestartSelectedAsync()
     {
         if (SelectedRunner is null) return;
         if (!ConfirmBusy(SelectedRunner)) return;
-        await ExecuteAction(() => _control.RestartAsync(SelectedRunner), $"Reiniciando {SelectedRunner.Alias}...");
+        await ExecuteAction(() => _control.RestartAsync(SelectedRunner), UiLanguage.Choose($"Reiniciando {SelectedRunner.Alias}...", $"Restarting {SelectedRunner.Alias}..."));
     }
 
     private async Task StartAllAsync()
     {
         foreach (var runner in Runners.Where(x => x.State == RunnerState.Stopped).ToList())
-            await ExecuteAction(() => _control.StartAsync(runner), $"Iniciando {runner.Alias}...", refreshAfter: false);
+            await ExecuteAction(() => _control.StartAsync(runner), UiLanguage.Choose($"Iniciando {runner.Alias}...", $"Starting {runner.Alias}..."), refreshAfter: false);
         await RefreshAsync();
     }
 
@@ -145,10 +147,10 @@ public sealed class MainViewModel : ObservableObject
         var active = Runners.Where(x => x.State is RunnerState.Ready or RunnerState.Busy).ToList();
         if (active.Any(x => x.State == RunnerState.Busy) && _settingsService.Load().ConfirmStopBusy)
         {
-            if (!_dialogs.Confirm("Hay runners BUSY. Parar todos puede interrumpir jobs en ejecución.\n\n¿Continuar?", "Parar todos")) return;
+            if (!_dialogs.Confirm(UiLanguage.Choose("Hay runners BUSY. Parar todos puede interrumpir jobs en ejecución.\n\n¿Continuar?", "Some runners are BUSY. Stopping all may interrupt running jobs.\n\nContinue?"), UiLanguage.Text("Parar todos"))) return;
         }
         foreach (var runner in active)
-            await ExecuteAction(() => _control.StopAsync(runner), $"Parando {runner.Alias}...", refreshAfter: false);
+            await ExecuteAction(() => _control.StopAsync(runner), UiLanguage.Choose($"Parando {runner.Alias}...", $"Stopping {runner.Alias}..."), refreshAfter: false);
         await RefreshAsync();
     }
 
@@ -167,15 +169,15 @@ public sealed class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLogger.Error(status, ex);
-            _dialogs.ShowError($"No se pudo completar la acción.\n\n{ex.Message}\n\nSi el runner está instalado como servicio, prueba a ejecutar NRS Workbench como administrador.");
-            StatusText = "La acción ha fallado";
+            _dialogs.ShowError(UiLanguage.Choose($"No se pudo completar la acción.\n\n{ex.Message}\n\nSi el runner está instalado como servicio, prueba a ejecutar NRS Workbench como administrador.", $"Could not complete the action.\n\n{ex.Message}\n\nIf the runner is installed as a service, try running NRS Workbench as administrator."));
+            StatusText = UiLanguage.Choose("La acción ha fallado", "Action failed");
         }
     }
 
     private bool ConfirmBusy(RunnerInfo runner)
     {
         if (runner.State != RunnerState.Busy || !_settingsService.Load().ConfirmStopBusy) return true;
-        return _dialogs.Confirm($"El runner '{runner.Alias}' está ejecutando un job.\n\nLa operación puede interrumpirlo y marcarlo como fallido.\n\n¿Continuar?", "Runner BUSY");
+        return _dialogs.Confirm(UiLanguage.Choose($"El runner '{runner.Alias}' está ejecutando un job.\n\nLa operación puede interrumpirlo y marcarlo como fallido.\n\n¿Continuar?", $"Runner '{runner.Alias}' is running a job.\n\nThis action may interrupt it and mark it as failed.\n\nContinue?"), "Runner BUSY");
     }
 
     private bool CanStartSelected() => SelectedRunner?.State == RunnerState.Stopped;
@@ -185,7 +187,7 @@ public sealed class MainViewModel : ObservableObject
 
     private void LoadSelectedLog()
     {
-        LogText = SelectedRunner is null ? "Selecciona un runner para ver el log." : _logs.ReadLatest(SelectedRunner.FolderPath);
+        LogText = SelectedRunner is null ? UiLanguage.Choose("Selecciona un runner para ver el log.", "Select a runner to view its log.") : _logs.ReadLatest(SelectedRunner.FolderPath);
     }
 
     private static void OpenPath(string? path)
