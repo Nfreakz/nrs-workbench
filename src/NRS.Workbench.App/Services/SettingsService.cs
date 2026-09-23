@@ -241,6 +241,7 @@ public sealed class SettingsService
         if (string.IsNullOrWhiteSpace(settings.FolderPattern)) settings.FolderPattern = "actions-runner*";
         if (settings.RunnerRoots.Count == 0) settings.RunnerRoots.Add(FindFallbackRoot());
         settings.RefreshIntervalSeconds = Math.Clamp(settings.RefreshIntervalSeconds, 2, 300);
+        settings.Language = string.Equals(settings.Language, "en", StringComparison.OrdinalIgnoreCase) ? "en" : "es";
     }
 
     private sealed class PortableSettingsEnvelope
@@ -266,6 +267,7 @@ public sealed class SettingsService
         public bool NotifyRunnerIssues { get; set; } = true;
         public bool NotifyOnlyWhenHidden { get; set; } = true;
         public List<string> RepositoryPaths { get; set; } = [];
+        public string Language { get; set; } = "es";
 
         public static PortableSettingsData FromSettings(RunnerSettings settings) => new()
         {
@@ -279,7 +281,8 @@ public sealed class SettingsService
             NotifyJobCompleted = settings.NotifyJobCompleted,
             NotifyRunnerIssues = settings.NotifyRunnerIssues,
             NotifyOnlyWhenHidden = settings.NotifyOnlyWhenHidden,
-            RepositoryPaths = settings.RepositoryPaths?.ToList() ?? []
+            RepositoryPaths = settings.RepositoryPaths?.ToList() ?? [],
+            Language = settings.Language
         };
 
         public RunnerSettings ToSettings() => new()
@@ -294,7 +297,8 @@ public sealed class SettingsService
             NotifyJobCompleted = NotifyJobCompleted,
             NotifyRunnerIssues = NotifyRunnerIssues,
             NotifyOnlyWhenHidden = NotifyOnlyWhenHidden,
-            RepositoryPaths = RepositoryPaths?.ToList() ?? []
+            RepositoryPaths = RepositoryPaths?.ToList() ?? [],
+            Language = Language
         };
     }
 }

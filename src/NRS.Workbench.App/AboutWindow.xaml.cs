@@ -17,7 +17,7 @@ public partial class AboutWindow : Window
         SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
 
         var version = Assembly.GetEntryAssembly()?.GetName().Version;
-        VersionText.Text = $"Versión {(version is null ? "desconocida" : $"{version.Major}.{version.Minor}.{version.Build}")}";
+        VersionText.Text = UiLanguage.Choose("Versión ", "Version ") + (version is null ? UiLanguage.Choose("desconocida", "unknown") : $"{version.Major}.{version.Minor}.{version.Build}");
         RuntimeText.Text = RuntimeInformation.FrameworkDescription;
         SystemText.Text = RuntimeInformation.OSDescription;
         DataPathText.Text = _settings.SettingsDirectory;
@@ -32,7 +32,7 @@ public partial class AboutWindow : Window
         catch (Exception ex)
         {
             AppLogger.Error("Could not open support page", ex);
-            MessageBox.Show("No se pudo abrir la página de apoyo.", "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(UiLanguage.Choose("No se pudo abrir la página de apoyo.", "Could not open the support page."), "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -46,7 +46,7 @@ public partial class AboutWindow : Window
         catch (Exception ex)
         {
             AppLogger.Error("Could not open local data directory", ex);
-            MessageBox.Show("No se pudo abrir la carpeta de datos locales.", "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(UiLanguage.Choose("No se pudo abrir la carpeta de datos locales.", "Could not open the local data folder."), "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -54,13 +54,13 @@ public partial class AboutWindow : Window
     {
         try
         {
-            var text = $"NRS Workbench {VersionText.Text}\nCreado por Neo RS\n{RuntimeText.Text}\n{SystemText.Text}\nDatos: {_settings.SettingsDirectory}";
+            var text = UiLanguage.Choose($"NRS Workbench {VersionText.Text}\nCreado por Neo RS\n{RuntimeText.Text}\n{SystemText.Text}\nDatos: {_settings.SettingsDirectory}", $"NRS Workbench {VersionText.Text}\nCreated by Neo RS\n{RuntimeText.Text}\n{SystemText.Text}\nData: {_settings.SettingsDirectory}");
             Clipboard.SetText(text);
         }
         catch (Exception ex)
         {
             AppLogger.Error("Could not copy About information", ex);
-            MessageBox.Show("No se pudo copiar la información al portapapeles.", "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(UiLanguage.Choose("No se pudo copiar la información al portapapeles.", "Could not copy information to the clipboard."), "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 

@@ -13,7 +13,7 @@ public sealed class StatisticsViewModel : ObservableObject
     private readonly SettingsService _settings;
     private StatisticsPeriodOption _selectedPeriod;
     private bool _isLoading;
-    private string _statusText = "Preparando estadísticas...";
+    private string _statusText = UiLanguage.Choose("Preparando estadísticas...", "Preparing statistics...");
     private int _totalRuns;
     private int _succeededRuns;
     private int _failedRuns;
@@ -38,7 +38,7 @@ public sealed class StatisticsViewModel : ObservableObject
     private string _peakDay = "—";
     private double _scanProgress;
     private string _scanDetail = string.Empty;
-    private string _auditText = "Worker logs: — · Jobs únicos: — · Duplicados: — · Con ID: —";
+    private string _auditText = UiLanguage.Choose("Worker logs: — · Jobs únicos: — · Duplicados: — · Con ID: —", "Worker logs: — · Unique jobs: — · Duplicates: — · With ID: —");
 
     private int _repositoryTotalCount;
     private int _repositoryCleanCount;
@@ -50,7 +50,7 @@ public sealed class StatisticsViewModel : ObservableObject
     private string _repositorySyncRate = "—";
     private string _repositoryLastCommit = "—";
     private string _repositoryMostChanged = "—";
-    private string _repositoryStatusText = "Preparando inventario Git local...";
+    private string _repositoryStatusText = UiLanguage.Choose("Preparando inventario Git local...", "Preparing local Git inventory...");
 
     public ObservableCollection<RunnerStatisticsRow> ByRunner { get; } = [];
     public ObservableCollection<JobRunRecord> RecentRuns { get; } = [];
@@ -59,10 +59,10 @@ public sealed class StatisticsViewModel : ObservableObject
 
     public IReadOnlyList<StatisticsPeriodOption> PeriodOptions { get; } =
     [
-        new("Todo", StatisticsPeriod.All),
-        new("Hoy", StatisticsPeriod.Today),
-        new("Últimos 7 días", StatisticsPeriod.Last7Days),
-        new("Últimos 30 días", StatisticsPeriod.Last30Days)
+        new(UiLanguage.Choose("Todo", "All time"), StatisticsPeriod.All),
+        new(UiLanguage.Choose("Hoy", "Today"), StatisticsPeriod.Today),
+        new(UiLanguage.Choose("Últimos 7 días", "Last 7 days"), StatisticsPeriod.Last7Days),
+        new(UiLanguage.Choose("Últimos 30 días", "Last 30 days"), StatisticsPeriod.Last30Days)
     ];
 
     public StatisticsPeriodOption SelectedPeriod
@@ -132,9 +132,9 @@ public sealed class StatisticsViewModel : ObservableObject
         if (IsLoading) return;
         IsLoading = true;
         ScanProgress = 0;
-        ScanDetail = "Preparando historial local...";
-        StatusText = "Analizando historial local de Worker logs...";
-        RepositoryStatusText = "Actualizando inventario Git local...";
+        ScanDetail = UiLanguage.Choose("Preparando historial local...", "Preparing local history...");
+        StatusText = UiLanguage.Choose("Analizando historial local de Worker logs...", "Analyzing local Worker log history...");
+        RepositoryStatusText = UiLanguage.Choose("Actualizando inventario Git local...", "Refreshing local Git inventory...");
 
         try
         {
@@ -154,12 +154,12 @@ public sealed class StatisticsViewModel : ObservableObject
                 ScanProgress = value.Percent;
                 if (value.TotalFiles <= 0)
                 {
-                    ScanDetail = "No hay Worker logs históricos que analizar.";
+                    ScanDetail = UiLanguage.Choose("No hay Worker logs históricos que analizar.", "No historical Worker logs to analyze.");
                     return;
                 }
 
                 var runner = string.IsNullOrWhiteSpace(value.RunnerAlias) ? string.Empty : $" · {value.RunnerAlias}";
-                ScanDetail = $"Analizando {value.ProcessedFiles:N0}/{value.TotalFiles:N0} logs{runner}";
+                ScanDetail = UiLanguage.Choose($"Analizando {value.ProcessedFiles:N0}/{value.TotalFiles:N0} logs{runner}", $"Analyzing {value.ProcessedFiles:N0}/{value.TotalFiles:N0} logs{runner}");
                 StatusText = ScanDetail;
             });
 
@@ -187,7 +187,7 @@ public sealed class StatisticsViewModel : ObservableObject
             RunsLast24Hours = snapshot.RunsLast24Hours;
             JobsPerDay = snapshot.JobsPerDayDisplay;
             PeakDay = snapshot.PeakDayDisplay;
-            AuditText = $"Worker logs: {snapshot.WorkerLogsScanned:N0} · Jobs únicos: {snapshot.TotalRuns:N0} · Duplicados: {snapshot.DuplicateLogsDiscarded:N0} · Con ID: {snapshot.StableIdentityRuns:N0}";
+            AuditText = UiLanguage.Choose($"Worker logs: {snapshot.WorkerLogsScanned:N0} · Jobs únicos: {snapshot.TotalRuns:N0} · Duplicados: {snapshot.DuplicateLogsDiscarded:N0} · Con ID: {snapshot.StableIdentityRuns:N0}", $"Worker logs: {snapshot.WorkerLogsScanned:N0} · Unique jobs: {snapshot.TotalRuns:N0} · Duplicates: {snapshot.DuplicateLogsDiscarded:N0} · With ID: {snapshot.StableIdentityRuns:N0}");
 
             DailyActivity.Clear();
             foreach (var point in snapshot.DailyActivity) DailyActivity.Add(point);
@@ -202,18 +202,18 @@ public sealed class StatisticsViewModel : ObservableObject
 
             ScanProgress = 100;
             ScanDetail = snapshot.TotalRuns == 0
-                ? "Historial analizado."
-                : $"{snapshot.TotalRuns:N0} jobs locales auditados.";
+                ? UiLanguage.Choose("Historial analizado.", "History analyzed.")
+                : UiLanguage.Choose($"{snapshot.TotalRuns:N0} jobs locales auditados.", $"{snapshot.TotalRuns:N0} local jobs audited.");
             StatusText = snapshot.TotalRuns == 0
                 ? snapshot.ActiveRuns > 0
-                    ? $"Sin historial finalizado · {snapshot.ActiveRuns} job(s) en curso"
-                    : "No hay jobs históricos disponibles para este periodo."
-                : $"{snapshot.TotalRuns:N0} jobs locales · {snapshot.RunnersWithActivity} runners con actividad";
+                    ? UiLanguage.Choose($"Sin historial finalizado · {snapshot.ActiveRuns} job(s) en curso", $"No completed history · {snapshot.ActiveRuns} jobs in progress")
+                    : UiLanguage.Choose("No hay jobs históricos disponibles para este periodo.", "No historical jobs available for this period.")
+                : UiLanguage.Choose($"{snapshot.TotalRuns:N0} jobs locales · {snapshot.RunnersWithActivity} runners con actividad", $"{snapshot.TotalRuns:N0} local jobs · {snapshot.RunnersWithActivity} active runners");
         }
         catch (Exception ex)
         {
             AppLogger.Error("Statistics refresh failed", ex);
-            StatusText = "No se pudieron calcular las estadísticas.";
+            StatusText = UiLanguage.Choose("No se pudieron calcular las estadísticas.", "Could not calculate statistics.");
         }
         finally
         {
@@ -233,7 +233,7 @@ public sealed class StatisticsViewModel : ObservableObject
             if (paths.Count == 0)
             {
                 ApplyRepositorySnapshot([]);
-                RepositoryStatusText = "Sin repositorios configurados.";
+                RepositoryStatusText = UiLanguage.Choose("Sin repositorios configurados.", "No repositories configured.");
                 return;
             }
 
@@ -271,7 +271,7 @@ public sealed class StatisticsViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLogger.Error("Repository statistics refresh failed", ex);
-            RepositoryStatusText = "No se pudo actualizar el estado de los repositorios.";
+            RepositoryStatusText = UiLanguage.Choose("No se pudo actualizar el estado de los repositorios.", "Could not refresh repository status.");
         }
     }
 
@@ -312,11 +312,11 @@ public sealed class StatisticsViewModel : ObservableObject
             .FirstOrDefault();
         RepositoryMostChanged = mostChanged is null
             ? "—"
-            : $"{mostChanged.Name} · {mostChanged.ChangeCount} cambio{(mostChanged.ChangeCount == 1 ? string.Empty : "s")}";
+            : UiLanguage.Choose($"{mostChanged.Name} · {mostChanged.ChangeCount} cambio{(mostChanged.ChangeCount == 1 ? string.Empty : "s")}", $"{mostChanged.Name} · {mostChanged.ChangeCount} changes");
 
         RepositoryStatusText = rows.Count == 0
-            ? "Sin repositorios configurados."
-            : $"{rows.Count} repos · {RepositoryCleanCount} clean · {RepositoryChangesCount} con cambios · {RepositoryAttentionCount} con atención";
+            ? UiLanguage.Choose("Sin repositorios configurados.", "No repositories configured.")
+            : UiLanguage.Choose($"{rows.Count} repos · {RepositoryCleanCount} clean · {RepositoryChangesCount} con cambios · {RepositoryAttentionCount} con atención", $"{rows.Count} repos · {RepositoryCleanCount} clean · {RepositoryChangesCount} changed · {RepositoryAttentionCount} need attention");
     }
 }
 

@@ -35,6 +35,7 @@ internal static class PortableSettingsSmoke
                 NotifyJobCompleted = true,
                 NotifyRunnerIssues = false,
                 NotifyOnlyWhenHidden = false,
+                Language = "en",
                 RepositoryPaths = [repositoryPath, repositoryPath]
             };
 
@@ -51,6 +52,11 @@ internal static class PortableSettingsSmoke
                 "portable settings import normalizes duplicate runner roots");
             Assert(imported.RepositoryPaths.Count == 1 && imported.RepositoryPaths[0] == repositoryPath,
                 "portable settings import normalizes duplicate repository paths");
+            Assert(imported.Language == "en", "portable settings preserves selected language");
+            UiLanguage.Select(imported.Language);
+            Assert(UiLanguage.Text("Configuración") == "Settings", "English UI resources load from the packaged app");
+            UiLanguage.Select("es");
+            Assert(UiLanguage.Text("Configuración") == "Configuración", "Spanish remains the default UI text");
             Assert(imported.RefreshIntervalSeconds == 300 &&
                    !imported.ConfirmStopBusy &&
                    !imported.KeepInTray &&

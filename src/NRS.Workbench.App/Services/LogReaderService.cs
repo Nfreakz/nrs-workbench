@@ -39,13 +39,13 @@ public sealed class LogReaderService : ILogReaderService
             }
 
             return queue.Count == 0
-                ? "El log está vacío por ahora."
+                ? UiLanguage.Choose("El log está vacío por ahora.", "The log is empty for now.")
                 : string.Join(Environment.NewLine, queue);
         }
         catch (IOException ex)
         {
             AppLogger.Error($"Could not read logs for '{runnerFolder}'", ex);
-            return "El log está temporalmente ocupado. Se reintentará en la próxima actualización.";
+            return UiLanguage.Choose("El log está temporalmente ocupado. Se reintentará en la próxima actualización.", "The log is temporarily busy. It will be retried at the next refresh.");
         }
         catch (UnauthorizedAccessException ex)
         {

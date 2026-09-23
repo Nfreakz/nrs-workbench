@@ -13,8 +13,8 @@ public sealed class RepositoriesViewModel : ObservableObject
     private readonly IDialogService _dialogs;
     private readonly SemaphoreSlim _refreshGate = new(1, 1);
     private GitRepositoryInfo? _selectedRepository;
-    private string _statusText = "Preparando repositorios...";
-    private string _gitVersionText = "Comprobando Git...";
+    private string _statusText = UiLanguage.Choose("Preparando repositorios...", "Preparing repositories...");
+    private string _gitVersionText = UiLanguage.Choose("Comprobando Git...", "Checking Git...");
     private DateTimeOffset _lastUpdated;
 
     public ObservableCollection<GitRepositoryInfo> Repositories { get; } = [];
@@ -71,7 +71,7 @@ public sealed class RepositoriesViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLogger.Error("Could not detect Git", ex);
-            GitVersionText = "Git no disponible";
+            GitVersionText = UiLanguage.Choose("Git no disponible", "Git unavailable");
         }
         await RefreshAsync();
     }
@@ -87,7 +87,9 @@ public sealed class RepositoriesViewModel : ObservableObject
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            StatusText = paths.Count == 0 ? "Añade un repositorio o escanea una carpeta para empezar." : $"Actualizando {paths.Count} repositorio{(paths.Count == 1 ? string.Empty : "s")}...";
+            StatusText = paths.Count == 0
+                ? UiLanguage.Choose("Añade un repositorio o escanea una carpeta para empezar.", "Add a repository or scan a folder to get started.")
+                : UiLanguage.Choose($"Actualizando {paths.Count} repositorio{(paths.Count == 1 ? string.Empty : "s")}...", $"Refreshing {paths.Count} repositories...");
 
             var rows = new List<GitRepositoryInfo>();
             using var gate = new SemaphoreSlim(4, 4);
@@ -119,15 +121,15 @@ public sealed class RepositoriesViewModel : ObservableObject
 
             _lastUpdated = DateTimeOffset.Now;
             StatusText = rows.Count == 0
-                ? "Sin repositorios configurados. Usa Añadir repositorio o Escanear carpeta."
-                : $"{rows.Count} repositorio{(rows.Count == 1 ? string.Empty : "s")} · {CleanCount} clean · {ChangesCount} con cambios · {AttentionCount} con atención";
+                ? UiLanguage.Choose("Sin repositorios configurados. Usa Añadir repositorio o Escanear carpeta.", "No repositories configured. Use Add repository or Scan folder.")
+                : UiLanguage.Choose($"{rows.Count} repositorio{(rows.Count == 1 ? string.Empty : "s")} · {CleanCount} clean · {ChangesCount} con cambios · {AttentionCount} con atención", $"{rows.Count} repositories · {CleanCount} clean · {ChangesCount} changed · {AttentionCount} need attention");
             RaiseSummary();
             RaiseCommandStates();
         }
         catch (Exception ex)
         {
             AppLogger.Error("Repository refresh failed", ex);
-            StatusText = "No se pudieron actualizar los repositorios.";
+            StatusText = UiLanguage.Choose("No se pudieron actualizar los repositorios.", "Could not refresh repositories.");
         }
         finally { _refreshGate.Release(); }
     }
@@ -149,14 +151,14 @@ public sealed class RepositoriesViewModel : ObservableObject
                 settings.RepositoryPaths.Add(info.Path);
                 _settings.Save(settings);
             }
-            StatusText = $"Añadido {info.Name}.";
+            StatusText = UiLanguage.Choose($"Añadido {info.Name}.", $"Added {info.Name}.");
             await RefreshAsync();
             SelectedRepository = Repositories.FirstOrDefault(x => string.Equals(x.Path, info.Path, StringComparison.OrdinalIgnoreCase));
         }
         catch (Exception ex)
         {
             AppLogger.Error("Could not add repository", ex);
-            _dialogs.ShowError(ex.Message, "Añadir repositorio");
+            _dialogs.ShowError(ex.Message, UiLanguage.Text("Añadir repositorio"));
         }
     }
 
@@ -164,7 +166,7 @@ public sealed class RepositoriesViewModel : ObservableObject
     {
         try
         {
-            StatusText = $"Buscando repositorios en {rootPath}...";
+            StatusText = UiLanguage.Choose($"Buscando repositorios en {rootPath}...", $"Finding repositories in {rootPath}...");
             var found = await _git.FindRepositoriesAsync(rootPath, 3);
             var settings = _settings.Load();
             var before = settings.RepositoryPaths.Count;
@@ -177,14 +179,14 @@ public sealed class RepositoriesViewModel : ObservableObject
             var added = settings.RepositoryPaths.Count - before;
             await RefreshAsync();
             StatusText = found.Count == 0
-                ? "No se encontraron repositorios Git en la carpeta seleccionada."
-                : $"Escaneo completado · {found.Count} encontrados · {added} añadidos.";
+                ? UiLanguage.Choose("No se encontraron repositorios Git en la carpeta seleccionada.", "No Git repositories found in the selected folder.")
+                : UiLanguage.Choose($"Escaneo completado · {found.Count} encontrados · {added} añadidos.", $"Scan complete · {found.Count} found · {added} added.");
             return added;
         }
         catch (Exception ex)
         {
             AppLogger.Error("Repository scan failed", ex);
-            _dialogs.ShowError(ex.Message, "Escanear repositorios");
+            _dialogs.ShowError(ex.Message, UiLanguage.Choose("Escanear repositorios", "Scan repositories"));
             return 0;
         }
     }
@@ -198,14 +200,14 @@ public sealed class RepositoriesViewModel : ObservableObject
     private async Task PullSelectedAsync()
     {
         if (SelectedRepository is null) return;
-        if (!_dialogs.Confirm($"Se ejecutará git pull --ff-only en:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nEl pull se bloqueará si requiere merge o rebase.\n\n¿Continuar?", "Pull seguro")) return;
+        if (!_dialogs.Confirm(UiLanguage.Choose($"Se ejecutará git pull --ff-only en:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nEl pull se bloqueará si requiere merge o rebase.\n\n¿Continuar?", $"Run git pull --ff-only in:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nPull will stop if a merge or rebase is required.\n\nContinue?"), UiLanguage.Choose("Pull seguro", "Safe pull"))) return;
         await ExecuteGitActionAsync(() => _git.PullFastForwardAsync(SelectedRepository), $"Pull · {SelectedRepository.Name}");
     }
 
     private async Task PushSelectedAsync()
     {
         if (SelectedRepository is null) return;
-        if (!_dialogs.Confirm($"Se enviarán {SelectedRepository.Ahead} commit{(SelectedRepository.Ahead == 1 ? string.Empty : "s")} a {SelectedRepository.Upstream}.\n\nRepositorio: {SelectedRepository.Name}\nRama: {SelectedRepository.Branch}\n\n¿Hacer push?", "Confirmar push")) return;
+        if (!_dialogs.Confirm(UiLanguage.Choose($"Se enviarán {SelectedRepository.Ahead} commit{(SelectedRepository.Ahead == 1 ? string.Empty : "s")} a {SelectedRepository.Upstream}.\n\nRepositorio: {SelectedRepository.Name}\nRama: {SelectedRepository.Branch}\n\n¿Hacer push?", $"Send {SelectedRepository.Ahead} commits to {SelectedRepository.Upstream}.\n\nRepository: {SelectedRepository.Name}\nBranch: {SelectedRepository.Branch}\n\nPush?"), UiLanguage.Choose("Confirmar push", "Confirm push"))) return;
         await ExecuteGitActionAsync(() => _git.PushAsync(SelectedRepository), $"Push · {SelectedRepository.Name}");
     }
 
@@ -216,13 +218,13 @@ public sealed class RepositoriesViewModel : ObservableObject
             StatusText = label + "...";
             await action();
             await RefreshAsync();
-            StatusText = label + " completado.";
+            StatusText = label + UiLanguage.Choose(" completado.", " completed.");
         }
         catch (Exception ex)
         {
             AppLogger.Error(label, ex);
             _dialogs.ShowError(ex.Message, label);
-            StatusText = label + " ha fallado.";
+            StatusText = label + UiLanguage.Choose(" ha fallado.", " failed.");
         }
     }
 
@@ -230,7 +232,7 @@ public sealed class RepositoriesViewModel : ObservableObject
     {
         if (SelectedRepository is null) return;
         var repo = SelectedRepository;
-        if (!_dialogs.Confirm($"Quitar '{repo.Name}' del NRS Workbench?\n\nNo se borrará ninguna carpeta ni dato Git.", "Quitar repositorio")) return;
+        if (!_dialogs.Confirm(UiLanguage.Choose($"Quitar '{repo.Name}' del NRS Workbench?\n\nNo se borrará ninguna carpeta ni dato Git.", $"Remove '{repo.Name}' from NRS Workbench?\n\nNo folder or Git data will be deleted."), UiLanguage.Choose("Quitar repositorio", "Remove repository"))) return;
 
         var settings = _settings.Load();
         settings.RepositoryPaths.RemoveAll(x => string.Equals(x, repo.Path, StringComparison.OrdinalIgnoreCase));

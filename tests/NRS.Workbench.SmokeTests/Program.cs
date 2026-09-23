@@ -40,6 +40,27 @@ internal static class Program
             var clean = await service.InspectAsync(work);
             Check("clean repository inspection", clean.State == GitRepositoryState.Clean, clean.StateLabel);
 
+            await RunGitAsync(work, "branch", "smoke-alternate");
+            var localBranches = await service.GetLocalBranchesAsync(clean);
+            Check("local branches listed", localBranches.Contains("smoke-alternate"));
+            await service.SwitchLocalBranchAsync(clean, "smoke-alternate");
+            var alternate = await service.InspectAsync(work);
+            Check("switch to an existing local branch", alternate.Branch == "smoke-alternate");
+
+            await File.WriteAllTextAsync(Path.Combine(work, "uncommitted.txt"), "keep me\n");
+            var dirtySwitchBlocked = false;
+            try { await service.SwitchLocalBranchAsync(alternate, clean.Branch); }
+            catch (InvalidOperationException) { dirtySwitchBlocked = true; }
+            Check("branch switch refuses uncommitted changes", dirtySwitchBlocked && (await service.InspectAsync(work)).Branch == "smoke-alternate");
+            File.Delete(Path.Combine(work, "uncommitted.txt"));
+
+            var staleSwitchBlocked = false;
+            try { await service.SwitchLocalBranchAsync(clean, clean.Branch); }
+            catch (InvalidOperationException) { staleSwitchBlocked = true; }
+            Check("branch switch refuses stale source branch", staleSwitchBlocked);
+            await service.SwitchLocalBranchAsync(alternate, clean.Branch);
+            Check("branch switch restores original branch", (await service.InspectAsync(work)).Branch == clean.Branch);
+
             await File.WriteAllTextAsync(Path.Combine(work, "test-a.txt"), "A\n");
             await File.WriteAllTextAsync(Path.Combine(work, "test-b.txt"), "B\n");
             var dirty = await service.InspectAsync(work);

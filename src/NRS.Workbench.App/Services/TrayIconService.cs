@@ -79,17 +79,17 @@ public sealed class TrayIconService : IDisposable
         }
         else
         {
-            _menu.Items.Add(new System.Windows.Forms.ToolStripMenuItem("Sin runners detectados") { Enabled = false });
+            _menu.Items.Add(new System.Windows.Forms.ToolStripMenuItem(UiLanguage.Choose("Sin runners detectados", "No runners detected")) { Enabled = false });
         }
 
         _menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-        _menu.Items.Add("Abrir NRS Workbench", null, (_, _) => _show());
-        _menu.Items.Add("Refrescar", null, (_, _) => _refresh());
-        _menu.Items.Add("Iniciar todos", null, (_, _) => _startAll());
-        _menu.Items.Add("Parar todos", null, (_, _) => _stopAll());
+        _menu.Items.Add(UiLanguage.Choose("Abrir NRS Workbench", "Open NRS Workbench"), null, (_, _) => _show());
+        _menu.Items.Add(UiLanguage.Text("Refrescar"), null, (_, _) => _refresh());
+        _menu.Items.Add(UiLanguage.Text("Iniciar todos"), null, (_, _) => _startAll());
+        _menu.Items.Add(UiLanguage.Text("Parar todos"), null, (_, _) => _stopAll());
         _menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-        _menu.Items.Add("Acerca de · Neo RS", null, (_, _) => _about());
-        _menu.Items.Add("Salir", null, (_, _) => _exit());
+        _menu.Items.Add(UiLanguage.Text("Acerca de · Neo RS"), null, (_, _) => _about());
+        _menu.Items.Add(UiLanguage.Choose("Salir", "Exit"), null, (_, _) => _exit());
     }
 
     private static string StateGlyph(RunnerState state) => state switch

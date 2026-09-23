@@ -53,4 +53,5 @@ public sealed class GitRepositoryInfo
     public bool CanPush => HasUpstream && Ahead > 0 && Behind == 0 && ConflictCount == 0;
     public bool CanFetch => HasRemote && State != GitRepositoryState.Error;
     public bool CanCommit => IsDirty && ConflictCount == 0 && State != GitRepositoryState.Error;
+    public bool CanSwitchBranch => !IsDirty && ConflictCount == 0 && State != GitRepositoryState.Error && !string.IsNullOrWhiteSpace(Branch);
 }

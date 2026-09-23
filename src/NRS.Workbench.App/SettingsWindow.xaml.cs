@@ -31,13 +31,14 @@ public partial class SettingsWindow : Window
         NotifyJobCompletedCheck.IsChecked = settings.NotifyJobCompleted;
         NotifyRunnerIssuesCheck.IsChecked = settings.NotifyRunnerIssues;
         NotifyOnlyWhenHiddenCheck.IsChecked = settings.NotifyOnlyWhenHidden;
+        LanguageChoice.SelectedValue = settings.Language;
     }
 
     private bool TryApplyFormToWorkingSettings()
     {
         if (!int.TryParse(RefreshText.Text, out var refresh) || refresh < 2 || refresh > 300)
         {
-            MessageBox.Show("El intervalo debe estar entre 2 y 300 segundos.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(UiLanguage.Choose("El intervalo debe estar entre 2 y 300 segundos.", "The interval must be between 2 and 300 seconds."), UiLanguage.Text("Configuración"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return false;
         }
 
@@ -55,6 +56,7 @@ public partial class SettingsWindow : Window
         _workingSettings.NotifyJobCompleted = NotifyJobCompletedCheck.IsChecked == true;
         _workingSettings.NotifyRunnerIssues = NotifyRunnerIssuesCheck.IsChecked == true;
         _workingSettings.NotifyOnlyWhenHidden = NotifyOnlyWhenHiddenCheck.IsChecked == true;
+        _workingSettings.Language = LanguageChoice.SelectedValue as string ?? "es";
         return true;
     }
 
@@ -64,8 +66,8 @@ public partial class SettingsWindow : Window
         if (roots.Count == 0)
         {
             MessageBox.Show(
-                "No he encontrado carpetas de runner en el nivel raíz de las unidades locales.\n\nPuedes añadir manualmente la carpeta que contiene actions-runner*.",
-                "Detección automática",
+                UiLanguage.Choose("No he encontrado carpetas de runner en el nivel raíz de las unidades locales.\n\nPuedes añadir manualmente la carpeta que contiene actions-runner*.", "No runner folders were found at the root of local drives.\n\nYou can add the folder containing actions-runner* manually."),
+                UiLanguage.Choose("Detección automática", "Automatic detection"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
             return;
@@ -80,8 +82,8 @@ public partial class SettingsWindow : Window
 
         var dialog = new SaveFileDialog
         {
-            Title = "Exportar configuración de NRS Workbench",
-            Filter = "Configuración NRS Workbench (*.json)|*.json|Todos los archivos (*.*)|*.*",
+            Title = UiLanguage.Choose("Exportar configuración de NRS Workbench", "Export NRS Workbench settings"),
+            Filter = UiLanguage.Choose("Configuración NRS Workbench (*.json)|*.json|Todos los archivos (*.*)|*.*", "NRS Workbench settings (*.json)|*.json|All files (*.*)|*.*"),
             FileName = $"NRSWorkbench-config-{DateTime.Now:yyyyMMdd}.json",
             AddExtension = true,
             DefaultExt = ".json",
@@ -94,16 +96,16 @@ public partial class SettingsWindow : Window
         {
             _settingsService.ExportPortableSettings(_workingSettings, dialog.FileName);
             MessageBox.Show(
-                "Configuración exportada.\n\nEl archivo contiene rutas y preferencias, pero no credenciales, tokens ni archivos internos de los runners.\n\nLas rutas locales pueden revelar nombres de carpetas o de usuario. Revísalo antes de compartir el archivo.",
-                "Exportar configuración",
+                UiLanguage.Choose("Configuración exportada.\n\nEl archivo contiene rutas y preferencias, pero no credenciales, tokens ni archivos internos de los runners.\n\nLas rutas locales pueden revelar nombres de carpetas o de usuario. Revísalo antes de compartir el archivo.", "Settings exported.\n\nThe file contains paths and preferences, but no runner credentials, tokens or internal files.\n\nLocal paths may reveal folder or user names. Review the file before sharing it."),
+                UiLanguage.Choose("Exportar configuración", "Export settings"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
             MessageBox.Show(
-                $"No se pudo exportar la configuración.\n\n{ex.Message}",
-                "Exportar configuración",
+                UiLanguage.Choose($"No se pudo exportar la configuración.\n\n{ex.Message}", $"Could not export settings.\n\n{ex.Message}"),
+                UiLanguage.Choose("Exportar configuración", "Export settings"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
@@ -113,8 +115,8 @@ public partial class SettingsWindow : Window
     {
         var dialog = new OpenFileDialog
         {
-            Title = "Importar configuración de NRS Workbench",
-            Filter = "Configuración NRS Workbench (*.json)|*.json|Todos los archivos (*.*)|*.*",
+            Title = UiLanguage.Choose("Importar configuración de NRS Workbench", "Import NRS Workbench settings"),
+            Filter = UiLanguage.Choose("Configuración NRS Workbench (*.json)|*.json|Todos los archivos (*.*)|*.*", "NRS Workbench settings (*.json)|*.json|All files (*.*)|*.*"),
             CheckFileExists = true,
             Multiselect = false
         };
@@ -131,12 +133,12 @@ public partial class SettingsWindow : Window
             {
                 var detectedRoots = _settingsService.DetectRunnerRoots(imported.FolderPattern);
                 if (PortableRepositoryPaths.RepairRunnerRoots(imported, detectedRoots))
-                    automaticNotes.Add($"Runners ajustados automáticamente a este PC: {string.Join(", ", imported.RunnerRoots)}.");
+                    automaticNotes.Add(UiLanguage.Choose($"Runners ajustados automáticamente a este PC: {string.Join(", ", imported.RunnerRoots)}.", $"Runner roots adjusted for this PC: {string.Join(", ", imported.RunnerRoots)}."));
             }
 
             var repairedRepositories = PortableRepositoryPaths.Repair(imported);
             if (repairedRepositories > 0)
-                automaticNotes.Add($"Repositorios reparados automáticamente por cambio de unidad: {repairedRepositories}.");
+                automaticNotes.Add(UiLanguage.Choose($"Repositorios reparados automáticamente por cambio de unidad: {repairedRepositories}.", $"Repository paths repaired by drive substitution: {repairedRepositories}."));
 
             var existingRepositories = _workingSettings.RepositoryPaths.ToList();
             var importedSet = imported.RepositoryPaths.ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -145,15 +147,13 @@ public partial class SettingsWindow : Window
             if (excluded.Count > 0)
             {
                 var preview = string.Join(Environment.NewLine, excluded.Take(6).Select(path => "  " + path));
-                if (excluded.Count > 6) preview += $"{Environment.NewLine}  ... y {excluded.Count - 6} más.";
+                if (excluded.Count > 6) preview += UiLanguage.Choose($"{Environment.NewLine}  ... y {excluded.Count - 6} más.", $"{Environment.NewLine}  ... and {excluded.Count - 6} more.");
                 var choice = MessageBox.Show(
                     this,
-                    $"El archivo aporta {addedCount} repositorio(s) nuevo(s), pero no incluye {excluded.Count} " +
-                    $"repositorio(s) configurado(s) actualmente en este PC:{Environment.NewLine}{Environment.NewLine}{preview}" +
-                    $"{Environment.NewLine}{Environment.NewLine}Sí: reemplazar la lista local por la importada (no se borran carpetas)." +
-                    $"{Environment.NewLine}No: conservar los repositorios locales y añadir los del archivo." +
-                    $"{Environment.NewLine}Cancelar: descartar la importación sin cambiar la configuración.",
-                    "Revisar repositorios antes de importar",
+                    UiLanguage.Choose(
+                        $"El archivo aporta {addedCount} repositorio(s) nuevo(s), pero no incluye {excluded.Count} repositorio(s) configurado(s) actualmente en este PC:{Environment.NewLine}{Environment.NewLine}{preview}{Environment.NewLine}{Environment.NewLine}Sí: reemplazar la lista local por la importada (no se borran carpetas).{Environment.NewLine}No: conservar los repositorios locales y añadir los del archivo.{Environment.NewLine}Cancelar: descartar la importación sin cambiar la configuración.",
+                        $"The file adds {addedCount} repositories, but omits {excluded.Count} repositories currently configured on this PC:{Environment.NewLine}{Environment.NewLine}{preview}{Environment.NewLine}{Environment.NewLine}Yes: replace the local list (no folders are deleted).{Environment.NewLine}No: keep local repositories and add those from the file.{Environment.NewLine}Cancel: discard the import without changing settings."),
+                    UiLanguage.Choose("Revisar repositorios antes de importar", "Review repositories before importing"),
                     MessageBoxButton.YesNoCancel,
                     MessageBoxImage.Warning,
                     MessageBoxResult.No);
@@ -161,9 +161,9 @@ public partial class SettingsWindow : Window
                 if (choice == MessageBoxResult.No)
                 {
                     var kept = PortableRepositoryPaths.PreserveExisting(imported, existingRepositories);
-                    automaticNotes.Add($"Repositorios locales conservados: {kept}.");
+                    automaticNotes.Add(UiLanguage.Choose($"Repositorios locales conservados: {kept}.", $"Local repositories retained: {kept}."));
                 }
-                else automaticNotes.Add($"Al guardar se reemplazará la lista local; {excluded.Count} registro(s) dejarán de figurar (no se borrarán carpetas).");
+                else automaticNotes.Add(UiLanguage.Choose($"Al guardar se reemplazará la lista local; {excluded.Count} registro(s) dejarán de figurar (no se borrarán carpetas).", $"Saving will replace the local list; {excluded.Count} registrations will be removed (no folders are deleted)."));
             }
 
             _workingSettings = imported;
@@ -172,24 +172,24 @@ public partial class SettingsWindow : Window
             var missingRunnerRoots = imported.RunnerRoots.Count(path => !Directory.Exists(path));
             var missingRepositories = imported.RepositoryPaths.Count(path => !Directory.Exists(path));
             var pathNote = missingRunnerRoots == 0 && missingRepositories == 0
-                ? "Todas las rutas importadas existen en este PC."
-                : $"Rutas no encontradas en este PC: {missingRunnerRoots} de runners y {missingRepositories} de repositorios.";
+                ? UiLanguage.Choose("Todas las rutas importadas existen en este PC.", "All imported paths exist on this PC.")
+                : UiLanguage.Choose($"Rutas no encontradas en este PC: {missingRunnerRoots} de runners y {missingRepositories} de repositorios.", $"Paths not found on this PC: {missingRunnerRoots} runner roots and {missingRepositories} repositories.");
 
             var automaticNote = automaticNotes.Count == 0
                 ? string.Empty
                 : string.Join(Environment.NewLine, automaticNotes) + Environment.NewLine + Environment.NewLine;
 
             MessageBox.Show(
-                $"Configuración cargada para revisar.\n\n{automaticNote}{pathNote}\n\nPulsa Guardar para aplicarla o Cancelar para descartarla.",
-                "Importar configuración",
+                UiLanguage.Choose($"Configuración cargada para revisar.\n\n{automaticNote}{pathNote}\n\nPulsa Guardar para aplicarla o Cancelar para descartarla.", $"Settings loaded for review.\n\n{automaticNote}{pathNote}\n\nSelect Save to apply them or Cancel to discard them."),
+                UiLanguage.Choose("Importar configuración", "Import settings"),
                 MessageBoxButton.OK,
                 missingRunnerRoots == 0 && missingRepositories == 0 ? MessageBoxImage.Information : MessageBoxImage.Warning);
         }
         catch (Exception ex)
         {
             MessageBox.Show(
-                $"No se pudo importar la configuración.\n\n{ex.Message}",
-                "Importar configuración",
+                UiLanguage.Choose($"No se pudo importar la configuración.\n\n{ex.Message}", $"Could not import settings.\n\n{ex.Message}"),
+                UiLanguage.Choose("Importar configuración", "Import settings"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }

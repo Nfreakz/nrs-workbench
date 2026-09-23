@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.17.0] - 2026-09-23
+
+### Added
+- Allows switching between existing local Git branches after confirming source and target. Rechecks the repository before the change and blocks uncommitted changes, conflicts and a stale source branch.
+- Adds an English interface alongside Spanish, with a saved language choice in Settings. Changing the language takes effect after restarting the application.
+
 ## [0.16.0] - 2026-09-13
 
 ### Added

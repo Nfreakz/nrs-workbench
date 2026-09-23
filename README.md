@@ -91,7 +91,13 @@ Version 0.13 adds a guarded **Commit** workflow. The user selects the files to i
 
 Selective commits use `git add -A -- <selected paths>` and then create one normal Git commit. If Git already contains staged files outside the user's selected set, NRS Workbench blocks the operation rather than silently including them. Conflicts also block commits. Files with both staged and unstaged changes are explicitly warned because selecting that file stages its current complete content.
 
-Branch switching and a higher-level Sync workflow remain deferred. NRS Workbench does not read or store Git credentials or GitHub tokens for these local operations; authentication remains the responsibility of the user's existing Git setup.
+In published v0.16, branch switching and a higher-level Sync workflow are deferred. NRS Workbench does not read or store Git credentials or GitHub tokens for these local operations; authentication remains the responsibility of the user's existing Git setup.
+
+### v0.17 development candidate
+
+The draft v0.17 branch adds switching between existing local branches. The repository must have no local changes or conflicts; the app checks again immediately before running `git switch`. It does not create a branch or fetch, merge, rebase or discard changes. The branch remains a draft until its Windows checks and interface review are complete.
+
+It also adds Spanish and English interface resources. Select the language in **Configuración / Settings**, save and restart NRS Workbench. The selection is stored in local preferences and included in portable configuration exports. Spanish remains the default for existing settings.
 
 ### NRS Workbench identity and migration
 
