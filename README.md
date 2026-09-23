@@ -14,6 +14,12 @@ La ventana principal muestra los runners, sus trabajos en curso y el uso de CPU,
 
 *English:* Local Windows control center for Git repositories and GitHub Actions self-hosted runners. The main window shows runner status, jobs, and host CPU, RAM and disk usage. Search or reorder runners, inspect local Git repositories, and switch existing branches. Spanish and English interfaces are included.
 
+### Ventana principal / Main window
+
+![Captura de NRS Workbench v0.18.0 con nombres, rutas y logs ocultos](docs/images/nrs-workbench-v0.18.0-redacted.png)
+
+Captura de la aplicación en Windows; los nombres de equipos, runners, repositorios y el log se han ocultado antes de publicarla.
+
 ## Public preview readiness
 
 The public-preview gate combines a dependency-free Git smoke-test executable, source audit, Windows CI, tag-driven release automation, community templates, privacy/testing/architecture documentation and repository hardening. v0.16.0 adds no new Git repository write behavior.
