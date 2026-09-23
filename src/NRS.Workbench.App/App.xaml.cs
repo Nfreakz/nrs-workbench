@@ -7,8 +7,8 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        UiLanguage.Select(new SettingsService().Load().Language);
         AppLogger.Initialize();
+        UiLanguage.Select(new SettingsService().Load().Language);
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
             AppLogger.Error("Unhandled AppDomain exception", args.ExceptionObject as Exception);
 
