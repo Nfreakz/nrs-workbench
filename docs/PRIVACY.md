@@ -8,6 +8,8 @@ Repository status is obtained through the locally installed `git.exe`. Git authe
 
 Remote URLs shown in the repositories UI are sanitized before display so HTTP(S)/SSH user-info credentials are not exposed. GitHub browser links are reconstructed without embedded credentials. Application diagnostics also redact embedded HTTP(S) user-info and GitHub token-shaped secrets before writing log text.
 
+A portable configuration JSON contains only preferences, local runner roots and repository paths from an explicit allow-list. It does not copy runner registration files, Git credentials, project files or diagnostic logs. Paths can still reveal usernames and project/folder names. Importing a configuration only registers paths: it does not transfer repositories or runner credentials. Existing local repository registrations can be retained, replaced or left unchanged by cancelling before saving.
+
 Runner credential files such as `.credentials` and `.credentials_rsaparams` are not part of supported display or diagnostic features.
 
 Logs may contain local filesystem paths and ordinary Git/runner error messages. Users should review diagnostics before posting them publicly.

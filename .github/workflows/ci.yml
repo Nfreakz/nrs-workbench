@@ -58,3 +58,24 @@ jobs:
 
       - name: Public source audit
         run: .\scripts\public-audit.ps1
+
+      # Local-only candidate packaging check. No tag, release, upload, or signing.
+      - name: Portable distribution smoke (no upload)
+        run: |
+          .\scripts\publish-win-x64.ps1
+          $zip = Join-Path $env:RUNNER_TEMP "NRSWorkbench-ci-$env:GITHUB_RUN_ID.zip"
+          try {
+            Compress-Archive -Path .\dist\win-x64\* -DestinationPath $zip -Force
+            if (-not (Test-Path -LiteralPath $zip -PathType Leaf)) { throw "Candidate ZIP is missing." }
+            if ((Get-Item -LiteralPath $zip).Length -lt 1MB) { throw "Candidate ZIP is unexpectedly small." }
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            $archive = [System.IO.Compression.ZipFile]::OpenRead($zip)
+            try {
+              $exeEntries = @($archive.Entries | Where-Object { $_.FullName -eq 'NRSWorkbench.exe' })
+              if ($exeEntries.Count -ne 1 -or $exeEntries[0].Length -lt 1MB) {
+                throw "Candidate ZIP is missing a valid NRSWorkbench.exe entry."
+              }
+            }
+            finally { $archive.Dispose() }
+          }
+          finally { if (Test-Path -LiteralPath $zip) { Remove-Item -LiteralPath $zip -Force } }

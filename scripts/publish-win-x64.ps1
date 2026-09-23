@@ -10,5 +10,9 @@ try {
         -p:IncludeNativeLibrariesForSelfExtract=true `
         -p:PublishReadyToRun=true `
         -o $out
+    if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed with exit code $LASTEXITCODE" }
+    $exe = Join-Path $out 'NRSWorkbench.exe'
+    if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) { throw "Portable publish did not create $exe" }
+    if ((Get-Item -LiteralPath $exe).Length -lt 1MB) { throw "Portable executable is unexpectedly small: $exe" }
     Write-Host "Publicado en: $out" -ForegroundColor Green
 } finally { Pop-Location }

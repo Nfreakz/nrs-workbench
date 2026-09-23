@@ -19,6 +19,17 @@ jobs:
     runs-on: [self-hosted, Windows, X64]
     timeout-minutes: 30
     steps:
+      - name: Ensure local Git is on PATH
+        run: |
+          if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+            $gitCmd = 'C:\Program Files\Git\cmd'
+            $gitExe = Join-Path $gitCmd 'git.exe'
+            if (-not (Test-Path $gitExe)) { throw "Git was not found in PATH or at $gitExe" }
+            $gitCmd | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            $env:PATH = "$gitCmd;$env:PATH"
+          }
+          git --version
+
       - name: Checkout
         uses: actions/checkout@v5
 
@@ -42,7 +53,12 @@ jobs:
       - name: Package
         run: |
           $name = "NRSWorkbench-$env:GITHUB_REF_NAME-win-x64.zip"
-          Compress-Archive -Path .\dist\win-x64\* -DestinationPath $name -Force
+          $exe = '.\\dist\\win-x64\\NRSWorkbench.exe'
+          if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) { throw "Portable EXE was not generated." }
+          Compress-Archive -Path .\\dist\\win-x64\\* -DestinationPath $name -Force
+          if (-not (Test-Path -LiteralPath $name -PathType Leaf)) { throw "Release ZIP was not generated." }
+          if ((Get-Item -LiteralPath $name).Length -lt 1MB) { throw "Release ZIP is unexpectedly small." }
+          Write-Host "ZIP SHA256: $((Get-FileHash -Algorithm SHA256 -LiteralPath $name).Hash)"
           "PACKAGE=$name" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Create or reuse GitHub prerelease and upload package

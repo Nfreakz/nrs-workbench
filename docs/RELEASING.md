@@ -10,19 +10,25 @@ NRS Workbench publishes pre-release builds before a stable `v1.0.0`.
 4. Confirm the version in `Directory.Build.props` and `CHANGELOG.md`.
 5. Review `SECURITY.md` and `docs/PRIVACY.md` if any credential-adjacent behavior changed.
 6. Confirm `LICENSE` still references `PolyForm-Noncommercial-1.0.0` and that commercial licensing language has not drifted.
-7. Confirm the repository-scoped Windows x64 self-hosted runner is online. Hosted GitHub runners are not used by project policy.
+7. Confirm the repository-scoped Windows x64 self-hosted runner is online. Hosted GitHub runners are not used by project policy.\n8. Verify import preview, keep/replace/cancel choices and missing-path warnings on the destination PC.\n9. Obtain explicit approval before merging to main, creating a tag or publishing a release.
 
-## Tag release
+## Tag release (only after explicit approval)
 
-Update local `main` first, then create and push the semantic-version tag:
+First merge the reviewed branch into `main`, verify HEAD and the approved version, and confirm that the tag does not already exist. Replace `<approved-version>` with the explicitly approved version. Never move or reuse an existing release tag.
 
 ```powershell
 git switch main
 git pull --ff-only origin main
-git tag -a v0.15.2 -m "NRS Workbench v0.15.2 Public Preview"
-git push origin v0.15.2
+git status --short
+git log -1 --oneline
+git ls-remote --tags origin refs/tags/v<approved-version>
+# Stop if the tag already exists or HEAD is not the approved release commit.
+git tag -a v<approved-version> -m "NRS Workbench v<approved-version> Public Preview"
+git push origin v<approved-version>
 ```
 
-The `Release` workflow runs on the repository-scoped local self-hosted Windows x64 runner. It builds the solution, executes the 22 Git safety smoke tests, runs the public source audit, publishes the self-contained `win-x64` application, creates the ZIP and uploads it to a GitHub prerelease using the workflow token.
+The `Release` workflow runs on the repository-scoped local self-hosted Windows x64 runner. It builds the solution, executes the Git and portable-settings smoke tests, runs the public source audit, publishes the self-contained `win-x64` application, creates the ZIP and uploads it to a GitHub prerelease using the workflow token.
+
+CI also produces and inspects a temporary candidate ZIP locally without uploading it; that check is not a GitHub release or a substitute for manual startup testing. The public ZIP is currently unsigned and can trigger Windows SmartScreen or Smart App Control; do not instruct users to disable system-wide security protections to install it.
 
 The release step is designed to be idempotent: if the prerelease already exists for the tag, it reuses it; if the ZIP asset already exists, it does not upload a duplicate.

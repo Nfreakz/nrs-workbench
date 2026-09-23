@@ -19,6 +19,13 @@
 - Removes stale hard-coded v0.15.1 text from the local build launcher.
 - No Git repository write behavior changed; the existing guarded Fetch/Pull/Push/Commit rules remain in place.
 
+### Audit follow-up (2026-09-23)
+- Import now asks whether to replace or retain existing local repository registrations when the JSON omits them; Cancel leaves the current configuration unchanged.
+- Extracts conservative repository drive-remapping into a testable helper, covers ambiguous/missing/non-Git targets and worktree markers, and tests runner-root replacement logic.
+- Updates release/testing/privacy documentation to match self-hosted CI restrictions and imported-path behavior.
+- Portable publishing now fails on publish errors or missing/undersized EXE, and candidate CI validates a ZIP locally without uploading or creating a release.
+- Release workflow bootstraps Git PATH on fresh Windows runners and verifies packaged artifact presence and SHA256.
+
 ## [0.15.2] - 2026-09-09
 
 ### Added

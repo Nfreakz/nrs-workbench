@@ -130,16 +130,41 @@ public partial class SettingsWindow : Window
             if (imported.RunnerRoots.Count > 0 && missingRunnerRootsBeforeRepair == imported.RunnerRoots.Count)
             {
                 var detectedRoots = _settingsService.DetectRunnerRoots(imported.FolderPattern);
-                if (detectedRoots.Count > 0)
-                {
-                    imported.RunnerRoots = detectedRoots.ToList();
-                    automaticNotes.Add($"Runners ajustados automáticamente a este PC: {string.Join(", ", detectedRoots)}.");
-                }
+                if (PortableRepositoryPaths.RepairRunnerRoots(imported, detectedRoots))
+                    automaticNotes.Add($"Runners ajustados automáticamente a este PC: {string.Join(", ", imported.RunnerRoots)}.");
             }
 
-            var repairedRepositories = TryRepairImportedRepositoryPaths(imported);
+            var repairedRepositories = PortableRepositoryPaths.Repair(imported);
             if (repairedRepositories > 0)
                 automaticNotes.Add($"Repositorios reparados automáticamente por cambio de unidad: {repairedRepositories}.");
+
+            var existingRepositories = _workingSettings.RepositoryPaths.ToList();
+            var importedSet = imported.RepositoryPaths.ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var addedCount = imported.RepositoryPaths.Count(path => !existingRepositories.Contains(path, StringComparer.OrdinalIgnoreCase));
+            var excluded = existingRepositories.Where(path => !importedSet.Contains(path)).ToList();
+            if (excluded.Count > 0)
+            {
+                var preview = string.Join(Environment.NewLine, excluded.Take(6).Select(path => "  " + path));
+                if (excluded.Count > 6) preview += $"{Environment.NewLine}  ... y {excluded.Count - 6} más.";
+                var choice = MessageBox.Show(
+                    this,
+                    $"El archivo aporta {addedCount} repositorio(s) nuevo(s), pero no incluye {excluded.Count} " +
+                    $"repositorio(s) configurado(s) actualmente en este PC:{Environment.NewLine}{Environment.NewLine}{preview}" +
+                    $"{Environment.NewLine}{Environment.NewLine}Sí: reemplazar la lista local por la importada (no se borran carpetas)." +
+                    $"{Environment.NewLine}No: conservar los repositorios locales y añadir los del archivo." +
+                    $"{Environment.NewLine}Cancelar: descartar la importación sin cambiar la configuración.",
+                    "Revisar repositorios antes de importar",
+                    MessageBoxButton.YesNoCancel,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.No);
+                if (choice is MessageBoxResult.Cancel or MessageBoxResult.None) return;
+                if (choice == MessageBoxResult.No)
+                {
+                    var kept = PortableRepositoryPaths.PreserveExisting(imported, existingRepositories);
+                    automaticNotes.Add($"Repositorios locales conservados: {kept}.");
+                }
+                else automaticNotes.Add($"Al guardar se reemplazará la lista local; {excluded.Count} registro(s) dejarán de figurar (no se borrarán carpetas).");
+            }
 
             _workingSettings = imported;
             ApplySettingsToForm(_workingSettings);
@@ -168,90 +193,6 @@ public partial class SettingsWindow : Window
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
-    }
-
-    private static int TryRepairImportedRepositoryPaths(RunnerSettings settings)
-    {
-        var driveRoots = new List<string>();
-        foreach (var drive in DriveInfo.GetDrives())
-        {
-            try
-            {
-                if (!drive.IsReady) continue;
-                if (drive.DriveType is not (DriveType.Fixed or DriveType.Removable)) continue;
-                driveRoots.Add(drive.RootDirectory.FullName);
-            }
-            catch
-            {
-                // A drive can disappear while the import dialog is open. Skip it.
-            }
-        }
-
-        var repaired = 0;
-        for (var index = 0; index < settings.RepositoryPaths.Count; index++)
-        {
-            var originalPath = settings.RepositoryPaths[index];
-            if (Directory.Exists(originalPath)) continue;
-
-            string? sourceRoot;
-            try
-            {
-                sourceRoot = Path.GetPathRoot(Path.GetFullPath(originalPath));
-            }
-            catch
-            {
-                continue;
-            }
-
-            if (string.IsNullOrWhiteSpace(sourceRoot)) continue;
-
-            string relativePath;
-            try
-            {
-                relativePath = Path.GetRelativePath(sourceRoot, originalPath);
-            }
-            catch
-            {
-                continue;
-            }
-
-            if (Path.IsPathRooted(relativePath) ||
-                relativePath.Equals("..", StringComparison.Ordinal) ||
-                relativePath.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal))
-                continue;
-
-            var matches = new List<string>();
-            foreach (var driveRoot in driveRoots)
-            {
-                if (string.Equals(driveRoot, sourceRoot, StringComparison.OrdinalIgnoreCase)) continue;
-
-                string candidate;
-                try
-                {
-                    candidate = Path.GetFullPath(Path.Combine(driveRoot, relativePath));
-                }
-                catch
-                {
-                    continue;
-                }
-
-                if (!Directory.Exists(candidate)) continue;
-                var gitMarker = Path.Combine(candidate, ".git");
-                if (!Directory.Exists(gitMarker) && !File.Exists(gitMarker)) continue;
-
-                if (!matches.Contains(candidate, StringComparer.OrdinalIgnoreCase))
-                    matches.Add(candidate);
-            }
-
-            if (matches.Count != 1) continue;
-            settings.RepositoryPaths[index] = matches[0];
-            repaired++;
-        }
-
-        settings.RepositoryPaths = settings.RepositoryPaths
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-        return repaired;
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)

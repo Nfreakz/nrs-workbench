@@ -101,7 +101,7 @@ The public product and executable are **NRS Workbench** / `NRSWorkbench.exe`. Pu
 
 Version 0.16 adds **Exportar** and **Importar** controls in **Configuración**. The portable JSON contains the supported NRS Workbench preferences plus configured runner roots and repository paths. It uses an explicit allow-list and does not read or serialize runner registration credentials, tokens, `_diag` content or other internal runner files.
 
-Imported values are loaded into the Settings form for review first. They are only persisted after pressing **Guardar**. Paths that do not exist on the destination PC are reported so runner roots or repository locations can be corrected before applying the configuration.
+Imported values are loaded into the Settings form for review first. They are only persisted after pressing **Guardar**. Missing runner roots can be auto-detected and missing repository paths can be remapped only when exactly one Git working-tree match exists under another drive root. Ambiguous or missing paths remain unchanged. If imported settings omit repositories already registered on this PC, users explicitly choose whether to replace the list, keep both lists or cancel; this only changes NRS Workbench registrations, never repository folders.
 
 Local paths are not authentication secrets, but they can reveal usernames, drive letters or private folder names. Treat the exported JSON as a local migration file and review it before publishing or sharing it outside machines you trust.
 

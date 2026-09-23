@@ -61,6 +61,72 @@ internal static class PortableSettingsSmoke
                    !imported.NotifyOnlyWhenHidden,
                 "portable settings round-trip preserves allowed preferences and clamps refresh interval");
 
+            var beforePreview = settings.RepositoryPaths.ToList();
+            var previewOnly = service.ReadPortableSettings(exportPath);
+            Assert(settings.RepositoryPaths.SequenceEqual(beforePreview) &&
+                   File.ReadAllText(exportPath) == json,
+                   "reading import for review leaves the current settings object and JSON untouched");
+
+            var missingRoot = Path.Combine(root, "missing-runner-root");
+            var importedRunnerRoots = new RunnerSettings { RunnerRoots = [missingRoot] };
+            Assert(PortableRepositoryPaths.RepairRunnerRoots(importedRunnerRoots, [runnerRoot]) &&
+                   importedRunnerRoots.RunnerRoots.Single() == runnerRoot,
+                   "missing runner roots can be replaced by detected local roots");
+            var keepValid = new RunnerSettings { RunnerRoots = [runnerRoot, missingRoot] };
+            Assert(!PortableRepositoryPaths.RepairRunnerRoots(keepValid, [root]) &&
+                   keepValid.RunnerRoots.Count == 2,
+                   "runner auto-detection does not overwrite partially valid roots");
+            var noDetected = new RunnerSettings { RunnerRoots = [missingRoot] };
+            Assert(!PortableRepositoryPaths.RepairRunnerRoots(noDetected, []) &&
+                   noDetected.RunnerRoots.Single() == missingRoot,
+                   "missing runner roots remain when detection finds nothing");
+
+            var existingPath = Path.Combine(root, "existing");
+            Assert(PortableRepositoryPaths.PreserveExisting(previewOnly, [existingPath]) == 1 &&
+                   PortableRepositoryPaths.PreserveExisting(previewOnly, [existingPath]) == 0 &&
+                   previewOnly.RepositoryPaths.Contains(existingPath),
+                   "keeping local registrations merges without duplicates");
+
+            var oldRoot = Path.Combine(root, "old-root");
+            var targetRoot = Path.Combine(root, "target-root");
+            var otherRoot = Path.Combine(root, "other-root");
+            var absentPath = Path.Combine(oldRoot, "projects", "repo");
+            var targetPath = Path.Combine(targetRoot, "projects", "repo");
+            Directory.CreateDirectory(Path.Combine(targetPath, ".git"));
+            var remap = new RunnerSettings { RepositoryPaths = [absentPath] };
+            Assert(PortableRepositoryPaths.Repair(remap, [targetRoot], _ => oldRoot) == 1 &&
+                   remap.RepositoryPaths.Single() == targetPath,
+                   "unique destination with .git folder is repaired");
+
+            var oldWorktree = Path.Combine(oldRoot, "projects", "worktree");
+            var newWorktree = Path.Combine(targetRoot, "projects", "worktree");
+            Directory.CreateDirectory(newWorktree);
+            File.WriteAllText(Path.Combine(newWorktree, ".git"), "gitdir: elsewhere");
+            var worktree = new RunnerSettings { RepositoryPaths = [oldWorktree] };
+            Assert(PortableRepositoryPaths.Repair(worktree, [targetRoot], _ => oldRoot) == 1 &&
+                   worktree.RepositoryPaths.Single() == newWorktree,
+                   "worktree with .git file is repaired");
+
+            Directory.CreateDirectory(Path.Combine(otherRoot, "projects", "repo", ".git"));
+            var ambiguous = new RunnerSettings { RepositoryPaths = [absentPath] };
+            Assert(PortableRepositoryPaths.Repair(ambiguous, [targetRoot, otherRoot], _ => oldRoot) == 0 &&
+                   ambiguous.RepositoryPaths.Single() == absentPath,
+                   "ambiguous destination is not selected");
+
+            var nonGit = new RunnerSettings { RepositoryPaths = [Path.Combine(oldRoot, "projects", "ordinary")] };
+            Directory.CreateDirectory(Path.Combine(targetRoot, "projects", "ordinary"));
+            Assert(PortableRepositoryPaths.Repair(nonGit, [targetRoot], _ => oldRoot) == 0,
+                   "non-Git destination is not selected");
+
+            var missing = new RunnerSettings { RepositoryPaths = [Path.Combine(oldRoot, "projects", "unknown")] };
+            Assert(PortableRepositoryPaths.Repair(missing, [targetRoot], _ => oldRoot) == 0 &&
+                   missing.RepositoryPaths.Count == 1,
+                   "unresolved import remains available for manual repair");
+
+            var relative = new RunnerSettings { RepositoryPaths = ["projects\\\\repo"] };
+            Assert(PortableRepositoryPaths.Repair(relative, [targetRoot], _ => oldRoot) == 0,
+                   "relative path cannot be silently relocated");
+
             var wrongProductPath = Path.Combine(root, "wrong-product.json");
             File.WriteAllText(wrongProductPath,
                 json.Replace("\"Product\": \"NRS Workbench\"", "\"Product\": \"Other Product\"", StringComparison.Ordinal));

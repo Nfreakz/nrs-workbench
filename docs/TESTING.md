@@ -16,7 +16,7 @@ The smoke-test executable uses temporary local repositories and a temporary bare
 dotnet run --project .\tests\NRS.Workbench.SmokeTests\NRS.Workbench.SmokeTests.csproj -c Release
 ```
 
-It covers clean/dirty inspection, empty-message protection, partial commits, staged-file protection, unusual filenames, rename/delete handling, ahead/push, behind/fast-forward pull, divergence blocking and remote-credential redaction.
+It also covers portable-settings privacy and round-trip checks plus unambiguous, ambiguous and invalid repository-path relocation. Review/Cancel UI behavior and ZIP startup must still be checked manually.\n\nIt covers clean/dirty inspection, empty-message protection, partial commits, staged-file protection, unusual filenames, rename/delete handling, ahead/push, behind/fast-forward pull, divergence blocking and remote-credential redaction.
 
 ## Public-source audit
 
@@ -28,7 +28,11 @@ The audit checks for common accidental secrets, private-key material, personal a
 
 ## CI
 
-The Windows CI workflow builds the full solution, runs the smoke tests and runs the public-source audit on every push and pull request.
+The Windows CI workflow builds the full solution, runs smoke tests and runs the public-source audit on trusted branch pushes and manual `workflow_dispatch` runs. It intentionally does not execute fork pull-request code on the persistent self-hosted runner.
+
+## Manual migration and distribution checks
+
+On a second Windows PC with some repositories already configured, import a JSON from the first PC and verify the replacement prompt. Test **Cancelar** (no saved change), **No** (retain local registrations), and **Sí** (replace only registrations, not folders). Verify missing-path notices and **Guardar** semantics. After an approved tag, verify the extracted ZIP can start and run on a normal Windows desktop; CI only inspects the archive structure and payload.
 
 ## One-command readiness check
 
