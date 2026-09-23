@@ -9,6 +9,7 @@
 - Adds instant runner search by name, agent, target, label or path with a visible results count.
 
 ### Improved
+- Binds the dashboard CPU, RAM and disk progress bars in read-only mode so opening the window does not fail when WPF initializes the resource indicators.
 - Keeps the selected runner and table position during refresh and while switching list order; a runner hidden by search is restored when the search is cleared.
 - Dashboard counts, tray notifications, statistics and Start/Stop all still use every detected runner. When a search is active, bulk actions explicitly confirm that hidden runners are included.
 - Includes list order in portable settings exports and imports.

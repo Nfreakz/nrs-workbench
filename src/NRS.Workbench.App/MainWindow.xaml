@@ -533,7 +533,7 @@
                         <TextBlock Text="CPU" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Grid.Column="1" Text="{Binding CpuUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding CpuPercent}" Foreground="#67B3FF" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding CpuPercent, Mode=OneWay}" Foreground="#67B3FF" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
                     <TextBlock Text="{Binding CpuCapacityText}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2" Margin="12,0,18,0">
@@ -541,7 +541,7 @@
                         <TextBlock Text="RAM" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Grid.Column="1" Text="{Binding MemoryUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding MemoryPercent}" Foreground="#72E6A5" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding MemoryPercent, Mode=OneWay}" Foreground="#72E6A5" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
                     <TextBlock Text="{local:Tr Source='Memoria usada / total'}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="3" Margin="12,0,0,0">
@@ -549,7 +549,7 @@
                         <TextBlock Text="{local:Tr Source='DISCO DEL SISTEMA'}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Grid.Column="1" Text="{Binding DiskUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding DiskPercent}" Foreground="#F5C451" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding DiskPercent, Mode=OneWay}" Foreground="#F5C451" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
                     <TextBlock Text="{local:Tr Source='Espacio usado / total'}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
             </Grid>
