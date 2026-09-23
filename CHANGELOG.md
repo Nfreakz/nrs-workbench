@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.18.0] - Unreleased
+## [0.18.0] - 2026-09-23
 
 ### Added
 - Displays the running application version beside its name on the main dashboard.

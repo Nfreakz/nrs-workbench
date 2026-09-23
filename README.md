@@ -4,9 +4,15 @@
   <img src="src/NRS.Workbench.App/Assets/NRSWorkbench.png" alt="NRS Workbench" width="180" />
 </p>
 
-**Local developer control center for Git repositories and GitHub Actions self-hosted runners on Windows.**
+**Control local de repositorios Git y runners de GitHub Actions para Windows.**
 
-> **Status:** v0.17.0 is the latest published public preview. It adds local branch switching and an optional English interface. v0.18.0 is in development with a visible app version and host PC resource usage on the main dashboard.
+> **v0.18.0 · Public Preview:** [Descargar ZIP para Windows](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.0) · [Cambios de la versión](CHANGELOG.md) · [English information](#goals)
+
+La ventana principal muestra los runners, sus trabajos en curso y el uso de CPU, RAM y disco del equipo. Puedes buscar runners, ordenarlos manualmente o por nombre, estado, destino y RAM; el orden elegido se guarda. También puedes revisar tus repositorios Git locales, cambiar entre ramas existentes y utilizar las acciones de Git con confirmaciones. La interfaz está disponible en español e inglés.
+
+**Requisitos:** Windows 10/11. La descarga es portable y no requiere un servicio GitHub adicional ni un token para inspeccionar runners y repositorios locales. [Compilar desde el código](#local-build).
+
+*English:* Local Windows control center for Git repositories and GitHub Actions self-hosted runners. The main window shows runner status, jobs, and host CPU, RAM and disk usage. Search or reorder runners, inspect local Git repositories, and switch existing branches. Spanish and English interfaces are included.
 
 ## Public preview readiness
 
@@ -91,7 +97,7 @@ Version 0.13 adds a guarded **Commit** workflow. The user selects the files to i
 
 Selective commits use `git add -A -- <selected paths>` and then create one normal Git commit. If Git already contains staged files outside the user's selected set, NRS Workbench blocks the operation rather than silently including them. Conflicts also block commits. Files with both staged and unstaged changes are explicitly warned because selecting that file stages its current complete content.
 
-In published v0.16, branch switching and a higher-level Sync workflow are deferred. NRS Workbench does not read or store Git credentials or GitHub tokens for these local operations; authentication remains the responsibility of the user's existing Git setup.
+NRS Workbench does not read or store Git credentials or GitHub tokens for these local operations; authentication remains the responsibility of the user's existing Git setup. A higher-level Sync workflow is deferred.
 
 ### v0.17
 
@@ -99,7 +105,7 @@ Version 0.17 adds switching between existing local branches. The repository must
 
 It also adds Spanish and English interface resources. Select the language in **Configuración / Settings**, save and restart NRS Workbench. The selection is stored in local preferences and included in portable configuration exports. Spanish remains the default for existing settings.
 
-### Runner list in the v0.18 candidate
+### Runner list in v0.18
 
 The main window shows the application version and live host CPU, RAM and system disk use. Search runners by name, agent, GitHub target, labels or folder. Use the order menu to sort by name, status, GitHub target or RAM, or choose manual order and move a selected runner with the arrow buttons. The selected sort and manual order persist in local settings and portable configuration exports. Search filters the table only: dashboard totals, notifications, statistics and Start/Stop all still cover every detected runner. Bulk actions warn when a search is active.
 
