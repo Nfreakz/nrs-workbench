@@ -196,11 +196,11 @@
                             <DataTemplate>
                                 <Grid>
                                     <TextBlock x:Name="IdleProgress" Text="—" Foreground="#60758D" VerticalAlignment="Center"/>
-                                    <StackPanel x:Name="BusyProgress" Visibility="Collapsed" VerticalAlignment="Center" ToolTip="{Binding Progress.EstimateSourceDisplay}">
+                                    <StackPanel x:Name="BusyProgress" Visibility="Collapsed" VerticalAlignment="Center" ToolTip="{Binding Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}">
                                         <Grid Margin="0,0,0,3">
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding Progress.PhaseDisplay}" FontSize="11" Foreground="#E7F0FA" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding Progress.PercentDisplay}" FontSize="10" FontWeight="Bold" Foreground="#F5C451" Margin="8,0,0,0"/>
+                                            <TextBlock Text="{Binding Progress.PhaseDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#E7F0FA" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" FontSize="10" FontWeight="Bold" Foreground="#F5C451" Margin="8,0,0,0"/>
                                         </Grid>
                                         <ProgressBar Height="6" Minimum="0" Maximum="100" Value="{Binding Progress.Percent, Mode=OneWay}"
                                                      Foreground="#F5C451" Background="#1A2A3E" BorderThickness="0">
@@ -215,7 +215,7 @@
                                                 </Style>
                                             </ProgressBar.Style>
                                         </ProgressBar>
-                                        <TextBlock Text="{Binding Progress.CompactMetaDisplay}" FontSize="9" Foreground="#7F95AC" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Progress.CompactMetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="9" Foreground="#7F95AC" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Grid>
                                 <DataTemplate.Triggers>
@@ -292,10 +292,10 @@
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <TextBlock Text="{local:Tr Source='Trabajo en curso'}" FontSize="10" Foreground="#A89355" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding SelectedRunner.Progress.JobDisplay}" FontSize="11" Foreground="#8FB6DE" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
-                                    <TextBlock Text="{Binding SelectedRunner.Progress.PhaseDisplay}" FontSize="13" FontWeight="SemiBold" Foreground="#F6F8FB" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                                    <TextBlock Text="{Binding SelectedRunner.Progress.JobDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8FB6DE" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                                    <TextBlock Text="{Binding SelectedRunner.Progress.PhaseDisplay, Converter={StaticResource LocalizedText}}" FontSize="13" FontWeight="SemiBold" Foreground="#F6F8FB" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
                                 </StackPanel>
-                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.PercentDisplay}" Foreground="#F5C451" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" Foreground="#F5C451" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
                             </Grid>
                             <ProgressBar Height="8" Minimum="0" Maximum="100" Value="{Binding SelectedRunner.Progress.Percent, Mode=OneWay}"
                                          Foreground="#F5C451" Background="#213044" BorderThickness="0">
@@ -312,8 +312,8 @@
                             </ProgressBar>
                             <Grid Margin="0,7,0,0">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding SelectedRunner.Progress.MetaDisplay}" FontSize="10.5" Foreground="#AFC0D2"/>
-                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.EstimateSourceDisplay}" FontSize="9.5" Foreground="#6F879F" Margin="10,0,0,0"/>
+                                <TextBlock Text="{Binding SelectedRunner.Progress.MetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="10.5" Foreground="#AFC0D2"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}" FontSize="9.5" Foreground="#6F879F" Margin="10,0,0,0"/>
                             </Grid>
                         </StackPanel>
                     </Border>

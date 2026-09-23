@@ -429,7 +429,7 @@
                         <DataGridTemplateColumn Header="{local:Tr Source='FIAB.'}" Width="76">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding ReliabilityDisplay}" FontWeight="SemiBold" ToolTip="{Binding ReliabilityLabel}">
+                                    <TextBlock Text="{Binding ReliabilityDisplay}" FontWeight="SemiBold" ToolTip="{Binding ReliabilityLabel, Converter={StaticResource LocalizedText}}">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Foreground" Value="#8EA7C0"/>
@@ -493,7 +493,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border x:Name="OutcomeBadge" Background="#2A3442" BorderBrush="#536273" BorderThickness="1" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
-                                        <TextBlock x:Name="OutcomeText" Text="{Binding OutcomeDisplay}" FontSize="9.5" FontWeight="Bold" Foreground="#D8E1EA"/>
+                                        <TextBlock x:Name="OutcomeText" Text="{Binding OutcomeDisplay, Converter={StaticResource LocalizedText}}" FontSize="9.5" FontWeight="Bold" Foreground="#D8E1EA"/>
                                     </Border>
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Succeeded}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#123A27"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#258653"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#63E6A0"/></DataTrigger>
