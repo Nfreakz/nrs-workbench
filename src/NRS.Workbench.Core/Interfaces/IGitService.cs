@@ -13,4 +13,6 @@ public interface IGitService
     Task FetchAsync(GitRepositoryInfo repository);
     Task PullFastForwardAsync(GitRepositoryInfo repository);
     Task PushAsync(GitRepositoryInfo repository);
+    Task<IReadOnlyList<string>> GetLocalBranchesAsync(GitRepositoryInfo repository);
+    Task SwitchLocalBranchAsync(GitRepositoryInfo repository, string branch);
 }

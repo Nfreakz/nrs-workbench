@@ -199,6 +199,35 @@ public sealed class GitService : IGitService
         await RunAsync(repository.Path, ["push"], allowFailure: false);
     }
 
+    public async Task<IReadOnlyList<string>> GetLocalBranchesAsync(GitRepositoryInfo repository)
+    {
+        EnsureRepositoryUsable(repository);
+        var result = await RunAsync(repository.Path, ["branch", "--list", "--format=%(refname:short)"], allowFailure: false);
+        return result.StdOut.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+            .OrderBy(branch => branch, StringComparer.OrdinalIgnoreCase).ToArray();
+    }
+
+    public async Task SwitchLocalBranchAsync(GitRepositoryInfo repository, string branch)
+    {
+        EnsureRepositoryUsable(repository);
+        if (string.IsNullOrWhiteSpace(branch)) throw new InvalidOperationException("Selecciona una rama local.");
+
+        // The displayed snapshot may be stale. Reinspect immediately before any Git write.
+        var current = await InspectAsync(repository.Path);
+        if (current.State == GitRepositoryState.Error || current.IsDirty || current.ConflictCount > 0)
+            throw new InvalidOperationException("Cambio de rama bloqueado: el repositorio tiene cambios locales o conflictos.");
+        if (!string.Equals(current.Branch, repository.Branch, StringComparison.Ordinal))
+            throw new InvalidOperationException("La rama actual ha cambiado. Actualiza el repositorio y vuelve a intentarlo.");
+        if (string.Equals(branch, current.Branch, StringComparison.Ordinal)) return;
+
+        var branches = await GetLocalBranchesAsync(current);
+        if (!branches.Contains(branch, StringComparer.Ordinal))
+            throw new InvalidOperationException("La rama seleccionada ya no existe como rama local.");
+
+        // An exact validated ref prevents a branch name from being interpreted as a Git option.
+        await RunAsync(current.Path, ["switch", "--", branch], allowFailure: false);
+    }
+
 
     private static IReadOnlyList<GitFileChange> ParseFileChanges(string text)
     {

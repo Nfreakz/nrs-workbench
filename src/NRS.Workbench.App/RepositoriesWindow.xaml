@@ -51,6 +51,9 @@
                 <Button Style="{StaticResource PrimaryToolbarButton}" Click="Commit_Click" IsEnabled="{Binding SelectedRepository.CanCommit}">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE73E;"/><TextBlock Text="Commit..."/></StackPanel>
                 </Button>
+                <Button Style="{StaticResource ToolbarButton}" Click="SwitchBranch_Click" IsEnabled="{Binding SelectedRepository.CanSwitchBranch}">
+                    <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE8AB;"/><TextBlock Text="Cambiar rama..."/></StackPanel>
+                </Button>
                 <Button Style="{StaticResource ToolbarButton}" Command="{Binding FetchCommand}">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE72C;"/><TextBlock Text="Fetch"/></StackPanel>
                 </Button>
