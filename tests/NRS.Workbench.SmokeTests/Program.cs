@@ -20,6 +20,15 @@ internal static class Program
             return 2;
         }
 
+        var resources = new SystemResourceService();
+        resources.Read(); // CPU usage needs two samples.
+        await Task.Delay(150);
+        var host = resources.Read();
+        Check("Windows host resource snapshot",
+            host.CpuPercent is >= 0 and <= 100 && host.LogicalProcessors > 0 &&
+            host.TotalMemoryBytes > 0 && host.UsedMemoryBytes <= host.TotalMemoryBytes &&
+            host.TotalDiskBytes > 0 && host.UsedDiskBytes <= host.TotalDiskBytes);
+
         var root = Path.Combine(Path.GetTempPath(), "nrs-workbench-smoke-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
 
