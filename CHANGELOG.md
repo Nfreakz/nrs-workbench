@@ -1,11 +1,10 @@
 # Changelog
 
-## [0.17.0] - Unreleased
+## [0.17.0] - 2026-09-23
 
-### In development
+### Added
 - Allows switching between existing local Git branches after confirming source and target. Rechecks the repository before the change and blocks uncommitted changes, conflicts and a stale source branch.
 - Adds an English interface alongside Spanish, with a saved language choice in Settings. Changing the language takes effect after restarting the application.
-- Keeps v0.16.0 as the published release while the Windows build, smoke tests and UI review for v0.17.0 are completed.
 
 ## [0.16.0] - 2026-09-13
 
