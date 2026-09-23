@@ -93,6 +93,12 @@ Selective commits use `git add -A -- <selected paths>` and then create one norma
 
 Branch switching and a higher-level Sync workflow remain deferred. NRS Workbench does not read or store Git credentials or GitHub tokens for these local operations; authentication remains the responsibility of the user's existing Git setup.
 
+### v0.17 development candidate
+
+The draft v0.17 branch adds switching between existing local branches. The repository must have no local changes or conflicts; the app checks again immediately before running `git switch`. It does not create a branch or fetch, merge, rebase or discard changes. The branch remains a draft until its Windows checks and interface review are complete.
+
+It also adds Spanish and English interface resources. Select the language in **Configuración / Settings**, save and restart NRS Workbench. The selection is stored in local preferences and included in portable configuration exports. Spanish remains the default for existing settings.
+
 ### NRS Workbench identity and migration
 
 The public product and executable are **NRS Workbench** / `NRSWorkbench.exe`. Public .NET namespaces are `NRS.Workbench.*`. Local data is stored under `%LOCALAPPDATA%\NRSWorkbench`. On first launch, if the new settings file does not yet exist, NRS Workbench copies the legacy `%LOCALAPPDATA%\RunnerManager\settings.json` once so existing runner roots, repository paths and preferences are preserved. The legacy file is left untouched.

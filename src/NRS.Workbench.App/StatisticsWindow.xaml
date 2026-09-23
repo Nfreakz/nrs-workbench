@@ -313,7 +313,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="3,0" ToolTip="{Binding Tooltip}">
+                                <Grid Margin="3,0" ToolTip="{Binding Tooltip, Converter={StaticResource LocalizedText}}">
                                     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                                     <ProgressBar Grid.Row="0" Minimum="0" Maximum="100" Value="{Binding RelativeHeight, Mode=OneWay}" Orientation="Vertical"
                                                  Width="18" HorizontalAlignment="Center" Foreground="#48A9FF" Background="#14283D" BorderThickness="0"/>

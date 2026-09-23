@@ -27,6 +27,11 @@ public sealed class LocalizedTextConverter : IValueConverter
         translated = Regex.Replace(translated, @"\bejecución comparable\b", "comparable run");
         translated = Regex.Replace(translated, @"^Ejecutando\b", "Running");
         translated = Regex.Replace(translated, @"^Preparando\b", "Preparing");
+        if (translated.Contains(" jobs · ", StringComparison.Ordinal))
+        {
+            translated = Regex.Replace(translated, @"\bfallos\b", "failures");
+            translated = Regex.Replace(translated, @"\bcancelados\b", "cancelled");
+        }
         return translated;
     }
 

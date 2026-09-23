@@ -53,6 +53,8 @@
   "Duración histórica del job": "Historical job duration",
   "Duración histórica del runner": "Historical runner duration",
   "Estimación local": "Local estimate",
+  "Analizando": "Analyzing",
+  "Analizando actividad": "Analyzing activity",
   "Sin historial comparable todavía": "No comparable history yet",
   "Compilando con .NET": "Building with .NET",
   "Ejecutando build PowerShell": "Running PowerShell build",
