@@ -110,7 +110,7 @@ public sealed class GitService : IGitService
             if (!string.IsNullOrWhiteSpace(rename.StdOut)) sections.Add(rename.StdOut.TrimEnd());
         }
 
-        return sections.Count == 0 ? "No hay diff textual disponible para este archivo." : string.Join("\r\n\r\n", sections);
+        return sections.Count == 0 ? UiLanguage.Choose("No hay diff textual disponible para este archivo.", "No text diff is available for this file.") : string.Join("\r\n\r\n", sections);
     }
 
     public async Task CommitAsync(GitRepositoryInfo repository, string message, IReadOnlyList<GitFileChange> selectedChanges)
@@ -277,34 +277,34 @@ public sealed class GitService : IGitService
             var fullPath = Path.GetFullPath(Path.Combine(repositoryPath, relativePath));
             var root = Path.GetFullPath(repositoryPath).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
             if (!fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase) || !File.Exists(fullPath))
-                return "Archivo nuevo no disponible para vista previa.";
+                return UiLanguage.Choose("Archivo nuevo no disponible para vista previa.", "New file unavailable for preview.");
 
             var attributes = File.GetAttributes(fullPath);
             if ((attributes & FileAttributes.ReparsePoint) != 0)
-                return "Vista previa omitida para enlaces o reparse points por seguridad.";
+                return UiLanguage.Choose("Vista previa omitida para enlaces o reparse points por seguridad.", "Preview skipped for links or reparse points for safety.");
 
             var info = new FileInfo(fullPath);
-            if (info.Length > 512 * 1024) return $"Archivo nuevo de {info.Length / 1024:N0} KB. Vista previa omitida por tamaño.";
+            if (info.Length > 512 * 1024) return UiLanguage.Choose($"Archivo nuevo de {info.Length / 1024:N0} KB. Vista previa omitida por tamaño.", $"New file of {info.Length / 1024:N0} KB. Preview skipped due to size.");
 
             await using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             using var reader = new StreamReader(stream, detectEncodingFromByteOrderMarks: true);
             var text = await reader.ReadToEndAsync();
-            if (text.IndexOf('\0') >= 0) return "Archivo nuevo binario. No hay diff textual disponible.";
+            if (text.IndexOf('\0') >= 0) return UiLanguage.Choose("Archivo nuevo binario. No hay diff textual disponible.", "New binary file. No text diff is available.");
             var lines = text.Replace("\r\n", "\n").Split('\n');
             var preview = string.Join("\r\n", lines.Take(800).Select(line => "+ " + line));
-            if (lines.Length > 800) preview += $"\r\n… vista previa truncada ({lines.Length - 800} líneas más)";
-            return $"=== ARCHIVO NUEVO ===\r\n+++ {relativePath}\r\n\r\n{preview}";
+            if (lines.Length > 800) preview += UiLanguage.Choose($"\r\n… vista previa truncada ({lines.Length - 800} líneas más)", $"\r\n… preview truncated ({lines.Length - 800} more lines)");
+            return UiLanguage.Choose($"=== ARCHIVO NUEVO ===\r\n+++ {relativePath}\r\n\r\n{preview}", $"=== NEW FILE ===\r\n+++ {relativePath}\r\n\r\n{preview}");
         }
         catch (Exception ex)
         {
-            return "No se pudo generar la vista previa: " + ex.Message;
+            return UiLanguage.Choose("No se pudo generar la vista previa: ", "Could not generate preview: ") + ex.Message;
         }
     }
 
     private static void EnsureRepositoryUsable(GitRepositoryInfo repository)
     {
         if (repository.State == GitRepositoryState.Error)
-            throw new InvalidOperationException(string.IsNullOrWhiteSpace(repository.ErrorMessage) ? "Repositorio no disponible." : repository.ErrorMessage);
+            throw new InvalidOperationException(string.IsNullOrWhiteSpace(repository.ErrorMessage) ? UiLanguage.Choose("Repositorio no disponible.", "Repository unavailable.") : repository.ErrorMessage);
     }
 
     private static GitRepositoryState DetermineState(GitRepositoryInfo info)
@@ -495,13 +495,13 @@ public sealed class GitService : IGitService
             {
                 var message = string.IsNullOrWhiteSpace(result.StdErr) ? result.StdOut : result.StdErr;
                 var safeMessage = SensitiveDataRedactor.Redact(message.Trim());
-                throw new InvalidOperationException($"Git devolvió código {result.ExitCode}: {safeMessage}");
+                throw new InvalidOperationException(UiLanguage.Choose($"Git devolvió código {result.ExitCode}: {safeMessage}", $"Git exited with code {result.ExitCode}: {safeMessage}"));
             }
             return result;
         }
         catch (System.ComponentModel.Win32Exception ex)
         {
-            throw new InvalidOperationException("No se encuentra Git en PATH. Instala Git for Windows o añade git.exe al PATH.", ex);
+            throw new InvalidOperationException(UiLanguage.Choose("No se encuentra Git en PATH. Instala Git for Windows o añade git.exe al PATH.", "Git was not found in PATH. Install Git for Windows or add git.exe to PATH."), ex);
         }
     }
 

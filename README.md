@@ -91,7 +91,7 @@ Version 0.13 adds a guarded **Commit** workflow. The user selects the files to i
 
 Selective commits use `git add -A -- <selected paths>` and then create one normal Git commit. If Git already contains staged files outside the user's selected set, NRS Workbench blocks the operation rather than silently including them. Conflicts also block commits. Files with both staged and unstaged changes are explicitly warned because selecting that file stages its current complete content.
 
-Branch switching and a higher-level Sync workflow remain deferred. NRS Workbench does not read or store Git credentials or GitHub tokens for these local operations; authentication remains the responsibility of the user's existing Git setup.
+In published v0.16, branch switching and a higher-level Sync workflow are deferred. NRS Workbench does not read or store Git credentials or GitHub tokens for these local operations; authentication remains the responsibility of the user's existing Git setup.
 
 ### v0.17 development candidate
 
