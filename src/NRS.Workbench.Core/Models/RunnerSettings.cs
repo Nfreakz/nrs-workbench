@@ -13,4 +13,5 @@ public sealed class RunnerSettings
     public bool NotifyRunnerIssues { get; set; } = true;
     public bool NotifyOnlyWhenHidden { get; set; } = true;
     public List<string> RepositoryPaths { get; set; } = [];
+    public string Language { get; set; } = "es";
 }
