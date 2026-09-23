@@ -6,7 +6,7 @@
 
 **Local developer control center for Git repositories and GitHub Actions self-hosted runners on Windows.**
 
-> **Status:** v0.16.0 is the current public-preview development candidate. It adds portable configuration transfer between PCs while keeping the audited runner/repository safety baseline and the current local Git repository snapshot in Statistics.
+> **Status:** v0.17.0 is the latest published public preview. It adds local branch switching and an optional English interface. v0.18.0 is in development with a visible app version and host PC resource usage on the main dashboard.
 
 ## Public preview readiness
 

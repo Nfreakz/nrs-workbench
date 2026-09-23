@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows;
 using NRS.Workbench.App.Services;
 using NRS.Workbench.Core.Interfaces;
@@ -19,6 +20,12 @@ public sealed class MainViewModel : ObservableObject
     private string _logText = UiLanguage.Choose("Selecciona un runner para ver el log.", "Select a runner to view its log.");
     private string _statusText = UiLanguage.Choose("Inicializando...", "Initializing...");
     private DateTimeOffset _lastUpdated;
+    private string _cpuUseText = "—";
+    private string _memoryUseText = "—";
+    private string _diskUseText = "—";
+    private double _cpuPercent;
+    private double _memoryPercent;
+    private double _diskPercent;
 
     public ObservableCollection<RunnerInfo> Runners { get; } = [];
     public int TotalCount => Runners.Count;
@@ -45,7 +52,46 @@ public sealed class MainViewModel : ObservableObject
     public string LogText { get => _logText; private set => SetProperty(ref _logText, value); }
     public string StatusText { get => _statusText; private set => SetProperty(ref _statusText, value); }
     public string LastUpdatedText => _lastUpdated == default ? string.Empty : _lastUpdated.ToString("dd MMM yyyy  HH:mm:ss");
+    public string AppVersionText
+    {
+        get
+        {
+            var version = Assembly.GetEntryAssembly()?.GetName().Version;
+            return version is null ? "v—" : $"v{version.Major}.{version.Minor}.{version.Build}";
+        }
+    }
+    public string CpuUseText { get => _cpuUseText; private set => SetProperty(ref _cpuUseText, value); }
+    public string MemoryUseText { get => _memoryUseText; private set => SetProperty(ref _memoryUseText, value); }
+    public string DiskUseText { get => _diskUseText; private set => SetProperty(ref _diskUseText, value); }
+    public double CpuPercent { get => _cpuPercent; private set => SetProperty(ref _cpuPercent, value); }
+    public double MemoryPercent { get => _memoryPercent; private set => SetProperty(ref _memoryPercent, value); }
+    public double DiskPercent { get => _diskPercent; private set => SetProperty(ref _diskPercent, value); }
+    public string CpuCapacityText => UiLanguage.Choose($"{Environment.ProcessorCount} procesadores lógicos", $"{Environment.ProcessorCount} logical processors");
     public int RefreshIntervalSeconds => _settingsService.Load().RefreshIntervalSeconds;
+
+    public void UpdateSystemResources(SystemResourceSnapshot snapshot)
+    {
+        CpuUseText = snapshot.CpuPercent is double cpu ? $"{cpu:N0}%" : "—";
+        CpuPercent = snapshot.CpuPercent ?? 0;
+        MemoryUseText = FormatCapacity(snapshot.UsedMemoryBytes, snapshot.TotalMemoryBytes);
+        MemoryPercent = Percent(snapshot.UsedMemoryBytes, snapshot.TotalMemoryBytes);
+        DiskUseText = FormatCapacity(snapshot.UsedDiskBytes, snapshot.TotalDiskBytes);
+        DiskPercent = Percent(snapshot.UsedDiskBytes, snapshot.TotalDiskBytes);
+    }
+
+    private static string FormatCapacity(ulong? used, ulong? total) =>
+        used is ulong value && total is ulong capacity && capacity > 0
+            ? $"{value / 1073741824d:N1} / {capacity / 1073741824d:N1} GiB" : "—";
+
+    private static string FormatCapacity(long? used, long? total) =>
+        used is long value && total is long capacity && capacity > 0
+            ? $"{value / 1073741824d:N1} / {capacity / 1073741824d:N1} GiB" : "—";
+
+    private static double Percent(ulong? used, ulong? total) =>
+        used is ulong value && total is ulong capacity && capacity > 0 ? 100d * value / capacity : 0;
+
+    private static double Percent(long? used, long? total) =>
+        used is long value && total is long capacity && capacity > 0 ? 100d * value / capacity : 0;
 
     public AsyncRelayCommand RefreshCommand { get; }
     public AsyncRelayCommand StartCommand { get; }

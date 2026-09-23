@@ -20,6 +20,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="336"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
@@ -34,7 +35,12 @@
                     <Image Source="/Assets/NRSWorkbench.png" Stretch="Uniform" Margin="3"/>
                 </Border>
                 <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="NRS Workbench" FontSize="31" FontWeight="Bold"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="NRS Workbench" FontSize="31" FontWeight="Bold"/>
+                        <Border Background="#173A61" BorderBrush="#38618A" BorderThickness="1" CornerRadius="7" Padding="7,2" Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding AppVersionText}" FontSize="11" Foreground="#C9E4FF" FontWeight="SemiBold"/>
+                        </Border>
+                    </StackPanel>
                     <TextBlock Text="{local:Tr Source='Runners y repositorios locales desde un solo sitio'}" FontSize="14" Foreground="{StaticResource MutedBrush}" Margin="1,4,0,0"/>
                 </StackPanel>
             </StackPanel>
@@ -380,8 +386,48 @@
             </Border>
         </Grid>
 
+        <!-- Host PC resources; values include all applications, not only runners. -->
+        <Border Grid.Row="4" Style="{StaticResource PanelCard}" Padding="14,9" Margin="0,12,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="165"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{local:Tr Source='RECURSOS DEL EQUIPO'}" FontSize="10" FontWeight="Bold" Foreground="#C9E4FF"/>
+                    <TextBlock Text="{local:Tr Source='Uso total del PC'}" FontSize="10" Foreground="{StaticResource MutedBrush}" Margin="0,3,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="12,0,18,0">
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="CPU" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding CpuUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding CpuPercent}" Foreground="#67B3FF" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
+                    <TextBlock Text="{Binding CpuCapacityText}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="12,0,18,0">
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="RAM" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding MemoryUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding MemoryPercent}" Foreground="#72E6A5" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
+                    <TextBlock Text="{local:Tr Source='Memoria usada / total'}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="3" Margin="12,0,0,0">
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="{local:Tr Source='DISCO DEL SISTEMA'}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding DiskUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding DiskPercent}" Foreground="#F5C451" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
+                    <TextBlock Text="{local:Tr Source='Espacio usado / total'}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <!-- Footer -->
-        <Grid Grid.Row="4" Margin="2,12,2,0">
+        <Grid Grid.Row="5" Margin="2,12,2,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
                 <Ellipse Width="9" Height="9" Fill="#3DDC84" Margin="0,1,8,0"/>

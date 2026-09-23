@@ -12,6 +12,8 @@ public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
     private readonly DispatcherTimer _timer;
+    private readonly DispatcherTimer _resourceTimer;
+    private readonly SystemResourceService _systemResources = new();
     private readonly IRunnerStatisticsService _statistics;
     private readonly SettingsService _settings;
     private readonly TrayIconService _tray;
@@ -47,12 +49,16 @@ public partial class MainWindow : Window
 
         _timer = new DispatcherTimer();
         _timer.Tick += async (_, _) => await RefreshAndUpdateTrayAsync();
+        _resourceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        _resourceTimer.Tick += (_, _) => _viewModel.UpdateSystemResources(_systemResources.Read());
 
         Loaded += async (_, _) =>
         {
             ApplyTimerInterval();
             ApplyTraySetting();
             _timer.Start();
+            _viewModel.UpdateSystemResources(_systemResources.Read());
+            _resourceTimer.Start();
             await RefreshAndUpdateTrayAsync();
         };
 
@@ -66,6 +72,7 @@ public partial class MainWindow : Window
         Closed += (_, _) =>
         {
             _timer.Stop();
+            _resourceTimer.Stop();
             _tray.Dispose();
         };
     }

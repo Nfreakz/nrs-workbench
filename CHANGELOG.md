@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.18.0] - Unreleased
+
+### Added
+- Displays the running application version beside its name on the main dashboard.
+- Adds live host PC CPU usage and logical processor count, physical RAM used/total, and system drive space used/total to the main dashboard. These figures include all applications, not only runners.
+
 ## [0.17.0] - 2026-09-23
 
 ### Added
