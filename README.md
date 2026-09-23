@@ -4,25 +4,25 @@
   <img src="src/NRS.Workbench.App/Assets/NRSWorkbench.png" alt="NRS Workbench" width="180" />
 </p>
 
-**Control local de repositorios Git y runners de GitHub Actions para Windows.**
+**A local Windows dashboard for Git repositories and GitHub Actions self-hosted runners.**
 
-> **v0.18.0 · Public Preview:** [Descargar ZIP para Windows](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.0) · [Cambios de la versión](CHANGELOG.md) · [English information](#goals)
+**Latest release: [v0.18.0 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.0)** · [Download the portable Windows ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.0/NRSWorkbench-v0.18.0-win-x64.zip) · [What's new](CHANGELOG.md)
 
-La ventana principal muestra los runners, sus trabajos en curso y el uso de CPU, RAM y disco del equipo. Puedes buscar runners, ordenarlos manualmente o por nombre, estado, destino y RAM; el orden elegido se guarda. También puedes revisar tus repositorios Git locales, cambiar entre ramas existentes y utilizar las acciones de Git con confirmaciones. La interfaz está disponible en español e inglés.
+NRS Workbench brings your local runners and Git working trees into one desktop app. Check runner status and current jobs, inspect locally retained job history, and see your PC's CPU, memory and disk usage. Search and sort runners, including a saved manual order. Review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in English and Spanish.
 
-**Requisitos:** Windows 10/11. La descarga es portable y no requiere un servicio GitHub adicional ni un token para inspeccionar runners y repositorios locales. [Compilar desde el código](#local-build).
+**Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-*English:* Local Windows control center for Git repositories and GitHub Actions self-hosted runners. The main window shows runner status, jobs, and host CPU, RAM and disk usage. Search or reorder runners, inspect local Git repositories, and switch existing branches. Spanish and English interfaces are included.
+**En español:** NRS Workbench reúne en Windows tus runners de GitHub Actions y repositorios Git locales. Muestra trabajos y recursos del PC; permite buscar y ordenar runners, consultar repositorios y realizar operaciones Git con confirmación. La interfaz está disponible en español e inglés.
 
-### Ventana principal / Main window
+### Main window
 
-![Captura de NRS Workbench v0.18.0 con nombres, rutas y logs ocultos](docs/images/nrs-workbench-v0.18.0-redacted.png)
+![NRS Workbench v0.18.0 main window showing runner status, logs and PC resource usage; private details redacted](docs/images/nrs-workbench-v0.18.0-redacted.png)
 
-Captura de la aplicación en Windows; los nombres de equipos, runners, repositorios y el log se han ocultado antes de publicarla.
+Screenshot from Windows. Computer, runner and repository names, paths and log content have been redacted.
 
 ## Public preview readiness
 
-The public-preview gate combines a dependency-free Git smoke-test executable, source audit, Windows CI, tag-driven release automation, community templates, privacy/testing/architecture documentation and repository hardening. v0.16.0 adds no new Git repository write behavior.
+The public-preview gate combines a dependency-free Git smoke-test executable, source audit, Windows CI, tag-driven release automation, community templates, privacy/testing/architecture documentation and repository hardening.
 
 Repository remotes are sanitized before display so embedded HTTP(S)/SSH user-info credentials are not exposed. Diff preview disables external diff and text-conversion helpers, untracked-file preview skips reparse points, and folder scanning does not follow junctions/symlinked directories.
 
@@ -196,6 +196,6 @@ The statistics dashboard distinguishes two different ideas:
 
 The 24-hour trend compares technical reliability in the last 24 hours with the previous 24 hours. It is only shown when both windows contain at least three classified technical jobs.
 
-## Autoría
+## Credits
 
-Interfaz y dirección del proyecto: **Neo RS**. La aplicación muestra una firma discreta en el pie de sus vistas principales.
+Product design and direction: **Neo RS**. The application displays a discreet signature at the bottom of its main views.
