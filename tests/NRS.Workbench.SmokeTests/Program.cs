@@ -29,6 +29,21 @@ internal static class Program
             host.TotalMemoryBytes > 0 && host.UsedMemoryBytes <= host.TotalMemoryBytes &&
             host.TotalDiskBytes > 0 && host.UsedDiskBytes <= host.TotalDiskBytes);
 
+        var runnerA = new RunnerInfo { Alias = "alpha", FolderPath = @"C:\actions-runner-alpha", State = RunnerState.Ready, RamBytes = 100 };
+        var runnerB = new RunnerInfo { Alias = "beta", FolderPath = @"C:\actions-runner-beta", State = RunnerState.Busy, RamBytes = 300 };
+        var runnerC = new RunnerInfo { Alias = "gamma", FolderPath = @"D:\actions-runner-gamma", State = RunnerState.Stopped, RamBytes = 200 };
+        var candidates = new[] { runnerA, runnerB, runnerC };
+        var manual = RunnerListOrganizer.Arrange(candidates, "manual", [runnerC.FolderPath, runnerA.FolderPath], null);
+        Check("manual runner order appends new runners", manual.Select(x => x.Alias).SequenceEqual(["gamma", "alpha", "beta"]));
+        var moved = RunnerListOrganizer.Move(manual, runnerA.FolderPath, -1);
+        Check("manual runner move swaps only adjacent runners", moved.SequenceEqual([runnerA.FolderPath, runnerC.FolderPath, runnerB.FolderPath]));
+        Check("runner status and memory sorting use current values",
+            RunnerListOrganizer.Arrange(candidates, "state", moved, null)[0].Alias == "beta" &&
+            RunnerListOrganizer.Arrange(candidates, "memory", moved, null)[0].Alias == "beta");
+        Check("runner search ignores case and does not mutate source",
+            RunnerListOrganizer.Arrange(candidates, "manual", moved, " BETA ").Single().FolderPath == runnerB.FolderPath &&
+            candidates.Length == 3);
+
         var root = Path.Combine(Path.GetTempPath(), "nrs-workbench-smoke-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
 

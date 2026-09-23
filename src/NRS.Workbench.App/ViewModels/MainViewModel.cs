@@ -16,6 +16,12 @@ public sealed class MainViewModel : ObservableObject
     private readonly SettingsService _settingsService;
     private readonly IDialogService _dialogs;
     private readonly SemaphoreSlim _refreshGate = new(1, 1);
+    private IReadOnlyList<RunnerInfo> _allRunners = [];
+    private List<string> _manualOrder = [];
+    private string _selectedSortMode = "manual";
+    private string _runnerSearchText = string.Empty;
+    private string? _preferredRunnerPath;
+    private bool _updatingRunnerView;
     private RunnerInfo? _selectedRunner;
     private string _logText = UiLanguage.Choose("Selecciona un runner para ver el log.", "Select a runner to view its log.");
     private string _statusText = UiLanguage.Choose("Inicializando...", "Initializing...");
@@ -28,15 +34,54 @@ public sealed class MainViewModel : ObservableObject
     private double _diskPercent;
 
     public ObservableCollection<RunnerInfo> Runners { get; } = [];
-    public int TotalCount => Runners.Count;
-    public int ReadyCount => Runners.Count(x => x.State == RunnerState.Ready);
-    public int BusyCount => Runners.Count(x => x.State == RunnerState.Busy);
-    public int StoppedCount => Runners.Count(x => x.State == RunnerState.Stopped);
-    public int ErrorCount => Runners.Count(x => x.State is RunnerState.Error or RunnerState.Unregistered);
+    public IReadOnlyList<RunnerInfo> AllRunners => _allRunners;
+    public int TotalCount => _allRunners.Count;
+    public int ReadyCount => _allRunners.Count(x => x.State == RunnerState.Ready);
+    public int BusyCount => _allRunners.Count(x => x.State == RunnerState.Busy);
+    public int StoppedCount => _allRunners.Count(x => x.State == RunnerState.Stopped);
+    public int ErrorCount => _allRunners.Count(x => x.State is RunnerState.Error or RunnerState.Unregistered);
     public int IssueCount => StoppedCount + ErrorCount;
     public string HealthLabel => TotalCount == 0 ? UiLanguage.Choose("SIN DATOS", "NO DATA") : ErrorCount > 0 ? UiLanguage.Choose("ALERTA", "ALERT") : StoppedCount > 0 ? UiLanguage.Text("ATENCIÓN") : "OK";
     public string HealthKind => TotalCount == 0 ? "Unknown" : ErrorCount > 0 ? "Alert" : StoppedCount > 0 ? "Warning" : "Healthy";
     public string HealthDetail => TotalCount == 0 ? "0 runners" : IssueCount == 0 ? UiLanguage.Choose($"{TotalCount} operativos", $"{TotalCount} operational") : UiLanguage.Choose($"{IssueCount} con atención", $"{IssueCount} need attention");
+    public IReadOnlyList<RunnerSortOption> SortOptions { get; } =
+    [
+        new("manual", UiLanguage.Choose("Orden manual", "Manual order")),
+        new("name", UiLanguage.Choose("Nombre (A–Z)", "Name (A–Z)")),
+        new("state", UiLanguage.Choose("Estado (BUSY primero)", "Status (BUSY first)")),
+        new("target", UiLanguage.Choose("Destino GitHub", "GitHub target")),
+        new("memory", UiLanguage.Choose("RAM (mayor primero)", "RAM (highest first)"))
+    ];
+
+    public string SelectedSortMode
+    {
+        get => _selectedSortMode;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value)) return;
+            var normalized = RunnerListOrganizer.NormalizeMode(value);
+            if (!SetProperty(ref _selectedSortMode, normalized)) return;
+            var settings = _settingsService.Load();
+            settings.RunnerSortMode = normalized;
+            _settingsService.Save(settings);
+            UpdateRunnerView();
+        }
+    }
+
+    public string RunnerSearchText
+    {
+        get => _runnerSearchText;
+        set
+        {
+            if (!SetProperty(ref _runnerSearchText, value ?? string.Empty)) return;
+            UpdateRunnerView();
+            ClearRunnerSearchCommand.RaiseCanExecuteChanged();
+        }
+    }
+
+    public string RunnerViewSummary => string.IsNullOrWhiteSpace(RunnerSearchText)
+        ? UiLanguage.Choose($"{TotalCount} runners", $"{TotalCount} runners")
+        : UiLanguage.Choose($"{Runners.Count} de {TotalCount} runners", $"{Runners.Count} of {TotalCount} runners");
 
     public RunnerInfo? SelectedRunner
     {
@@ -44,6 +89,7 @@ public sealed class MainViewModel : ObservableObject
         set
         {
             if (!SetProperty(ref _selectedRunner, value)) return;
+            if (!_updatingRunnerView && value is not null) _preferredRunnerPath = value.FolderPath;
             LoadSelectedLog();
             RaiseCommandStates();
         }
@@ -103,6 +149,9 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand OpenDiagCommand { get; }
     public RelayCommand OpenGitHubCommand { get; }
     public RelayCommand ClearLogCommand { get; }
+    public RelayCommand ClearRunnerSearchCommand { get; }
+    public RelayCommand MoveRunnerUpCommand { get; }
+    public RelayCommand MoveRunnerDownCommand { get; }
 
     public MainViewModel(IRunnerDiscoveryService discovery, IRunnerControlService control, ILogReaderService logs,
         SettingsService settingsService, IDialogService dialogs)
@@ -112,17 +161,23 @@ public sealed class MainViewModel : ObservableObject
         _logs = logs;
         _settingsService = settingsService;
         _dialogs = dialogs;
+        var preferences = _settingsService.Load();
+        _selectedSortMode = preferences.RunnerSortMode;
+        _manualOrder = preferences.RunnerDisplayOrder.ToList();
 
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         StartCommand = new AsyncRelayCommand(StartSelectedAsync, CanStartSelected);
         StopCommand = new AsyncRelayCommand(StopSelectedAsync, CanStopSelected);
         RestartCommand = new AsyncRelayCommand(RestartSelectedAsync, CanRestartSelected);
-        StartAllCommand = new AsyncRelayCommand(StartAllAsync, () => Runners.Any(x => x.State == RunnerState.Stopped));
-        StopAllCommand = new AsyncRelayCommand(StopAllAsync, () => Runners.Any(x => x.State is RunnerState.Ready or RunnerState.Busy));
+        StartAllCommand = new AsyncRelayCommand(StartAllAsync, () => _allRunners.Any(x => x.State == RunnerState.Stopped));
+        StopAllCommand = new AsyncRelayCommand(StopAllAsync, () => _allRunners.Any(x => x.State is RunnerState.Ready or RunnerState.Busy));
         OpenFolderCommand = new RelayCommand(() => OpenPath(SelectedRunner?.FolderPath), () => SelectedRunner is not null);
         OpenDiagCommand = new RelayCommand(() => OpenPath(SelectedRunner is null ? null : Path.Combine(SelectedRunner.FolderPath, "_diag")), () => SelectedRunner is not null);
         OpenGitHubCommand = new RelayCommand(() => OpenUrl(SelectedRunner?.GitHubUrl), () => !string.IsNullOrWhiteSpace(SelectedRunner?.GitHubUrl));
         ClearLogCommand = new RelayCommand(() => LogText = string.Empty, () => SelectedRunner is not null);
+        ClearRunnerSearchCommand = new RelayCommand(() => RunnerSearchText = string.Empty, () => !string.IsNullOrEmpty(RunnerSearchText));
+        MoveRunnerUpCommand = new RelayCommand(() => MoveSelectedRunner(-1), () => CanMoveSelectedRunner(-1));
+        MoveRunnerDownCommand = new RelayCommand(() => MoveSelectedRunner(1), () => CanMoveSelectedRunner(1));
     }
 
     public async Task RefreshAsync()
@@ -130,14 +185,10 @@ public sealed class MainViewModel : ObservableObject
         if (!await _refreshGate.WaitAsync(0)) return;
         try
         {
-            var selectedPath = SelectedRunner?.FolderPath;
             StatusText = UiLanguage.Choose("Actualizando runners...", "Refreshing runners...");
             var rows = await Task.Run(_discovery.Discover);
-
-            Runners.Clear();
-            foreach (var row in rows) Runners.Add(row);
-            SelectedRunner = selectedPath is null ? Runners.FirstOrDefault() : Runners.FirstOrDefault(x =>
-                string.Equals(x.FolderPath, selectedPath, StringComparison.OrdinalIgnoreCase)) ?? Runners.FirstOrDefault();
+            _allRunners = rows;
+            UpdateRunnerView();
 
             _lastUpdated = DateTimeOffset.Now;
             StatusText = rows.Count == 0
@@ -157,8 +208,77 @@ public sealed class MainViewModel : ObservableObject
     public bool EditSettings(Window owner)
     {
         var changed = _dialogs.EditSettings(owner);
-        if (changed) _ = RefreshAsync();
+        if (changed)
+        {
+            var preferences = _settingsService.Load();
+            _manualOrder = preferences.RunnerDisplayOrder.ToList();
+            _selectedSortMode = preferences.RunnerSortMode;
+            RaisePropertyChanged(nameof(SelectedSortMode));
+            _ = RefreshAsync();
+        }
         return changed;
+    }
+
+    private void UpdateRunnerView()
+    {
+        var ordered = RunnerListOrganizer.Arrange(_allRunners, SelectedSortMode, _manualOrder, RunnerSearchText);
+        _updatingRunnerView = true;
+        try
+        {
+            // Update in place so the grid keeps its scroll position across automatic refreshes.
+            for (var index = 0; index < ordered.Count; index++)
+            {
+                var target = ordered[index];
+                if (index >= Runners.Count)
+                {
+                    Runners.Add(target);
+                    continue;
+                }
+
+                if (!SamePath(Runners[index], target))
+                {
+                    var previous = -1;
+                    for (var candidate = index + 1; candidate < Runners.Count; candidate++)
+                        if (SamePath(Runners[candidate], target)) { previous = candidate; break; }
+                    if (previous >= 0) Runners.Move(previous, index);
+                    else Runners.Insert(index, target);
+                }
+                if (!ReferenceEquals(Runners[index], target)) Runners[index] = target;
+            }
+            while (Runners.Count > ordered.Count) Runners.RemoveAt(Runners.Count - 1);
+
+            SelectedRunner = _preferredRunnerPath is null
+                ? Runners.FirstOrDefault()
+                : Runners.FirstOrDefault(runner =>
+                    string.Equals(runner.FolderPath, _preferredRunnerPath, StringComparison.OrdinalIgnoreCase));
+        }
+        finally { _updatingRunnerView = false; }
+
+        RaisePropertyChanged(nameof(RunnerViewSummary));
+        RaiseCommandStates();
+    }
+
+    private static bool SamePath(RunnerInfo left, RunnerInfo right) =>
+        string.Equals(left.FolderPath, right.FolderPath, StringComparison.OrdinalIgnoreCase);
+
+    private bool CanMoveSelectedRunner(int direction)
+    {
+        if (SelectedSortMode != "manual" || !string.IsNullOrWhiteSpace(RunnerSearchText) || SelectedRunner is null)
+            return false;
+        var ordered = RunnerListOrganizer.Arrange(_allRunners, "manual", _manualOrder, null);
+        var index = ordered.ToList().FindIndex(runner => SamePath(runner, SelectedRunner));
+        return index >= 0 && index + direction >= 0 && index + direction < ordered.Count;
+    }
+
+    private void MoveSelectedRunner(int direction)
+    {
+        if (!CanMoveSelectedRunner(direction) || SelectedRunner is null) return;
+        var ordered = RunnerListOrganizer.Arrange(_allRunners, "manual", _manualOrder, null);
+        _manualOrder = RunnerListOrganizer.Move(ordered, SelectedRunner.FolderPath, direction).ToList();
+        var settings = _settingsService.Load();
+        settings.RunnerDisplayOrder = _manualOrder.ToList();
+        _settingsService.Save(settings);
+        UpdateRunnerView();
     }
 
     private async Task StartSelectedAsync()
@@ -183,18 +303,22 @@ public sealed class MainViewModel : ObservableObject
 
     private async Task StartAllAsync()
     {
-        foreach (var runner in Runners.Where(x => x.State == RunnerState.Stopped).ToList())
+        if (!string.IsNullOrWhiteSpace(RunnerSearchText) && !_dialogs.Confirm(
+            UiLanguage.Choose("Hay una búsqueda activa. Iniciar todos actuará sobre todos los runners, incluidos los que no se ven. ¿Continuar?", "A search is active. Start all will affect every runner, including those not shown. Continue?"),
+            UiLanguage.Text("Iniciar todos"))) return;
+        foreach (var runner in _allRunners.Where(x => x.State == RunnerState.Stopped).ToList())
             await ExecuteAction(() => _control.StartAsync(runner), UiLanguage.Choose($"Iniciando {runner.Alias}...", $"Starting {runner.Alias}..."), refreshAfter: false);
         await RefreshAsync();
     }
 
     private async Task StopAllAsync()
     {
-        var active = Runners.Where(x => x.State is RunnerState.Ready or RunnerState.Busy).ToList();
-        if (active.Any(x => x.State == RunnerState.Busy) && _settingsService.Load().ConfirmStopBusy)
-        {
-            if (!_dialogs.Confirm(UiLanguage.Choose("Hay runners BUSY. Parar todos puede interrumpir jobs en ejecución.\n\n¿Continuar?", "Some runners are BUSY. Stopping all may interrupt running jobs.\n\nContinue?"), UiLanguage.Text("Parar todos"))) return;
-        }
+        var active = _allRunners.Where(x => x.State is RunnerState.Ready or RunnerState.Busy).ToList();
+        var hasBusy = active.Any(x => x.State == RunnerState.Busy) && _settingsService.Load().ConfirmStopBusy;
+        if ((hasBusy || !string.IsNullOrWhiteSpace(RunnerSearchText)) &&
+            !_dialogs.Confirm(UiLanguage.Choose(
+                $"{(!string.IsNullOrWhiteSpace(RunnerSearchText) ? "Hay una búsqueda activa. Parar todos actuará sobre todos los runners, incluidos los que no se ven.\n\n" : "")}{(hasBusy ? "Hay runners BUSY. Parar todos puede interrumpir jobs en ejecución.\n\n" : "")}¿Continuar?",
+                $"{(!string.IsNullOrWhiteSpace(RunnerSearchText) ? "A search is active. Stop all will affect every runner, including those not shown.\n\n" : "")}{(hasBusy ? "Some runners are BUSY. Stopping all may interrupt running jobs.\n\n" : "")}Continue?"), UiLanguage.Text("Parar todos"))) return;
         foreach (var runner in active)
             await ExecuteAction(() => _control.StopAsync(runner), UiLanguage.Choose($"Parando {runner.Alias}...", $"Stopping {runner.Alias}..."), refreshAfter: false);
         await RefreshAsync();
@@ -273,5 +397,9 @@ public sealed class MainViewModel : ObservableObject
         OpenDiagCommand.RaiseCanExecuteChanged();
         OpenGitHubCommand.RaiseCanExecuteChanged();
         ClearLogCommand.RaiseCanExecuteChanged();
+        MoveRunnerUpCommand.RaiseCanExecuteChanged();
+        MoveRunnerDownCommand.RaiseCanExecuteChanged();
     }
 }
+
+public sealed record RunnerSortOption(string Value, string Label);

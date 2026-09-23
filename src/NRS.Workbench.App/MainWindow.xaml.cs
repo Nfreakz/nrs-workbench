@@ -80,7 +80,7 @@ public partial class MainWindow : Window
     private async Task RefreshAndUpdateTrayAsync()
     {
         await _viewModel.RefreshAsync();
-        var runners = _viewModel.Runners.ToList();
+        var runners = _viewModel.AllRunners.ToList();
         _tray.Update(runners);
         ProcessStateTransitions(runners);
     }
@@ -152,7 +152,7 @@ public partial class MainWindow : Window
 
     private void Statistics_Click(object sender, RoutedEventArgs e)
     {
-        var window = new StatisticsWindow(_statistics, () => _viewModel.Runners.ToList())
+        var window = new StatisticsWindow(_statistics, () => _viewModel.AllRunners.ToList())
         {
             Owner = this
         };

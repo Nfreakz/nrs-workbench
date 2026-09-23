@@ -8,6 +8,120 @@
         WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
     <Window.Resources>
+        <!-- Fully templated ComboBox so Windows' light native chrome never leaks through. -->
+        <Style x:Key="RunnerSortComboItem" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="#EAF3FD"/>
+            <Setter Property="Background" Value="#0F1D2D"/>
+            <Setter Property="Padding" Value="11,7"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="ItemChrome"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemChrome" Property="Background" Value="#163451"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemChrome" Property="Background" Value="#1B4B76"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="RunnerSortCombo" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="#EAF3FD"/>
+            <Setter Property="Background" Value="#11243A"/>
+            <Setter Property="BorderBrush" Value="#2B4767"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="Padding" Value="11,6,34,6"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource RunnerSortComboItem}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="DropDownToggle"
+                                          Focusable="False"
+                                          ClickMode="Press"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="ComboChrome"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="8">
+                                            <Grid>
+                                                <TextBlock Text="{Binding SelectedItem.Label, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"
+                                                           Foreground="#EAF3FD"
+                                                           Margin="11,0,34,0"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           IsHitTestVisible="False"/>
+                                                <Border Width="30" HorizontalAlignment="Right" Background="#0D1C2D" CornerRadius="0,7,7,0"
+                                                        IsHitTestVisible="False">
+                                                    <TextBlock Text="⌄" Foreground="#8FB3D8" FontSize="18"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                               Margin="0,-4,0,0"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ComboChrome" Property="Background" Value="#163451"/>
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4B79A6"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4F91CB"/>
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter TargetName="ComboChrome" Property="Opacity" Value="0.45"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   PopupAnimation="Fade">
+                                <Border Background="#0F1D2D"
+                                        BorderBrush="#31577D"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Margin="0,4,0,0"
+                                        MinWidth="150">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled"
+                                                  MaxHeight="280"
+                                                  CanContentScroll="True">
+                                        <StackPanel IsItemsHost="True"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <conv:RunnerStateBrushConverter x:Key="StateBrush"/>
         <conv:RunnerStateAccentBrushConverter x:Key="StateAccentBrush"/>
         <conv:RunnerStateLabelConverter x:Key="StateLabel"/>
@@ -15,6 +129,7 @@
 
     <Grid Background="{StaticResource BgBrush}" Margin="22">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -153,9 +268,23 @@
             </WrapPanel>
         </Grid>
 
+        <!-- Runner list controls -->
+        <Grid Grid.Row="2" Margin="2,0,2,10">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <TextBlock Text="{local:Tr Source='Buscar runner'}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,9,0"/>
+            <TextBox Grid.Column="1" Width="235" Height="30" VerticalAlignment="Center" VerticalContentAlignment="Center" Text="{Binding RunnerSearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="{local:Tr Source='Busca por nombre, destino, etiqueta o ruta'}"/>
+            <Button Grid.Column="2" Style="{StaticResource ToolbarButton}" Command="{Binding ClearRunnerSearchCommand}" Content="✕" Padding="9,5" Margin="5,0,18,0" ToolTip="{local:Tr Source='Limpiar búsqueda'}"/>
+            <ComboBox Grid.Column="3" Style="{StaticResource RunnerSortCombo}" Width="205" Height="38" VerticalAlignment="Center" ItemsSource="{Binding SortOptions}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding SelectedSortMode, Mode=TwoWay}" ToolTip="{local:Tr Source='Orden de runners'}"/>
+            <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="7,0,0,0">
+                <Button Style="{StaticResource ToolbarButton}" Command="{Binding MoveRunnerUpCommand}" Content="↑" Padding="10,5" Margin="0,0,4,0" ToolTip="{local:Tr Source='Subir runner seleccionado en el orden manual'}"/>
+                <Button Style="{StaticResource ToolbarButton}" Command="{Binding MoveRunnerDownCommand}" Content="↓" Padding="10,5" Margin="0" ToolTip="{local:Tr Source='Bajar runner seleccionado en el orden manual'}"/>
+            </StackPanel>
+            <TextBlock Grid.Column="5" Text="{Binding RunnerViewSummary}" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        </Grid>
+
         <!-- Runner table -->
-        <Border Grid.Row="2" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,14">
-            <DataGrid ItemsSource="{Binding Runners}" SelectedItem="{Binding SelectedRunner, Mode=TwoWay}" AlternationCount="2" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <Border Grid.Row="3" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,14">
+            <DataGrid ItemsSource="{Binding Runners}" SelectedItem="{Binding SelectedRunner, Mode=TwoWay}" AlternationCount="2" CanUserSortColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="{local:Tr Source='ESTADO'}" Width="112">
                         <DataGridTemplateColumn.CellTemplate>
@@ -253,7 +382,7 @@
         </Border>
 
         <!-- Detail + log -->
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="4">
             <Grid.ColumnDefinitions><ColumnDefinition Width="0.88*"/><ColumnDefinition Width="1.62*"/></Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Style="{StaticResource PanelCard}" Margin="0,0,7,0" Padding="17">
@@ -387,7 +516,7 @@
         </Grid>
 
         <!-- Host PC resources; values include all applications, not only runners. -->
-        <Border Grid.Row="4" Style="{StaticResource PanelCard}" Padding="14,9" Margin="0,12,0,0">
+        <Border Grid.Row="5" Style="{StaticResource PanelCard}" Padding="14,9" Margin="0,12,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="165"/>
@@ -427,7 +556,7 @@
         </Border>
 
         <!-- Footer -->
-        <Grid Grid.Row="5" Margin="2,12,2,0">
+        <Grid Grid.Row="6" Margin="2,12,2,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
                 <Ellipse Width="9" Height="9" Fill="#3DDC84" Margin="0,1,8,0"/>

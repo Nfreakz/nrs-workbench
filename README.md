@@ -93,11 +93,15 @@ Selective commits use `git add -A -- <selected paths>` and then create one norma
 
 In published v0.16, branch switching and a higher-level Sync workflow are deferred. NRS Workbench does not read or store Git credentials or GitHub tokens for these local operations; authentication remains the responsibility of the user's existing Git setup.
 
-### v0.17 development candidate
+### v0.17
 
-The draft v0.17 branch adds switching between existing local branches. The repository must have no local changes or conflicts; the app checks again immediately before running `git switch`. It does not create a branch or fetch, merge, rebase or discard changes. The branch remains a draft until its Windows checks and interface review are complete.
+Version 0.17 adds switching between existing local branches. The repository must have no local changes or conflicts; the app checks again immediately before running `git switch`. It does not create a branch or fetch, merge, rebase or discard changes.
 
 It also adds Spanish and English interface resources. Select the language in **Configuración / Settings**, save and restart NRS Workbench. The selection is stored in local preferences and included in portable configuration exports. Spanish remains the default for existing settings.
+
+### Runner list in the v0.18 candidate
+
+The main window shows the application version and live host CPU, RAM and system disk use. Search runners by name, agent, GitHub target, labels or folder. Use the order menu to sort by name, status, GitHub target or RAM, or choose manual order and move a selected runner with the arrow buttons. The selected sort and manual order persist in local settings and portable configuration exports. Search filters the table only: dashboard totals, notifications, statistics and Start/Stop all still cover every detected runner. Bulk actions warn when a search is active.
 
 ### NRS Workbench identity and migration
 

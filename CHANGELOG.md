@@ -5,6 +5,13 @@
 ### Added
 - Displays the running application version beside its name on the main dashboard.
 - Adds live host PC CPU usage and logical processor count, physical RAM used/total, and system drive space used/total to the main dashboard. These figures include all applications, not only runners.
+- Adds a saved manual runner order with move up/down controls, plus name, status, GitHub target and RAM sorting.
+- Adds instant runner search by name, agent, target, label or path with a visible results count.
+
+### Improved
+- Keeps the selected runner and table position during refresh and while switching list order; a runner hidden by search is restored when the search is cleared.
+- Dashboard counts, tray notifications, statistics and Start/Stop all still use every detected runner. When a search is active, bulk actions explicitly confirm that hidden runners are included.
+- Includes list order in portable settings exports and imports.
 
 ## [0.17.0] - 2026-09-23
 

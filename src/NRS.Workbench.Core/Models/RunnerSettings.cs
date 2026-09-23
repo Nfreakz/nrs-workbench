@@ -14,4 +14,6 @@ public sealed class RunnerSettings
     public bool NotifyOnlyWhenHidden { get; set; } = true;
     public List<string> RepositoryPaths { get; set; } = [];
     public string Language { get; set; } = "es";
+    public string RunnerSortMode { get; set; } = "manual";
+    public List<string> RunnerDisplayOrder { get; set; } = [];
 }

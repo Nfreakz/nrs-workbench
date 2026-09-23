@@ -228,6 +228,7 @@ public sealed class SettingsService
     {
         settings.RunnerRoots ??= [];
         settings.RepositoryPaths ??= [];
+        settings.RunnerDisplayOrder ??= [];
         settings.RunnerRoots = settings.RunnerRoots
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Select(x => x.Trim())
@@ -238,6 +239,12 @@ public sealed class SettingsService
             .Select(x => x.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
+        settings.RunnerDisplayOrder = settings.RunnerDisplayOrder
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        settings.RunnerSortMode = RunnerListOrganizer.NormalizeMode(settings.RunnerSortMode);
         if (string.IsNullOrWhiteSpace(settings.FolderPattern)) settings.FolderPattern = "actions-runner*";
         if (settings.RunnerRoots.Count == 0) settings.RunnerRoots.Add(FindFallbackRoot());
         settings.RefreshIntervalSeconds = Math.Clamp(settings.RefreshIntervalSeconds, 2, 300);
@@ -268,6 +275,8 @@ public sealed class SettingsService
         public bool NotifyOnlyWhenHidden { get; set; } = true;
         public List<string> RepositoryPaths { get; set; } = [];
         public string Language { get; set; } = "es";
+        public string RunnerSortMode { get; set; } = "manual";
+        public List<string> RunnerDisplayOrder { get; set; } = [];
 
         public static PortableSettingsData FromSettings(RunnerSettings settings) => new()
         {
@@ -282,7 +291,9 @@ public sealed class SettingsService
             NotifyRunnerIssues = settings.NotifyRunnerIssues,
             NotifyOnlyWhenHidden = settings.NotifyOnlyWhenHidden,
             RepositoryPaths = settings.RepositoryPaths?.ToList() ?? [],
-            Language = settings.Language
+            Language = settings.Language,
+            RunnerSortMode = settings.RunnerSortMode,
+            RunnerDisplayOrder = settings.RunnerDisplayOrder?.ToList() ?? []
         };
 
         public RunnerSettings ToSettings() => new()
@@ -298,7 +309,9 @@ public sealed class SettingsService
             NotifyRunnerIssues = NotifyRunnerIssues,
             NotifyOnlyWhenHidden = NotifyOnlyWhenHidden,
             RepositoryPaths = RepositoryPaths?.ToList() ?? [],
-            Language = Language
+            Language = Language,
+            RunnerSortMode = RunnerSortMode,
+            RunnerDisplayOrder = RunnerDisplayOrder?.ToList() ?? []
         };
     }
 }
