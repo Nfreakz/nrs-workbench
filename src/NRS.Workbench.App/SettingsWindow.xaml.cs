@@ -26,6 +26,8 @@ public partial class SettingsWindow : Window
         RefreshText.Text = settings.RefreshIntervalSeconds.ToString();
         ConfirmBusyCheck.IsChecked = settings.ConfirmStopBusy;
         KeepInTrayCheck.IsChecked = settings.KeepInTray;
+        RunnerQueueEnabledCheck.IsChecked = settings.RunnerQueueEnabled;
+        RunnerQueueLimitChoice.SelectedValue = settings.RunnerQueueLimit.ToString();
         NotificationsEnabledCheck.IsChecked = settings.NotificationsEnabled;
         NotifyJobStartedCheck.IsChecked = settings.NotifyJobStarted;
         NotifyJobCompletedCheck.IsChecked = settings.NotifyJobCompleted;
@@ -51,6 +53,8 @@ public partial class SettingsWindow : Window
         _workingSettings.RefreshIntervalSeconds = refresh;
         _workingSettings.ConfirmStopBusy = ConfirmBusyCheck.IsChecked == true;
         _workingSettings.KeepInTray = KeepInTrayCheck.IsChecked == true;
+        _workingSettings.RunnerQueueEnabled = RunnerQueueEnabledCheck.IsChecked == true;
+        _workingSettings.RunnerQueueLimit = int.TryParse(RunnerQueueLimitChoice.SelectedValue as string, out var queueLimit) ? queueLimit : 2;
         _workingSettings.NotificationsEnabled = NotificationsEnabledCheck.IsChecked == true;
         _workingSettings.NotifyJobStarted = NotifyJobStartedCheck.IsChecked == true;
         _workingSettings.NotifyJobCompleted = NotifyJobCompletedCheck.IsChecked == true;

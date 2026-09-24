@@ -6,5 +6,6 @@ public interface IRunnerControlService
 {
     Task StartAsync(RunnerInfo runner, CancellationToken cancellationToken = default);
     Task StopAsync(RunnerInfo runner, CancellationToken cancellationToken = default);
+    Task<bool> StopIfIdleAsync(RunnerInfo runner, CancellationToken cancellationToken = default);
     Task RestartAsync(RunnerInfo runner, CancellationToken cancellationToken = default);
 }

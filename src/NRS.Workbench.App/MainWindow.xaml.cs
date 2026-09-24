@@ -17,6 +17,7 @@ public partial class MainWindow : Window
     private readonly IRunnerStatisticsService _statistics;
     private readonly SettingsService _settings;
     private readonly TrayIconService _tray;
+    private readonly RunnerQueueCoordinator _runnerQueue;
     private bool _allowExit;
     private readonly Dictionary<string, RunnerState> _previousStates = new(StringComparer.OrdinalIgnoreCase);
     private bool _stateSnapshotInitialized;
@@ -33,6 +34,7 @@ public partial class MainWindow : Window
         _statistics = new RunnerStatisticsService();
         IRunnerDiscoveryService discovery = new RunnerDiscoveryService(_settings, processService, serviceController, progress);
         IRunnerControlService control = new RunnerControlService(processService, serviceController);
+        _runnerQueue = new RunnerQueueCoordinator(control);
         ILogReaderService logs = new LogReaderService();
         var dialogs = new DialogService(_settings);
 
@@ -83,6 +85,8 @@ public partial class MainWindow : Window
         var runners = _viewModel.AllRunners.ToList();
         _tray.Update(runners);
         ProcessStateTransitions(runners);
+        var queueStatus = await _runnerQueue.ReconcileAsync(runners, _settings.Load());
+        _viewModel.UpdateQueueStatus(queueStatus);
     }
 
     private void ProcessStateTransitions(IReadOnlyList<RunnerInfo> runners)
@@ -159,12 +163,13 @@ public partial class MainWindow : Window
         window.ShowDialog();
     }
 
-    private void Settings_Click(object sender, RoutedEventArgs e)
+    private async void Settings_Click(object sender, RoutedEventArgs e)
     {
         if (_viewModel.EditSettings(this))
         {
             ApplyTimerInterval();
             ApplyTraySetting();
+            await RefreshAndUpdateTrayAsync();
         }
     }
 
@@ -179,14 +184,16 @@ public partial class MainWindow : Window
 
     private void MainWindow_Closing(object? sender, CancelEventArgs e)
     {
-        if (_allowExit || !_settings.Load().KeepInTray) return;
+        var settings = _settings.Load();
+        if (_allowExit || (!settings.KeepInTray && !settings.RunnerQueueEnabled)) return;
         e.Cancel = true;
         HideToTray();
     }
 
     private void HideToTray()
     {
-        if (!_settings.Load().KeepInTray) return;
+        var settings = _settings.Load();
+        if (!settings.KeepInTray && !settings.RunnerQueueEnabled) return;
         ShowInTaskbar = false;
         Hide();
     }
@@ -204,6 +211,14 @@ public partial class MainWindow : Window
 
     private void ExitApplication()
     {
+        if (_settings.Load().RunnerQueueEnabled &&
+            MessageBox.Show(
+                UiLanguage.Choose("La cola necesita que NRS Workbench siga activo. Si sales, los jobs dirigidos a runners detenidos pueden esperar hasta que vuelvas a abrir la app. ¿Salir de todos modos?", "The queue needs NRS Workbench to remain active. If you exit, jobs assigned to stopped runners may wait until you reopen the app. Exit anyway?"),
+                UiLanguage.Choose("Salir con la cola activa", "Exit with queue active"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No) != MessageBoxResult.Yes)
+            return;
         _allowExit = true;
         Close();
     }

@@ -58,6 +58,17 @@
                     <StackPanel>
                         <CheckBox x:Name="ConfirmBusyCheck" Content="{local:Tr Source='Confirmar antes de parar un runner BUSY'}" Foreground="{StaticResource TextBrush}"/>
                         <CheckBox x:Name="KeepInTrayCheck" Content="{local:Tr Source='Mantener NRS Workbench en la bandeja al cerrar o minimizar'}" Foreground="{StaticResource TextBrush}" Margin="0,10,0,0"/>
+                        <Border BorderBrush="#263D5A" BorderThickness="0,1,0,0" Margin="0,12,0,10"/>
+                        <CheckBox x:Name="RunnerQueueEnabledCheck" Content="{local:Tr Source='Activar cola automática de runners'}" Foreground="{StaticResource TextBrush}"/>
+                        <StackPanel Orientation="Horizontal" Margin="22,8,0,0">
+                            <TextBlock Text="{local:Tr Source='Máximo de runners conectados'}" Style="{StaticResource MutedLabel}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <ComboBox x:Name="RunnerQueueLimitChoice" Width="82" SelectedValuePath="Tag">
+                                <ComboBoxItem Content="1" Tag="1"/>
+                                <ComboBoxItem Content="2" Tag="2"/>
+                            </ComboBox>
+                        </StackPanel>
+                        <TextBlock Text="{local:Tr Source='La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. GitHub conserva los jobs en cola para los runners detenidos. Los jobs activos no se detienen; al activar la cola, los runners libres sobrantes se apagan. NRS Workbench debe permanecer abierto o en la bandeja.'}"
+                                   Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="22,7,0,0"/>
                     </StackPanel>
                 </Border>
 

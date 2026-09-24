@@ -21,6 +21,37 @@ public sealed class RunnerControlService : IRunnerControlService
     public Task StopAsync(RunnerInfo runner, CancellationToken cancellationToken = default) =>
         Task.Run(() => Stop(runner), cancellationToken);
 
+    public Task<bool> StopIfIdleAsync(RunnerInfo runner, CancellationToken cancellationToken = default) =>
+        Task.Run(() =>
+        {
+            // Read the process snapshot immediately before issuing the stop. The
+            // dashboard snapshot may already be stale by the time reconciliation
+            // reaches this runner.
+            var snapshot = _processService.GetSnapshot(runner.FolderPath);
+            try
+            {
+                if (snapshot.HasWorker) return false;
+                if (runner.Mode == RunnerMode.Service && !string.IsNullOrWhiteSpace(runner.ServiceName))
+                {
+                    _serviceController.Stop(runner.ServiceName);
+                    return true;
+                }
+
+                if (snapshot.Listener is null) return true;
+                // Do not kill the listener's process tree here. A worker that
+                // starts in the small interval after this check must be allowed
+                // to finish instead of being terminated with its parent.
+                snapshot.Listener.Kill(entireProcessTree: false);
+                snapshot.Listener.WaitForExit(5000);
+                return true;
+            }
+            finally
+            {
+                snapshot.Listener?.Dispose();
+                foreach (var worker in snapshot.Workers) worker.Dispose();
+            }
+        }, cancellationToken);
+
     public async Task RestartAsync(RunnerInfo runner, CancellationToken cancellationToken = default)
     {
         await StopAsync(runner, cancellationToken);

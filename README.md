@@ -8,11 +8,11 @@
 
 **Latest release: [v0.18.0 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.0)** · [Download the portable Windows ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.0/NRSWorkbench-v0.18.0-win-x64.zip) · [What's new](CHANGELOG.md)
 
-NRS Workbench brings your local runners and Git working trees into one desktop app. Check runner status and current jobs, inspect locally retained job history, and see your PC's CPU, memory and disk usage. Search and sort runners, including a saved manual order. Review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in English and Spanish.
+NRS Workbench brings your local runners and Git working trees into one desktop app. Check runner status and current jobs, inspect locally retained job history, and see your PC's CPU, memory and disk usage. Search and sort runners, including a saved manual order. An optional automatic queue can keep one or two runners connected and rotate idle runners while GitHub holds jobs for stopped runners. Review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in English and Spanish.
 
 **Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-**En español:** NRS Workbench reúne en Windows tus runners de GitHub Actions y repositorios Git locales. Muestra trabajos y recursos del PC; permite buscar y ordenar runners, consultar repositorios y realizar operaciones Git con confirmación. La interfaz está disponible en español e inglés.
+**En español:** NRS Workbench reúne en Windows tus runners de GitHub Actions y repositorios Git locales. Muestra trabajos y recursos del PC; permite buscar y ordenar runners, limitar cuántos permanecen conectados con una cola automática y consultar repositorios. La interfaz está disponible en español e inglés.
 
 ### Main window
 
@@ -41,6 +41,7 @@ See `docs/TESTING.md`, `docs/PRIVACY.md`, `docs/ARCHITECTURE.md`, `docs/RELEASIN
 - Provide one local Windows control center for self-hosted runners and Git repositories.
 - Keep runner control and repository management independent from mandatory GitHub API access.
 - Discover local `actions-runner*` installations.
+- Optionally limit connected runners to one or two and rotate idle runners to reduce host load while GitHub queues jobs for runners that are offline.
 - Show trustworthy runner state (`READY`, `BUSY`, `STOPPED`, etc.).
 - Start, stop and restart interactive runners and Windows-service runners.
 - Inspect local runner metadata and `_diag` logs without exposing credentials.
@@ -114,6 +115,10 @@ It also adds Spanish and English interface resources. Select the language in **C
 ### Runner list in v0.18
 
 The main window shows the application version and live host CPU, RAM and system disk use. Search runners by name, agent, GitHub target, labels or folder. Use the order menu to sort by name, status, GitHub target or RAM, or choose manual order and move a selected runner with the arrow buttons. The selected sort and manual order persist in local settings and portable configuration exports. Search filters the table only: dashboard totals, notifications, statistics and Start/Stop all still cover every detected runner. Bulk actions warn when a search is active.
+
+### Automatic runner queue
+
+Enable the optional queue in **Settings** to keep at most one or two runners connected. When the limit is reached, idle runners rotate every 45 seconds so a runner with matching labels can come online; GitHub keeps jobs queued while no matching runner is available. Active jobs are left running. Keep NRS Workbench open or in the system tray for the queue to continue managing runners.
 
 ### NRS Workbench identity and migration
 
