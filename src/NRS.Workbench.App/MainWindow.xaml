@@ -310,7 +310,14 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="HOST / AGENT" Binding="{Binding AgentName}" Width="135"/>
+                    <DataGridTextColumn Header="HOST / AGENT" Binding="{Binding AgentName}" Width="135">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
 
                     <DataGridTemplateColumn Header="{local:Tr Source='DESTINO GITHUB'}" Width="1.15*" MinWidth="210">
                         <DataGridTemplateColumn.CellTemplate>
@@ -366,17 +373,33 @@
                     <DataGridTemplateColumn Header="{local:Tr Source='MODO'}" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" Foreground="#72B7FF" FontSize="13" Margin="0,0,7,0"/>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" Foreground="#72B7FF" FontSize="13" Margin="0,0,7,0" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding ModeDisplay, Converter={StaticResource LocalizedText}}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="PID" Binding="{Binding PidDisplay}" Width="62"/>
-                    <DataGridTextColumn Header="RAM" Binding="{Binding RamDisplay}" Width="72"/>
-                    <DataGridTextColumn Header="UPTIME" Binding="{Binding UptimeDisplay}" Width="82"/>
-                    <DataGridTextColumn Header="{local:Tr Source='VERSIÓN'}" Binding="{Binding Version}" Width="78"/>
+                    <DataGridTextColumn Header="PID" Binding="{Binding PidDisplay}" Width="62">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="RAM" Binding="{Binding RamDisplay}" Width="72">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="UPTIME" Binding="{Binding UptimeDisplay}" Width="82">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="{local:Tr Source='VERSIÓN'}" Binding="{Binding Version}" Width="78">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
