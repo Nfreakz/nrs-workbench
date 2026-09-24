@@ -245,6 +245,7 @@ public sealed class SettingsService
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
         settings.RunnerSortMode = RunnerListOrganizer.NormalizeMode(settings.RunnerSortMode);
+        settings.RunnerQueueLimit = Math.Clamp(settings.RunnerQueueLimit, 1, 2);
         if (string.IsNullOrWhiteSpace(settings.FolderPattern)) settings.FolderPattern = "actions-runner*";
         if (settings.RunnerRoots.Count == 0) settings.RunnerRoots.Add(FindFallbackRoot());
         settings.RefreshIntervalSeconds = Math.Clamp(settings.RefreshIntervalSeconds, 2, 300);
@@ -277,6 +278,8 @@ public sealed class SettingsService
         public string Language { get; set; } = "es";
         public string RunnerSortMode { get; set; } = "manual";
         public List<string> RunnerDisplayOrder { get; set; } = [];
+        public bool RunnerQueueEnabled { get; set; }
+        public int RunnerQueueLimit { get; set; } = 2;
 
         public static PortableSettingsData FromSettings(RunnerSettings settings) => new()
         {
@@ -293,7 +296,9 @@ public sealed class SettingsService
             RepositoryPaths = settings.RepositoryPaths?.ToList() ?? [],
             Language = settings.Language,
             RunnerSortMode = settings.RunnerSortMode,
-            RunnerDisplayOrder = settings.RunnerDisplayOrder?.ToList() ?? []
+            RunnerDisplayOrder = settings.RunnerDisplayOrder?.ToList() ?? [],
+            RunnerQueueEnabled = settings.RunnerQueueEnabled,
+            RunnerQueueLimit = settings.RunnerQueueLimit
         };
 
         public RunnerSettings ToSettings() => new()
@@ -311,7 +316,9 @@ public sealed class SettingsService
             RepositoryPaths = RepositoryPaths?.ToList() ?? [],
             Language = Language,
             RunnerSortMode = RunnerSortMode,
-            RunnerDisplayOrder = RunnerDisplayOrder?.ToList() ?? []
+            RunnerDisplayOrder = RunnerDisplayOrder?.ToList() ?? [],
+            RunnerQueueEnabled = RunnerQueueEnabled,
+            RunnerQueueLimit = RunnerQueueLimit
         };
     }
 }

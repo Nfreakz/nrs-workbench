@@ -16,4 +16,6 @@ public sealed class RunnerSettings
     public string Language { get; set; } = "es";
     public string RunnerSortMode { get; set; } = "manual";
     public List<string> RunnerDisplayOrder { get; set; } = [];
+    public bool RunnerQueueEnabled { get; set; }
+    public int RunnerQueueLimit { get; set; } = 2;
 }

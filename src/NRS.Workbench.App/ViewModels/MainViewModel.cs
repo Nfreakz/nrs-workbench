@@ -25,6 +25,7 @@ public sealed class MainViewModel : ObservableObject
     private RunnerInfo? _selectedRunner;
     private string _logText = UiLanguage.Choose("Selecciona un runner para ver el log.", "Select a runner to view its log.");
     private string _statusText = UiLanguage.Choose("Inicializando...", "Initializing...");
+    private string _queueStatusText = string.Empty;
     private DateTimeOffset _lastUpdated;
     private string _cpuUseText = "—";
     private string _memoryUseText = "—";
@@ -97,6 +98,8 @@ public sealed class MainViewModel : ObservableObject
 
     public string LogText { get => _logText; private set => SetProperty(ref _logText, value); }
     public string StatusText { get => _statusText; private set => SetProperty(ref _statusText, value); }
+    public string QueueStatusText { get => _queueStatusText; private set => SetProperty(ref _queueStatusText, value); }
+    public void UpdateQueueStatus(string status) => QueueStatusText = status;
     public string LastUpdatedText => _lastUpdated == default ? string.Empty : _lastUpdated.ToString("dd MMM yyyy  HH:mm:ss");
     public string AppVersionText
     {
@@ -169,8 +172,8 @@ public sealed class MainViewModel : ObservableObject
         StartCommand = new AsyncRelayCommand(StartSelectedAsync, CanStartSelected);
         StopCommand = new AsyncRelayCommand(StopSelectedAsync, CanStopSelected);
         RestartCommand = new AsyncRelayCommand(RestartSelectedAsync, CanRestartSelected);
-        StartAllCommand = new AsyncRelayCommand(StartAllAsync, () => _allRunners.Any(x => x.State == RunnerState.Stopped));
-        StopAllCommand = new AsyncRelayCommand(StopAllAsync, () => _allRunners.Any(x => x.State is RunnerState.Ready or RunnerState.Busy));
+        StartAllCommand = new AsyncRelayCommand(StartAllAsync, () => !_settingsService.Load().RunnerQueueEnabled && _allRunners.Any(x => x.State == RunnerState.Stopped));
+        StopAllCommand = new AsyncRelayCommand(StopAllAsync, () => !_settingsService.Load().RunnerQueueEnabled && _allRunners.Any(x => x.State is RunnerState.Ready or RunnerState.Busy));
         OpenFolderCommand = new RelayCommand(() => OpenPath(SelectedRunner?.FolderPath), () => SelectedRunner is not null);
         OpenDiagCommand = new RelayCommand(() => OpenPath(SelectedRunner is null ? null : Path.Combine(SelectedRunner.FolderPath, "_diag")), () => SelectedRunner is not null);
         OpenGitHubCommand = new RelayCommand(() => OpenUrl(SelectedRunner?.GitHubUrl), () => !string.IsNullOrWhiteSpace(SelectedRunner?.GitHubUrl));
@@ -350,9 +353,9 @@ public sealed class MainViewModel : ObservableObject
         return _dialogs.Confirm(UiLanguage.Choose($"El runner '{runner.Alias}' está ejecutando un job.\n\nLa operación puede interrumpirlo y marcarlo como fallido.\n\n¿Continuar?", $"Runner '{runner.Alias}' is running a job.\n\nThis action may interrupt it and mark it as failed.\n\nContinue?"), "Runner BUSY");
     }
 
-    private bool CanStartSelected() => SelectedRunner?.State == RunnerState.Stopped;
-    private bool CanStopSelected() => SelectedRunner is not null && CanStop(SelectedRunner);
-    private bool CanRestartSelected() => SelectedRunner?.State is RunnerState.Ready or RunnerState.Busy;
+    private bool CanStartSelected() => !_settingsService.Load().RunnerQueueEnabled && SelectedRunner?.State == RunnerState.Stopped;
+    private bool CanStopSelected() => !_settingsService.Load().RunnerQueueEnabled && SelectedRunner is not null && CanStop(SelectedRunner);
+    private bool CanRestartSelected() => !_settingsService.Load().RunnerQueueEnabled && (SelectedRunner?.State is RunnerState.Ready or RunnerState.Busy);
     private static bool CanStop(RunnerInfo runner) => runner.State is RunnerState.Ready or RunnerState.Busy or RunnerState.Starting;
 
     private void LoadSelectedLog()

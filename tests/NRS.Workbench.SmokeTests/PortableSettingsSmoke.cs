@@ -38,6 +38,8 @@ internal static class PortableSettingsSmoke
                 Language = "en",
                 RunnerSortMode = "memory",
                 RunnerDisplayOrder = [runnerFolder, runnerFolder],
+                RunnerQueueEnabled = true,
+                RunnerQueueLimit = 1,
                 RepositoryPaths = [repositoryPath, repositoryPath]
             };
 
@@ -57,6 +59,8 @@ internal static class PortableSettingsSmoke
             Assert(imported.Language == "en", "portable settings preserves selected language");
             Assert(imported.RunnerSortMode == "memory" && imported.RunnerDisplayOrder.SequenceEqual([runnerFolder]),
                 "portable settings preserves runner sorting and normalizes manual order");
+            Assert(imported.RunnerQueueEnabled && imported.RunnerQueueLimit == 1,
+                "portable settings preserves the automatic runner queue and its concurrency limit");
             UiLanguage.Select(imported.Language);
             Assert(UiLanguage.Text("Configuración") == "Settings", "English UI resources load from the packaged app");
             UiLanguage.Select("es");
