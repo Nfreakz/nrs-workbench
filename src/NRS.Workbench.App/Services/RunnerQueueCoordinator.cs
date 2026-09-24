@@ -30,8 +30,8 @@ public sealed class RunnerQueueCoordinator
             {
                 if (!_queueWasEnabled) return string.Empty;
                 _readySince.Clear();
-                var stopped = runners.Where(runner => runner.State == RunnerState.Stopped).ToList();
-                var outcomes = await Task.WhenAll(stopped.Select(async runner =>
+                var runnersToRestore = runners.Where(runner => runner.State == RunnerState.Stopped).ToList();
+                var outcomes = await Task.WhenAll(runnersToRestore.Select(async runner =>
                 {
                     try { await _control.StartAsync(runner, cancellationToken); return true; }
                     catch (Exception ex) { AppLogger.Error($"Runner queue could not restore '{runner.Alias}'", ex); return false; }
