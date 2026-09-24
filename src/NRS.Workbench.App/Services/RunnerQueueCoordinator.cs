@@ -78,7 +78,7 @@ public sealed class RunnerQueueCoordinator
                 var idleToStop = ordered.Where(runner => runner.State == RunnerState.Ready)
                     .Reverse().Take(excess).ToList();
                 if (idleToStop.Count == 0)
-                    return Summary(active.Count, busyCount, stopped.Count, limit, waitingForBusy: true);
+                    return Summary(active.Count, busyCount, stopped.Count, limit, waitingForCapacity: true);
 
                 var stoppedResults = await Task.WhenAll(idleToStop.Select(StopIfStillIdleAsync));
                 var failures = stoppedResults.Where(result => !result.Success && !result.BecameBusy).ToList();
@@ -174,10 +174,10 @@ public sealed class RunnerQueueCoordinator
     private static bool IsOnline(RunnerInfo runner) => runner.State is
         RunnerState.Ready or RunnerState.Busy or RunnerState.Starting or RunnerState.Stopping;
 
-    private static string Summary(int active, int busy, int waiting, int limit, bool changing = false, bool waitingForBusy = false)
+    private static string Summary(int active, int busy, int waiting, int limit, bool changing = false, bool waitingForCapacity = false)
     {
-        if (waitingForBusy)
-            return UiLanguage.Choose($"Cola activa · {busy} jobs en curso · deteniendo runners libres", $"Queue active · {busy} jobs running · stopping idle runners");
+        if (waitingForCapacity)
+            return UiLanguage.Choose("Cola activa · dejando terminar los jobs activos antes de liberar puestos.", "Queue active · waiting for active jobs to finish before freeing slots.");
         if (changing)
             return UiLanguage.Choose($"Cola activa · preparando {limit} runners a la vez", $"Queue active · preparing {limit} runners at a time");
         return UiLanguage.Choose($"Cola activa · {busy}/{limit} jobs · {waiting} runners en espera", $"Queue active · {busy}/{limit} jobs · {waiting} runners waiting");

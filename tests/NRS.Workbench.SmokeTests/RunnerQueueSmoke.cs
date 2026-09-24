@@ -12,6 +12,7 @@ internal static class RunnerQueueSmoke
     {
         StartLimitQueuesExtraRunners();
         ExistingBusyJobsAreNeverStopped();
+        ExistingBusyJobsMayTemporarilyExceedTheLimit();
         IdleSlotsRotateToReachOtherRunnerTargets();
     }
 
@@ -61,6 +62,19 @@ internal static class RunnerQueueSmoke
 
         Assert(control.Stopped.SequenceEqual(["idle"]) && control.Started.SequenceEqual(["waiting"]),
             "runner queue rotates an idle slot to the next stopped runner");
+    }
+
+    private static void ExistingBusyJobsMayTemporarilyExceedTheLimit()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
+        var runners = new[] { Runner("busy-a", RunnerState.Busy), Runner("busy-b", RunnerState.Busy) };
+
+        var status = queue.ReconcileAsync(runners, settings, DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
+
+        Assert(control.Stopped.Count == 0 && control.Started.Count == 0 && !string.IsNullOrWhiteSpace(status),
+            "runner queue leaves already-running jobs alone and waits for capacity before starting more runners");
     }
 
     private static RunnerInfo Runner(string name, RunnerState state) => new()

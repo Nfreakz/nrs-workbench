@@ -213,7 +213,7 @@ public partial class MainWindow : Window
     {
         if (_settings.Load().RunnerQueueEnabled &&
             MessageBox.Show(
-                UiLanguage.Choose("La cola necesita que NRS Workbench siga activo. Si sales, los jobs dirigidos a runners detenidos pueden esperar hasta que vuelvas a abrir la app. ¿Salir de todos modos?", "The queue needs NRS Workbench to remain active. If you exit, jobs assigned to stopped runners may wait until you reopen the app. Exit anyway?"),
+                UiLanguage.Choose("La cola necesita que NRS Workbench siga activo. Si sales, los runners que sigan conectados pueden continuar aceptando jobs sin el límite configurado hasta que los pares o vuelvas a abrir la app. ¿Salir de todos modos?", "The queue needs NRS Workbench to remain active. If you exit, connected runners may keep accepting jobs without the configured limit until you stop them or reopen the app. Exit anyway?"),
                 UiLanguage.Choose("Salir con la cola activa", "Exit with queue active"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning,
