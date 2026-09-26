@@ -32,8 +32,6 @@ Screenshot from Windows. Computer, runner and repository names, paths and log co
 
 **Try it:** [See published Windows downloads](https://github.com/Nfreakz/nrs-workbench/releases) · [Read the setup and usage Wiki](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
 
-**En español:** Gestiona tus runners de GitHub Actions y tus repositorios Git locales desde Windows. Descarga una versión publicada, consulta la Wiki y comparte errores o propuestas de mejora. Comprueba la versión del ZIP antes de buscar funciones que todavía están disponibles solo en el código fuente.
-
 ## Public preview readiness
 
 The public-preview gate combines a dependency-free Git smoke-test executable, source audit, Windows CI, tag-driven release automation, community templates, privacy/testing/architecture documentation and repository hardening.
@@ -181,14 +179,6 @@ On the first statistics load, NRS Workbench shows an `X/Y Worker logs` scan indi
 NRS Workbench reads `.runner`, `.service` and `_diag` only for operational metadata. It intentionally does not read or display runner credential files.
 
 Because this repository is public, persistent self-hosted CI intentionally does not run `pull_request` events. The local runner is used only for trusted branch pushes and explicit manual workflow runs, preventing code submitted from an external fork from being executed automatically on the physical runner machine.
-
-## Get involved and work with Neo RS
-
-**Testing and feedback are welcome.** Try the published Windows build, report a reproducible issue or propose an improvement through the [issue templates](https://github.com/Nfreakz/nrs-workbench/issues/new/choose). Please remove private paths, tokens and repository details from screenshots and logs.
-
-**Code contributions are not open yet.** Please do not submit code pull requests until a contributor agreement is published. See [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a contribution.
-
-**Professional collaboration and commercial licensing:** NRS Workbench is a source-available Neo RS project, not an OSI-approved open-source project. Read the [commercial licensing policy](COMMERCIAL-LICENSING.md) and use the contact method published on the [Neo RS / Nfreakz GitHub profile](https://github.com/Nfreakz) for private enquiries. Do not include confidential project information in public issues. Voluntary support does not grant a commercial license.
 
 ## License
 
