@@ -6,19 +6,19 @@
 
 **A local Windows dashboard for Git repositories and GitHub Actions self-hosted runners.**
 
-**Latest published release: [v0.18.1 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.1)** · [Download Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.1/NRSWorkbench-v0.18.1-win-x64.zip) · [What's new](CHANGELOG.md)
+**Latest published release: [v0.18.2 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.2)** · [Download Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.2/NRSWorkbench-v0.18.2-win-x64.zip) · [What's new](CHANGELOG.md)
 
-**Release candidate: v0.18.2.** The source has passed trusted Windows CI with Catalan, safer runner-queue recovery and guarded `RUN_ME_FIRST` updating. The latest published ZIP remains v0.18.1 until the v0.18.2 release workflow uploads and verifies its asset.
+**New in v0.18.2:** Catalan interface, safer runner-queue recovery across app restarts, stronger protection for manually stopped runners, and guarded repository updating from `RUN_ME_FIRST.cmd`.
 
-NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.1 Public Preview**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The published v0.18.1 interface is available in English and Spanish; Catalan is being added for v0.18.2.
+NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.2 Public Preview**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The published v0.18.2 interface is available in Spanish, English and Catalan.
 
 **New in v0.18.1:** The optional automatic runner queue can keep one or two runners connected and rotate idle runners while GitHub holds jobs for stopped runners. Active jobs are not intentionally interrupted. This feature is absent from the v0.18.0 ZIP. See [Automatic runner queue](#automatic-runner-queue) for operational limits.
 
 **Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-**En español:** La descarga v0.18.1 ya incluye la cola automática. El catalán y la recuperación segura de runners están en desarrollo para v0.18.2 y aún no forman parte del ZIP publicado.
+**En español:** La v0.18.2 ya está publicada con catalán, recuperación segura de la cola y actualización protegida del repositorio desde `RUN_ME_FIRST.cmd`.
 
-**En català:** La descàrrega v0.18.1 ja inclou la cua automàtica. El català i la recuperació segura dels runners s'estan preparant per a la v0.18.2; encara no formen part del ZIP publicat.
+**En català:** La v0.18.2 ja està publicada amb interfície en català, recuperació segura de la cua i actualització protegida del repositori des de `RUN_ME_FIRST.cmd`.
 
 ### Main window
 
@@ -130,7 +130,7 @@ The main window shows the application version and live host CPU, RAM and system 
 
 Enable the optional queue in **Settings** to keep at most one or two runners connected. When the limit is reached, idle runners rotate every 45 seconds so a runner with matching labels can come online; GitHub keeps jobs queued while no matching runner is available. Active jobs are left running. Keep NRS Workbench open or in the system tray for the queue to continue managing runners. Turning off the queue restores runners that the queue stopped during the current app session; runners already stopped manually are left stopped. After closing and reopening NRS Workbench, runners stopped in an earlier session may need to be started manually.
 
-**v0.18.2 release candidate:** The queue no longer auto-starts runners that were stopped before the queue was enabled or that were stopped outside the queue while it was running. Managed stops are recorded in a local-only journal; after reopening Workbench, a confirmation dialog lists the recorded runner folders before any previously stopped runner is made eligible for recovery. Declining the prompt leaves them stopped. Keep a single Workbench instance managing a runner set. The journal is stored locally, is not included in portable settings exports and is not a backup of runner configuration. Catalan can be selected in **Settings → Language**; restart the app to apply the choice.
+**v0.18.2:** The queue no longer auto-starts runners that were stopped before the queue was enabled or that were stopped outside the queue while it was running. Managed stops are recorded in a local-only journal; after reopening Workbench, a confirmation dialog lists the recorded runner folders before any previously stopped runner is made eligible for recovery. Declining the prompt leaves them stopped. Keep a single Workbench instance managing a runner set. The journal is stored locally, is not included in portable settings exports and is not a backup of runner configuration. Catalan can be selected in **Settings → Language**; restart the app to apply the choice.
 
 ### NRS Workbench identity and migration
 
