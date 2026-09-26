@@ -132,8 +132,9 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="336"/>
+            <RowDefinition Height="320"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -268,8 +269,67 @@
             </WrapPanel>
         </Grid>
 
+        <!-- Smart runner queue -->
+        <Border Grid.Row="2" Style="{StaticResource PanelCard}" Padding="13,10" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="145"/>
+                    <ColumnDefinition Width="1.1*"/>
+                    <ColumnDefinition Width="1.1*"/>
+                    <ColumnDefinition Width="1.1*"/>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Center">
+                    <TextBlock Text="{local:Tr Source='COLA INTELIGENTE'}" FontSize="9" FontWeight="Bold" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding QueueStateText}" FontSize="16" FontWeight="Bold" Margin="0,2,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="#6F879F"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Active"><Setter Property="Foreground" Value="#72E6A5"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Paused"><Setter Property="Foreground" Value="#F5C451"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Blocked"><Setter Property="Foreground" Value="#FFB56B"/></DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="12,0,14,0">
+                    <TextBlock Text="{local:Tr Source='EJECUTANDO'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding QueueRunningText}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueRunningText}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="12,0,14,0">
+                    <TextBlock Text="{local:Tr Source='SIGUIENTE'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding QueueNextText}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueNextText}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="3" Margin="12,0,14,0">
+                    <TextBlock Text="{local:Tr Source='EN ESPERA'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding QueueWaitingText}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueWaitingText}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="4" Margin="12,0,14,0">
+                    <TextBlock Text="{local:Tr Source='PARADOS MANUALMENTE'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{Binding QueueManualText}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueManualText}"/>
+                </StackPanel>
+
+                <Button Grid.Column="5" Grid.RowSpan="2" Style="{StaticResource ToolbarButton}" Content="{Binding QueuePauseButtonText}"
+                        IsEnabled="{Binding QueueControlsEnabled}" Margin="8,0,0,0" Padding="12,6" VerticalAlignment="Center"
+                        Click="QueuePause_Click"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Text="{Binding QueueReasonText}"
+                           FontSize="10" Foreground="{StaticResource MutedBrush}" Margin="12,6,14,0"
+                           TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueReasonText}"/>
+            </Grid>
+        </Border>
+
         <!-- Runner list controls -->
-        <Grid Grid.Row="2" Margin="2,0,2,10">
+        <Grid Grid.Row="3" Margin="2,0,2,10">
             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <TextBlock Text="{local:Tr Source='Buscar runner'}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,9,0"/>
             <TextBox Grid.Column="1" Width="235" Height="30" VerticalAlignment="Center" VerticalContentAlignment="Center" Text="{Binding RunnerSearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="{local:Tr Source='Busca por nombre, destino, etiqueta o ruta'}"/>
@@ -283,7 +343,7 @@
         </Grid>
 
         <!-- Runner table -->
-        <Border Grid.Row="3" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,14">
+        <Border Grid.Row="4" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,14">
             <DataGrid ItemsSource="{Binding Runners}" SelectedItem="{Binding SelectedRunner, Mode=TwoWay}" AlternationCount="2" CanUserSortColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="{local:Tr Source='ESTADO'}" Width="112">
@@ -405,7 +465,7 @@
         </Border>
 
         <!-- Detail + log -->
-        <Grid Grid.Row="4">
+        <Grid Grid.Row="5">
             <Grid.ColumnDefinitions><ColumnDefinition Width="0.88*"/><ColumnDefinition Width="1.62*"/></Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Style="{StaticResource PanelCard}" Margin="0,0,7,0" Padding="17">
@@ -539,7 +599,7 @@
         </Grid>
 
         <!-- Host PC resources; values include all applications, not only runners. -->
-        <Border Grid.Row="5" Style="{StaticResource PanelCard}" Padding="14,9" Margin="0,12,0,0">
+        <Border Grid.Row="6" Style="{StaticResource PanelCard}" Padding="14,9" Margin="0,12,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="165"/>
@@ -579,7 +639,7 @@
         </Border>
 
         <!-- Footer -->
-        <Grid Grid.Row="6" Margin="2,12,2,0">
+        <Grid Grid.Row="7" Margin="2,12,2,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
                 <Ellipse Width="9" Height="9" Fill="#3DDC84" Margin="0,1,8,0"/>
