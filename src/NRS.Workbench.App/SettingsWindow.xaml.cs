@@ -28,6 +28,9 @@ public partial class SettingsWindow : Window
         KeepInTrayCheck.IsChecked = settings.KeepInTray;
         RunnerQueueEnabledCheck.IsChecked = settings.RunnerQueueEnabled;
         RunnerQueueLimitChoice.SelectedValue = settings.RunnerQueueLimit.ToString();
+        RunnerQueueResourceGuardCheck.IsChecked = settings.RunnerQueueResourceGuardEnabled;
+        RunnerQueueCpuThresholdText.Text = settings.RunnerQueueCpuStartThreshold.ToString();
+        RunnerQueueMemoryThresholdText.Text = settings.RunnerQueueMemoryStartThreshold.ToString();
         NotificationsEnabledCheck.IsChecked = settings.NotificationsEnabled;
         NotifyJobStartedCheck.IsChecked = settings.NotifyJobStarted;
         NotifyJobCompletedCheck.IsChecked = settings.NotifyJobCompleted;
@@ -55,6 +58,22 @@ public partial class SettingsWindow : Window
         _workingSettings.KeepInTray = KeepInTrayCheck.IsChecked == true;
         _workingSettings.RunnerQueueEnabled = RunnerQueueEnabledCheck.IsChecked == true;
         _workingSettings.RunnerQueueLimit = int.TryParse(RunnerQueueLimitChoice.SelectedValue as string, out var queueLimit) ? queueLimit : 2;
+        if (!int.TryParse(RunnerQueueCpuThresholdText.Text, out var cpuThreshold) || cpuThreshold < 50 || cpuThreshold > 100 ||
+            !int.TryParse(RunnerQueueMemoryThresholdText.Text, out var memoryThreshold) || memoryThreshold < 50 || memoryThreshold > 100)
+        {
+            MessageBox.Show(
+                UiLanguage.Choose(
+                    "Los límites de CPU y RAM deben estar entre 50 y 100%.",
+                    "CPU and RAM thresholds must be between 50 and 100%.",
+                    "Els límits de CPU i RAM han d'estar entre 50 i 100%."),
+                UiLanguage.Text("Configuración"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return false;
+        }
+        _workingSettings.RunnerQueueResourceGuardEnabled = RunnerQueueResourceGuardCheck.IsChecked == true;
+        _workingSettings.RunnerQueueCpuStartThreshold = cpuThreshold;
+        _workingSettings.RunnerQueueMemoryStartThreshold = memoryThreshold;
         _workingSettings.NotificationsEnabled = NotificationsEnabledCheck.IsChecked == true;
         _workingSettings.NotifyJobStarted = NotifyJobStartedCheck.IsChecked == true;
         _workingSettings.NotifyJobCompleted = NotifyJobCompletedCheck.IsChecked == true;
