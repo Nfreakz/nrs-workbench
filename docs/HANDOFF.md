@@ -23,16 +23,23 @@
 - Test additions: manual-stop protection, owned rotation, recovery confirmation/decline, journal round-trip and Catalan settings/resources.
 - `RUN_ME_FIRST.cmd` now delegates to a launcher that, when executed from a Git clone, requires a clean working tree and configured upstream, runs `git fetch --prune` plus `git pull --ff-only` on the current branch, and never changes branches or performs automatic reset/rebase/merge/stash/discard operations. Non-Git source archives are built as extracted.
 
-## v0.18.3 candidate
+## v0.18.3 current candidate
 
-- Branch: `feat/v0.18.3-smart-queue`.
-- Version metadata is `0.18.3`; no v0.18.3 tag or public ZIP exists until the release gate passes.
+- Integrated on `main` at the current validated 0.18.3 state; no v0.18.3 tag or public ZIP exists until explicit release approval.
+- The professional graphite UI refresh is integrated on `main` and has been manually accepted visually. `docs/VISUAL_SYSTEM.md` is the source of truth for future visual changes.
 - Adds a visible smart-queue dashboard with BUSY runners, next runner, queue-owned waiting runners and manually stopped runners.
 - Adds a session-only Pause/Resume control. Pause freezes queue scheduling only; it does not stop READY/BUSY runners and is not persisted across app restarts.
 - Adds a resource guard enabled by default. New starts and idle rotations wait when host CPU reaches the configured CPU threshold or physical RAM reaches the configured RAM threshold. Existing BUSY jobs are never interrupted. Once a resource hold starts, it clears only after load drops 5 percentage points below the configured threshold to avoid rapid flapping.
 - Default resource thresholds: CPU 85%, RAM 90%. Settings normalize configurable values to 50-100% and portable settings preserve them.
 - Smoke coverage must include CPU/RAM holds, recovery below threshold, pause semantics and dashboard classification.
-- A professional UI pass is being validated on `style/v0.18.3-professional-ui`: graphite surfaces, restrained blue accent, larger metadata text, reduced corner radii, neutral KPI borders and no script font branding. `docs/VISUAL_SYSTEM.md` is the source of truth for future visual changes.
+## v0.18.4 isolated candidate
+
+- Branch: `feat/v0.18.4-repository-guidance-v2`, rebuilt on top of the professional v0.18.3 `main` instead of merging the stale pre-redesign branch.
+- Version metadata on this branch is `0.18.4`; it is intentionally not merged to `main` yet.
+- Repositories adds contextual safe-action guidance, a session-only in-memory action history, visible BEHIND summary, and correct dirty-repository counting.
+- Pull and Push re-inspect the repository immediately before writing and block stale branch/working-tree/local-commit state.
+- No automatic merge, rebase, reset, stash, remote creation or branch creation is introduced.
+- Repository guidance uses the shared graphite visual system and keeps status colors semantic and restrained.
 
 ## Verify before the next publication
 
@@ -45,4 +52,5 @@
 
 ## Other open work
 
-- The README-only public-showcase change from PR #13 is already merged into `main`. The v0.18.3 branch has reconciled that README content while keeping the smart-queue implementation independent.
+- v0.18.4 repository guidance is isolated from `main` until the v0.18.3 release decision is complete.
+- v0.18.5 remains Feedback & Diagnostics; v0.19.0 remains GitHub Actions Control. See `docs/ROADMAP.md`.
