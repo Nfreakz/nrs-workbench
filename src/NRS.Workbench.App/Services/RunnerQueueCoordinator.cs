@@ -51,10 +51,8 @@ public sealed class RunnerQueueCoordinator
                         outcomes.Add(false);
                     }
                 }
-                // A runner that is no longer stopped needs no restoration.
-                var stillStopped = runners.Where(runner => runner.State == RunnerState.Stopped)
-                    .Select(runner => runner.FolderPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
-                _stoppedByQueue.RemoveWhere(path => !stillStopped.Contains(path));
+                // A stop may still be in flight when a snapshot says READY.
+                // Retain the marker until the stopped state is observed and restored.
                 _queueWasEnabled = false;
                 return outcomes.Any(success => !success)
                     ? UiLanguage.Choose("Cola desactivada · algunos runners gestionados no se pudieron iniciar.", "Queue disabled · some queue-managed runners could not be started.")
@@ -80,7 +78,9 @@ public sealed class RunnerQueueCoordinator
                     _readySince.TryAdd(runner.FolderPath, timestamp);
                 else
                     _readySince.Remove(runner.FolderPath);
-                if (runner.State != RunnerState.Stopped)
+                // The first snapshot after StopIfIdleAsync may still report READY.
+                // BUSY means a job was accepted and the stop did not complete.
+                if (runner.State == RunnerState.Busy)
                     _stoppedByQueue.Remove(runner.FolderPath);
             }
 
@@ -141,6 +141,7 @@ public sealed class RunnerQueueCoordinator
                     {
                         _pendingStarts[next.FolderPath] = timestamp;
                         await _control.StartAsync(next, cancellationToken);
+                        _stoppedByQueue.Remove(next.FolderPath);
                         _lastScheduledIndex = ordered.IndexOf(next);
                         _readySince.Remove(next.FolderPath);
                         return UiLanguage.Choose($"Cola: iniciando {next.Alias} · límite {limit}.", $"Queue: starting {next.Alias} · limit {limit}.");
