@@ -318,5 +318,13 @@
   "Sin runners detectados": "No s'han detectat runners",
   "Abrir NRS Workbench": "Obrir NRS Workbench",
   "Salir": "Sortir",
-  "Cola activa · preparando": "Cua activa · preparant"
+  "Cola activa · preparando": "Cua activa · preparant",
+  "COLA INTELIGENTE": "CUA INTEL·LIGENT",
+  "EJECUTANDO": "EXECUTANT",
+  "SIGUIENTE": "SEGÜENT",
+  "EN ESPERA": "EN ESPERA",
+  "PARADOS MANUALMENTE": "ATURATS MANUALMENT",
+  "Esperar si el PC está demasiado cargado": "Esperar si el PC està massa carregat",
+  "No iniciar por encima de": "No iniciar per sobre de",
+  "Si se supera un límite, la cola no inicia ni rota runners nuevos. Los jobs BUSY siguen ejecutándose.": "Si se supera un límit, la cua no inicia ni rota runners nous. Els jobs BUSY continuen executant-se."
 }
