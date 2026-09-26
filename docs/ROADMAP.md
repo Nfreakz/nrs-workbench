@@ -13,7 +13,7 @@ Current unreleased candidate on `main`.
 
 ## v0.18.4
 
-Repository guidance candidate, currently isolated in PR #16 until the v0.18.3 release decision is complete.
+Repository guidance candidate, currently isolated in PR #18 until the v0.18.3 release decision is complete.
 
 - Contextual safe-action guidance.
 - Session-only repository action history.
