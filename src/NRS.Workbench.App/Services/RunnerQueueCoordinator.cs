@@ -36,20 +36,21 @@ public sealed class RunnerQueueCoordinator
                 _pendingStarts.Clear();
                 var runnersToRestore = runners.Where(runner =>
                     runner.State == RunnerState.Stopped && _stoppedByQueue.Contains(runner.FolderPath)).ToList();
-                var outcomes = await Task.WhenAll(runnersToRestore.Select(async runner =>
+                var outcomes = new List<bool>();
+                foreach (var runner in runnersToRestore)
                 {
                     try
                     {
                         await _control.StartAsync(runner, cancellationToken);
                         _stoppedByQueue.Remove(runner.FolderPath);
-                        return true;
+                        outcomes.Add(true);
                     }
                     catch (Exception ex)
                     {
                         AppLogger.Error($"Runner queue could not restore '{runner.Alias}'", ex);
-                        return false;
+                        outcomes.Add(false);
                     }
-                }));
+                }
                 // A runner that is no longer stopped needs no restoration.
                 var stillStopped = runners.Where(runner => runner.State == RunnerState.Stopped)
                     .Select(runner => runner.FolderPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -101,7 +102,9 @@ public sealed class RunnerQueueCoordinator
                 if (idleToStop.Count == 0)
                     return Summary(active.Count, busyCount, stopped.Count, limit, waitingForCapacity: true);
 
-                var stoppedResults = await Task.WhenAll(idleToStop.Select(StopIfStillIdleAsync));
+                var stoppedResults = new List<StopResult>();
+                foreach (var runner in idleToStop)
+                    stoppedResults.Add(await StopIfStillIdleAsync(runner));
                 var failures = stoppedResults.Where(result => !result.Success && !result.BecameBusy).ToList();
                 if (failures.Count > 0)
                     return UiLanguage.Choose("Cola: no se pudo detener un runner libre. Comprueba permisos de administrador.", "Queue: could not stop an idle runner. Check administrator permissions.");
