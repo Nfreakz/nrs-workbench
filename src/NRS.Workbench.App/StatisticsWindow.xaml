@@ -180,7 +180,7 @@
                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel Margin="13,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="{local:Tr Source='Estadísticas'}" FontSize="27" FontWeight="Bold"/>
+                    <TextBlock Text="{local:Tr Source='Estadísticas'}" FontSize="25" FontWeight="Bold"/>
                     <TextBlock Text="{local:Tr Source='Runners e inventario Git local · historial fiable y estado actual'}"
                                Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,3,0,0"/>
                 </StackPanel>
