@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### v0.18.4 candidate
+- Adds contextual safe-action guidance for the selected repository: clean/fetch, selective commit, safe fast-forward Pull, confirmed Push, divergence/conflict handling, and missing-remote guidance.
+- Adds a session-only repository action history for Fetch, Pull, Push, Commit and local branch switches. History is kept in memory and is not telemetry or persistent activity tracking.
+- Shows the BEHIND repository count in the repositories dashboard and makes CAMBIOS count every dirty repository even when its primary sync state is AHEAD/BEHIND.
+- Re-inspects the repository immediately before Pull and Push, blocking stale UI snapshots when the branch, working tree or local commit state changed after the last refresh.
+- Keeps the professional graphite visual system introduced on the v0.18.3 candidate instead of restoring the older blue-heavy repository panel.
+- Adds smoke coverage for stale Pull/Push snapshots and a manual repository-guidance validation checklist.
+
 ### Planned for v0.18.3
 - Adds a visible smart-queue dashboard showing BUSY runners, the next queued runner, queue-owned waiting runners, and runners that remain manually stopped.
 - Adds a session-only Pause/Resume control that freezes queue scheduling without stopping active jobs.
