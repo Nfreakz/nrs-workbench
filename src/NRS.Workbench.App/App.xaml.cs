@@ -16,7 +16,7 @@ public partial class App : Application
         {
             AppLogger.Error("Unhandled UI exception", args.Exception);
             MessageBox.Show(
-                UiLanguage.Choose($"Se ha producido un error inesperado.\n\n{args.Exception.Message}\n\nConsulta el log de NRS Workbench para más detalles.", $"An unexpected error occurred.\n\n{args.Exception.Message}\n\nSee the NRS Workbench log for details."),
+                UiLanguage.Choose($"Se ha producido un error inesperado.\n\n{args.Exception.Message}\n\nConsulta el log de NRS Workbench para más detalles.", $"An unexpected error occurred.\n\n{args.Exception.Message}\n\nSee the NRS Workbench log for details.", $"S\u0027ha produït un error inesperat.\n\n{args.Exception.Message}\n\nConsulta el log de NRS Workbench per obtenir-ne més detalls."),
                 "NRS Workbench",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
