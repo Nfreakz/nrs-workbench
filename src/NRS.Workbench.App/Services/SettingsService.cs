@@ -246,6 +246,8 @@ public sealed class SettingsService
             .ToList();
         settings.RunnerSortMode = RunnerListOrganizer.NormalizeMode(settings.RunnerSortMode);
         settings.RunnerQueueLimit = Math.Clamp(settings.RunnerQueueLimit, 1, 2);
+        settings.RunnerQueueCpuStartThreshold = Math.Clamp(settings.RunnerQueueCpuStartThreshold, 50, 100);
+        settings.RunnerQueueMemoryStartThreshold = Math.Clamp(settings.RunnerQueueMemoryStartThreshold, 50, 100);
         if (string.IsNullOrWhiteSpace(settings.FolderPattern)) settings.FolderPattern = "actions-runner*";
         if (settings.RunnerRoots.Count == 0) settings.RunnerRoots.Add(FindFallbackRoot());
         settings.RefreshIntervalSeconds = Math.Clamp(settings.RefreshIntervalSeconds, 2, 300);
@@ -285,6 +287,9 @@ public sealed class SettingsService
         public List<string> RunnerDisplayOrder { get; set; } = [];
         public bool RunnerQueueEnabled { get; set; }
         public int RunnerQueueLimit { get; set; } = 2;
+        public bool RunnerQueueResourceGuardEnabled { get; set; } = true;
+        public int RunnerQueueCpuStartThreshold { get; set; } = 85;
+        public int RunnerQueueMemoryStartThreshold { get; set; } = 90;
 
         public static PortableSettingsData FromSettings(RunnerSettings settings) => new()
         {
@@ -303,7 +308,10 @@ public sealed class SettingsService
             RunnerSortMode = settings.RunnerSortMode,
             RunnerDisplayOrder = settings.RunnerDisplayOrder?.ToList() ?? [],
             RunnerQueueEnabled = settings.RunnerQueueEnabled,
-            RunnerQueueLimit = settings.RunnerQueueLimit
+            RunnerQueueLimit = settings.RunnerQueueLimit,
+            RunnerQueueResourceGuardEnabled = settings.RunnerQueueResourceGuardEnabled,
+            RunnerQueueCpuStartThreshold = settings.RunnerQueueCpuStartThreshold,
+            RunnerQueueMemoryStartThreshold = settings.RunnerQueueMemoryStartThreshold
         };
 
         public RunnerSettings ToSettings() => new()
@@ -323,7 +331,10 @@ public sealed class SettingsService
             RunnerSortMode = RunnerSortMode,
             RunnerDisplayOrder = RunnerDisplayOrder?.ToList() ?? [],
             RunnerQueueEnabled = RunnerQueueEnabled,
-            RunnerQueueLimit = RunnerQueueLimit
+            RunnerQueueLimit = RunnerQueueLimit,
+            RunnerQueueResourceGuardEnabled = RunnerQueueResourceGuardEnabled,
+            RunnerQueueCpuStartThreshold = RunnerQueueCpuStartThreshold,
+            RunnerQueueMemoryStartThreshold = RunnerQueueMemoryStartThreshold
         };
     }
 }

@@ -23,6 +23,10 @@ internal static class RunnerQueueSmoke
         DisablingQueuePreservesManuallyStoppedRunners();
         DisablingQueueRestoresOnlyRunnersStoppedByQueue();
         StaleReadySnapshotDoesNotLoseQueueStopOwnership();
+        ResourceGuardBlocksStartsUntilCpuRecovers();
+        ResourceGuardBlocksStartsUntilMemoryRecovers();
+        QueuePauseFreezesRotationWithoutTouchingBusyJobs();
+        QueueSnapshotDistinguishesWaitingAndManualStops();
     }
 
     private static void ManuallyStoppedRunnersAreNotStartedAutomatically()
@@ -225,6 +229,123 @@ internal static class RunnerQueueSmoke
 
         Assert(control.Stopped.SequenceEqual(["second"]) && control.Started.SequenceEqual(["second"]),
             "a stale READY snapshot does not repeat the stop or lose queue stop ownership");
+    }
+
+    private static void ResourceGuardBlocksStartsUntilCpuRecovers()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings
+        {
+            RunnerQueueEnabled = true,
+            RunnerQueueLimit = 1,
+            RunnerQueueResourceGuardEnabled = true,
+            RunnerQueueCpuStartThreshold = 80,
+            RunnerQueueMemoryStartThreshold = 90
+        };
+        var first = Runner("first", RunnerState.Ready);
+        var second = Runner("second", RunnerState.Ready);
+        var now = DateTimeOffset.UnixEpoch;
+
+        queue.ReconcileAsync([first, second], settings, now).GetAwaiter().GetResult();
+        queue.ReconcileAsync(
+            [Runner("first", RunnerState.Stopped), Runner("second", RunnerState.Stopped)],
+            settings, now.AddSeconds(5), Resources(cpu: 95, memoryPercent: 40)).GetAwaiter().GetResult();
+
+        Assert(control.Started.Count == 0 &&
+               queue.Snapshot.HoldReason == RunnerQueueHoldReason.HighCpu &&
+               queue.Snapshot.NextAlias == "second",
+            "smart queue blocks a queued runner start while CPU is above the configured threshold");
+
+        queue.ReconcileAsync(
+            [Runner("first", RunnerState.Stopped), Runner("second", RunnerState.Stopped)],
+            settings, now.AddSeconds(10), Resources(cpu: 25, memoryPercent: 40)).GetAwaiter().GetResult();
+
+        Assert(control.Started.SequenceEqual(["second"]),
+            "smart queue starts the same queued runner after CPU returns below the threshold");
+    }
+
+    private static void ResourceGuardBlocksStartsUntilMemoryRecovers()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings
+        {
+            RunnerQueueEnabled = true,
+            RunnerQueueLimit = 1,
+            RunnerQueueResourceGuardEnabled = true,
+            RunnerQueueCpuStartThreshold = 95,
+            RunnerQueueMemoryStartThreshold = 75
+        };
+        var first = Runner("first", RunnerState.Ready);
+        var second = Runner("second", RunnerState.Ready);
+        var now = DateTimeOffset.UnixEpoch;
+
+        queue.ReconcileAsync([first, second], settings, now).GetAwaiter().GetResult();
+        queue.ReconcileAsync(
+            [Runner("first", RunnerState.Stopped), Runner("second", RunnerState.Stopped)],
+            settings, now.AddSeconds(5), Resources(cpu: 20, memoryPercent: 88)).GetAwaiter().GetResult();
+
+        Assert(control.Started.Count == 0 &&
+               queue.Snapshot.HoldReason == RunnerQueueHoldReason.HighMemory,
+            "smart queue blocks new starts while RAM is above the configured threshold");
+
+        queue.ReconcileAsync(
+            [Runner("first", RunnerState.Stopped), Runner("second", RunnerState.Stopped)],
+            settings, now.AddSeconds(10), Resources(cpu: 20, memoryPercent: 50)).GetAwaiter().GetResult();
+
+        Assert(control.Started.SequenceEqual(["second"]),
+            "smart queue resumes starts after RAM returns below the threshold");
+    }
+
+    private static void QueuePauseFreezesRotationWithoutTouchingBusyJobs()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
+        var now = DateTimeOffset.UnixEpoch;
+
+        queue.ReconcileAsync(
+            [Runner("busy", RunnerState.Busy), Runner("idle", RunnerState.Ready)],
+            settings, now).GetAwaiter().GetResult();
+        var stopCountBeforePause = control.Stopped.Count;
+        queue.TogglePaused();
+
+        queue.ReconcileAsync(
+            [Runner("busy", RunnerState.Busy), Runner("idle", RunnerState.Stopped)],
+            settings, now.AddSeconds(60), Resources(cpu: 10, memoryPercent: 20)).GetAwaiter().GetResult();
+
+        Assert(queue.Snapshot.Paused &&
+               control.Started.Count == 0 &&
+               control.Stopped.Count == stopCountBeforePause,
+            "pausing the smart queue freezes scheduling and leaves an existing BUSY job untouched");
+    }
+
+    private static void QueueSnapshotDistinguishesWaitingAndManualStops()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
+        var now = DateTimeOffset.UnixEpoch;
+
+        queue.ReconcileAsync(
+            [Runner("active", RunnerState.Ready), Runner("queued", RunnerState.Ready), Runner("manual", RunnerState.Stopped)],
+            settings, now).GetAwaiter().GetResult();
+        queue.ReconcileAsync(
+            [Runner("active", RunnerState.Ready), Runner("queued", RunnerState.Stopped), Runner("manual", RunnerState.Stopped)],
+            settings, now.AddSeconds(5), Resources(cpu: 10, memoryPercent: 20)).GetAwaiter().GetResult();
+
+        Assert(queue.Snapshot.WaitingAliases.SequenceEqual(["queued"]) &&
+               queue.Snapshot.ManualStoppedAliases.SequenceEqual(["manual"]) &&
+               queue.Snapshot.NextAlias == "queued",
+            "queue snapshot separates queue-owned waiting runners from manually stopped runners");
+    }
+
+    private static SystemResourceSnapshot Resources(double cpu, double memoryPercent)
+    {
+        const ulong total = 16UL * 1024 * 1024 * 1024;
+        var used = (ulong)(total * Math.Clamp(memoryPercent, 0, 100) / 100d);
+        return new SystemResourceSnapshot(cpu, 4, used, total, null, null);
     }
 
     private static void LocalJournalSurvivesRestartAndIsLocalOnly()

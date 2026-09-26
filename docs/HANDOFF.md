@@ -23,6 +23,16 @@
 - Test additions: manual-stop protection, owned rotation, recovery confirmation/decline, journal round-trip and Catalan settings/resources.
 - `RUN_ME_FIRST.cmd` now delegates to a launcher that, when executed from a Git clone, requires a clean working tree and configured upstream, runs `git fetch --prune` plus `git pull --ff-only` on the current branch, and never changes branches or performs automatic reset/rebase/merge/stash/discard operations. Non-Git source archives are built as extracted.
 
+## v0.18.3 candidate
+
+- Branch: `feat/v0.18.3-smart-queue`.
+- Version metadata is `0.18.3`; no v0.18.3 tag or public ZIP exists until the release gate passes.
+- Adds a visible smart-queue dashboard with BUSY runners, next runner, queue-owned waiting runners and manually stopped runners.
+- Adds a session-only Pause/Resume control. Pause freezes queue scheduling only; it does not stop READY/BUSY runners and is not persisted across app restarts.
+- Adds a resource guard enabled by default. New starts and idle rotations wait when host CPU reaches the configured CPU threshold or physical RAM reaches the configured RAM threshold. Existing BUSY jobs are never interrupted.
+- Default resource thresholds: CPU 85%, RAM 90%. Settings normalize configurable values to 50-100% and portable settings preserve them.
+- Smoke coverage must include CPU/RAM holds, recovery below threshold, pause semantics and dashboard classification.
+
 ## Verify before the next publication
 
 1. Confirm the current branch and version and compare candidate diff with the latest `main`.
@@ -34,4 +44,4 @@
 
 ## Other open work
 
-- PR #8 updates only the public README presentation. Reconcile its release-status wording with the published ZIP before merging. Do not incorporate unrelated application changes into v0.18.2 by default.
+- The README-only public-showcase change from PR #13 is already merged into `main`. The v0.18.3 branch has reconciled that README content while keeping the smart-queue implementation independent.

@@ -26,6 +26,15 @@ public sealed class MainViewModel : ObservableObject
     private string _logText = UiLanguage.Choose("Selecciona un runner para ver el log.", "Select a runner to view its log.");
     private string _statusText = UiLanguage.Choose("Inicializando...", "Initializing...");
     private string _queueStatusText = string.Empty;
+    private string _queueStateText = UiLanguage.Choose("DESACTIVADA", "DISABLED", "DESACTIVADA");
+    private string _queueStateKind = "Disabled";
+    private string _queueRunningText = "—";
+    private string _queueNextText = "—";
+    private string _queueWaitingText = "—";
+    private string _queueManualText = "—";
+    private string _queueReasonText = string.Empty;
+    private string _queuePauseButtonText = UiLanguage.Choose("Pausar cola", "Pause queue", "Pausar cua");
+    private bool _queueControlsEnabled;
     private DateTimeOffset _lastUpdated;
     private string _cpuUseText = "—";
     private string _memoryUseText = "—";
@@ -99,7 +108,92 @@ public sealed class MainViewModel : ObservableObject
     public string LogText { get => _logText; private set => SetProperty(ref _logText, value); }
     public string StatusText { get => _statusText; private set => SetProperty(ref _statusText, value); }
     public string QueueStatusText { get => _queueStatusText; private set => SetProperty(ref _queueStatusText, value); }
-    public void UpdateQueueStatus(string status) => QueueStatusText = status;
+    public string QueueStateText { get => _queueStateText; private set => SetProperty(ref _queueStateText, value); }
+    public string QueueStateKind { get => _queueStateKind; private set => SetProperty(ref _queueStateKind, value); }
+    public string QueueRunningText { get => _queueRunningText; private set => SetProperty(ref _queueRunningText, value); }
+    public string QueueNextText { get => _queueNextText; private set => SetProperty(ref _queueNextText, value); }
+    public string QueueWaitingText { get => _queueWaitingText; private set => SetProperty(ref _queueWaitingText, value); }
+    public string QueueManualText { get => _queueManualText; private set => SetProperty(ref _queueManualText, value); }
+    public string QueueReasonText { get => _queueReasonText; private set => SetProperty(ref _queueReasonText, value); }
+    public string QueuePauseButtonText { get => _queuePauseButtonText; private set => SetProperty(ref _queuePauseButtonText, value); }
+    public bool QueueControlsEnabled { get => _queueControlsEnabled; private set => SetProperty(ref _queueControlsEnabled, value); }
+
+    public void UpdateQueueSnapshot(RunnerQueueSnapshot snapshot)
+    {
+        QueueStatusText = snapshot.StatusText;
+        QueueStateText = snapshot.Enabled
+            ? snapshot.Paused
+                ? UiLanguage.Choose("PAUSADA", "PAUSED", "PAUSADA")
+                : snapshot.HoldReason is RunnerQueueHoldReason.HighCpu or RunnerQueueHoldReason.HighMemory or RunnerQueueHoldReason.HighCpuAndMemory
+                    ? UiLanguage.Choose("EN ESPERA", "WAITING", "EN ESPERA")
+                    : UiLanguage.Choose("ACTIVA", "ACTIVE", "ACTIVA")
+            : UiLanguage.Choose("DESACTIVADA", "DISABLED", "DESACTIVADA");
+        QueueStateKind = !snapshot.Enabled
+            ? "Disabled"
+            : snapshot.Paused
+                ? "Paused"
+                : snapshot.HoldReason is RunnerQueueHoldReason.HighCpu or RunnerQueueHoldReason.HighMemory or RunnerQueueHoldReason.HighCpuAndMemory
+                    ? "Blocked"
+                    : "Active";
+        QueueRunningText = FormatQueueAliases(snapshot.RunningAliases);
+        QueueNextText = string.IsNullOrWhiteSpace(snapshot.NextAlias) ? "—" : snapshot.NextAlias;
+        QueueWaitingText = FormatQueueAliases(snapshot.WaitingAliases);
+        QueueManualText = FormatQueueAliases(snapshot.ManualStoppedAliases);
+        QueuePauseButtonText = snapshot.Paused
+            ? UiLanguage.Choose("Reanudar cola", "Resume queue", "Reprendre cua")
+            : UiLanguage.Choose("Pausar cola", "Pause queue", "Pausar cua");
+        QueueControlsEnabled = snapshot.Enabled && snapshot.HoldReason != RunnerQueueHoldReason.Recovering;
+        QueueReasonText = FormatQueueReason(snapshot);
+    }
+
+    private static string FormatQueueAliases(IReadOnlyList<string> aliases)
+    {
+        if (aliases.Count == 0) return "—";
+        var visible = string.Join(", ", aliases.Take(3));
+        return aliases.Count <= 3 ? visible : $"{visible}  +{aliases.Count - 3}";
+    }
+
+    private static string FormatQueueReason(RunnerQueueSnapshot snapshot)
+    {
+        if (!snapshot.Enabled)
+            return UiLanguage.Choose("Activa la cola en Configuración.", "Enable the queue in Settings.", "Activa la cua a Configuració.");
+        return snapshot.HoldReason switch
+        {
+            RunnerQueueHoldReason.Paused => UiLanguage.Choose(
+                "Pausa manual: no se inicia ni rota ningún runner.",
+                "Manual pause: no runner is started or rotated.",
+                "Pausa manual: no s'inicia ni es rota cap runner."),
+            RunnerQueueHoldReason.Recovering => UiLanguage.Choose(
+                "Revisa los runners recuperados antes de continuar.",
+                "Review recovered runners before continuing.",
+                "Revisa els runners recuperats abans de continuar."),
+            RunnerQueueHoldReason.BusyCapacity => UiLanguage.Choose(
+                "Esperando a que termine un job BUSY para liberar capacidad.",
+                "Waiting for a BUSY job to finish and free capacity.",
+                "Esperant que acabi un job BUSY per alliberar capacitat."),
+            RunnerQueueHoldReason.HighCpu => UiLanguage.Choose(
+                $"CPU {snapshot.CpuPercent:N0}% · no se iniciarán runners por encima de {snapshot.CpuThreshold}%.",
+                $"CPU {snapshot.CpuPercent:N0}% · runners will not start above {snapshot.CpuThreshold}%.",
+                $"CPU {snapshot.CpuPercent:N0}% · no s'iniciaran runners per sobre de {snapshot.CpuThreshold}%."),
+            RunnerQueueHoldReason.HighMemory => UiLanguage.Choose(
+                $"RAM {snapshot.MemoryPercent:N0}% · no se iniciarán runners por encima de {snapshot.MemoryThreshold}%.",
+                $"RAM {snapshot.MemoryPercent:N0}% · runners will not start above {snapshot.MemoryThreshold}%.",
+                $"RAM {snapshot.MemoryPercent:N0}% · no s'iniciaran runners per sobre de {snapshot.MemoryThreshold}%."),
+            RunnerQueueHoldReason.HighCpuAndMemory => UiLanguage.Choose(
+                $"CPU {snapshot.CpuPercent:N0}% / RAM {snapshot.MemoryPercent:N0}% · esperando recursos.",
+                $"CPU {snapshot.CpuPercent:N0}% / RAM {snapshot.MemoryPercent:N0}% · waiting for resources.",
+                $"CPU {snapshot.CpuPercent:N0}% / RAM {snapshot.MemoryPercent:N0}% · esperant recursos."),
+            _ when snapshot.ResourceGuardEnabled => UiLanguage.Choose(
+                $"Guard activo · CPU < {snapshot.CpuThreshold}% · RAM < {snapshot.MemoryThreshold}%.",
+                $"Guard active · CPU < {snapshot.CpuThreshold}% · RAM < {snapshot.MemoryThreshold}%.",
+                $"Guard actiu · CPU < {snapshot.CpuThreshold}% · RAM < {snapshot.MemoryThreshold}%."),
+            _ => UiLanguage.Choose(
+                "Guard de recursos desactivado.",
+                "Resource guard disabled.",
+                "Guard de recursos desactivat.")
+        };
+    }
+
     public string LastUpdatedText => _lastUpdated == default ? string.Empty : _lastUpdated.ToString("dd MMM yyyy  HH:mm:ss");
     public string AppVersionText
     {

@@ -198,5 +198,13 @@
   "Último commit: ": "Latest commit: ",
   "Último log": "Latest log",
   "☕ Apoyar desarrollo": "☕ Support development",
-  "La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. Los runners que ya estaban detenidos manualmente no se iniciarán por la cola. Los jobs activos no se detienen. NRS Workbench debe permanecer abierto o en la bandeja.": "The app keeps at most this many runners connected and rotates idle ones every 45 seconds. Runners already stopped manually will not be started by the queue. Active jobs are not interrupted. NRS Workbench must stay open or in the system tray."
+  "La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. Los runners que ya estaban detenidos manualmente no se iniciarán por la cola. Los jobs activos no se detienen. NRS Workbench debe permanecer abierto o en la bandeja.": "The app keeps at most this many runners connected and rotates idle ones every 45 seconds. Runners already stopped manually will not be started by the queue. Active jobs are not interrupted. NRS Workbench must stay open or in the system tray.",
+  "COLA INTELIGENTE": "SMART QUEUE",
+  "EJECUTANDO": "RUNNING",
+  "SIGUIENTE": "NEXT",
+  "EN ESPERA": "WAITING",
+  "PARADOS MANUALMENTE": "MANUALLY STOPPED",
+  "Esperar si el PC está demasiado cargado": "Wait when the PC is under heavy load",
+  "No iniciar por encima de": "Do not start above",
+  "Si se supera un límite, la cola no inicia ni rota runners nuevos. Los jobs BUSY siguen ejecutándose.": "If a threshold is exceeded, the queue does not start or rotate new runners. BUSY jobs keep running."
 }

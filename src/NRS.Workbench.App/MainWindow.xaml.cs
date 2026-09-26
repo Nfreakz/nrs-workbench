@@ -18,6 +18,7 @@ public partial class MainWindow : Window
     private readonly SettingsService _settings;
     private readonly TrayIconService _tray;
     private readonly RunnerQueueCoordinator _runnerQueue;
+    private SystemResourceSnapshot? _latestResources;
     private bool _allowExit;
     private readonly Dictionary<string, RunnerState> _previousStates = new(StringComparer.OrdinalIgnoreCase);
     private bool _stateSnapshotInitialized;
@@ -53,7 +54,7 @@ public partial class MainWindow : Window
         _timer = new DispatcherTimer();
         _timer.Tick += async (_, _) => await RefreshAndUpdateTrayAsync();
         _resourceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
-        _resourceTimer.Tick += (_, _) => _viewModel.UpdateSystemResources(_systemResources.Read());
+        _resourceTimer.Tick += (_, _) => UpdateSystemResources();
 
         Loaded += async (_, _) =>
         {
@@ -61,7 +62,7 @@ public partial class MainWindow : Window
             ApplyTimerInterval();
             ApplyTraySetting();
             _timer.Start();
-            _viewModel.UpdateSystemResources(_systemResources.Read());
+            UpdateSystemResources();
             _resourceTimer.Start();
             await RefreshAndUpdateTrayAsync();
         };
@@ -108,8 +109,20 @@ public partial class MainWindow : Window
         var runners = _viewModel.AllRunners.ToList();
         _tray.Update(runners);
         ProcessStateTransitions(runners);
-        var queueStatus = await _runnerQueue.ReconcileAsync(runners, _settings.Load());
-        _viewModel.UpdateQueueStatus(queueStatus);
+        await _runnerQueue.ReconcileAsync(runners, _settings.Load(), resources: _latestResources);
+        _viewModel.UpdateQueueSnapshot(_runnerQueue.Snapshot);
+    }
+
+    private void UpdateSystemResources()
+    {
+        _latestResources = _systemResources.Read();
+        _viewModel.UpdateSystemResources(_latestResources);
+    }
+
+    private async void QueuePause_Click(object sender, RoutedEventArgs e)
+    {
+        _runnerQueue.TogglePaused();
+        await RefreshAndUpdateTrayAsync();
     }
 
     private void ProcessStateTransitions(IReadOnlyList<RunnerInfo> runners)
