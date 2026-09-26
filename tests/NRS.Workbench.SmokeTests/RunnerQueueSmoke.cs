@@ -14,6 +14,8 @@ internal static class RunnerQueueSmoke
         ExistingBusyJobsAreNeverStopped();
         ExistingBusyJobsMayTemporarilyExceedTheLimit();
         IdleSlotsRotateToReachOtherRunnerTargets();
+        DisablingQueuePreservesManuallyStoppedRunners();
+        DisablingQueueRestoresOnlyRunnersStoppedByQueue();
     }
 
     private static void StartLimitQueuesExtraRunners()
@@ -75,6 +77,41 @@ internal static class RunnerQueueSmoke
 
         Assert(control.Stopped.Count == 0 && control.Started.Count == 0 && !string.IsNullOrWhiteSpace(status),
             "runner queue leaves already-running jobs alone and waits for capacity before starting more runners");
+    }
+
+    private static void DisablingQueuePreservesManuallyStoppedRunners()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
+        var busy = Runner("busy", RunnerState.Busy);
+        var manuallyStopped = Runner("manually-stopped", RunnerState.Stopped);
+
+        queue.ReconcileAsync([busy, manuallyStopped], settings, DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
+        settings.RunnerQueueEnabled = false;
+        queue.ReconcileAsync([busy, manuallyStopped], settings, DateTimeOffset.UnixEpoch.AddSeconds(5)).GetAwaiter().GetResult();
+
+        Assert(control.Started.Count == 0 && control.Stopped.Count == 0,
+            "disabling the queue does not start a runner that the user had manually stopped");
+    }
+
+    private static void DisablingQueueRestoresOnlyRunnersStoppedByQueue()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
+        var first = Runner("first", RunnerState.Ready);
+        var queued = Runner("queued", RunnerState.Ready);
+        var manuallyStopped = Runner("manually-stopped", RunnerState.Stopped);
+        var start = DateTimeOffset.UnixEpoch;
+
+        queue.ReconcileAsync([first, queued, manuallyStopped], settings, start).GetAwaiter().GetResult();
+        settings.RunnerQueueEnabled = false;
+        queue.ReconcileAsync([first, Runner("queued", RunnerState.Stopped), manuallyStopped],
+            settings, start.AddSeconds(5)).GetAwaiter().GetResult();
+
+        Assert(control.Stopped.SequenceEqual(["queued"]) && control.Started.SequenceEqual(["queued"]),
+            "disabling the queue restores only runners that the queue stopped");
     }
 
     private static RunnerInfo Runner(string name, RunnerState state) => new()
