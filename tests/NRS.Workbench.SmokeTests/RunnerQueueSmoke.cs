@@ -15,6 +15,7 @@ internal static class RunnerQueueSmoke
         RecoveryRequiresExplicitApproval();
         DeclinedRecoveryPreservesStoppedRunners();
         ExternallyStoppedRunnersLeaveTheQueue();
+        LocalJournalSurvivesRestartAndIsLocalOnly();
         ExistingBusyJobsAreNeverStopped();
         ExistingBusyJobsMayTemporarilyExceedTheLimit();
         IdleSlotsRotateToReachOtherRunnerTargets();
@@ -204,6 +205,28 @@ internal static class RunnerQueueSmoke
 
         Assert(control.Started.SequenceEqual(["second"]),
             "a stale READY snapshot after an asynchronous stop does not lose queue stop ownership");
+    }
+
+    private static void LocalJournalSurvivesRestartAndIsLocalOnly()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "nrs-queue-smoke-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var path = Runner("persisted", RunnerState.Stopped).FolderPath;
+            var first = new FileRunnerQueueStateStore(directory);
+            first.Save([path]);
+            var reopened = new FileRunnerQueueStateStore(directory);
+            Assert(reopened.Load().SequenceEqual([path]),
+                "local runner queue ownership journal survives a new application session");
+            reopened.Save([]);
+            Assert(reopened.Load().Count == 0 &&
+                !File.Exists(Path.Combine(directory, "runner-queue-state.json")),
+                "clearing the queue journal deletes its local state file");
+        }
+        finally
+        {
+            if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
+        }
     }
 
     private static RunnerInfo Runner(string name, RunnerState state) => new()
