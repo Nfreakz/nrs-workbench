@@ -202,6 +202,11 @@ public sealed class GitService : IGitService
                 "Pull automático bloqueado: la rama ha divergido. Resuelve la estrategia manualmente.",
                 "Automatic pull blocked: the branch has diverged. Choose a strategy manually.",
                 "Pull automàtic bloquejat: la branca ha divergit. Resol l'estratègia manualment."));
+        if (current.Ahead > 0)
+            throw new InvalidOperationException(UiLanguage.Choose(
+                "Pull bloqueado: hay commits locales nuevos desde la última actualización. Refresca el repositorio.",
+                "Pull blocked: new local commits appeared since the last refresh. Refresh the repository.",
+                "Pull bloquejat: han aparegut commits locals nous des de l'última actualització. Actualitza el repositori."));
         await RunAsync(current.Path, ["pull", "--ff-only"], allowFailure: false);
     }
 
