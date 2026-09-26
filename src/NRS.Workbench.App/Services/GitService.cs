@@ -184,19 +184,58 @@ public sealed class GitService : IGitService
     public async Task PullFastForwardAsync(GitRepositoryInfo repository)
     {
         EnsureRepositoryUsable(repository);
-        if (!repository.HasUpstream) throw new InvalidOperationException(UiLanguage.Choose("La rama actual no tiene upstream configurado.", "The current branch has no configured upstream."));
-        if (repository.IsDirty) throw new InvalidOperationException(UiLanguage.Choose("Pull bloqueado: hay cambios locales sin commit. Guarda, descarta o haz commit primero.", "Pull blocked: there are uncommitted local changes. Save, discard or commit them first."));
-        if (repository.Ahead > 0 && repository.Behind > 0) throw new InvalidOperationException(UiLanguage.Choose("Pull automático bloqueado: la rama ha divergido. Resuelve la estrategia manualmente.", "Automatic pull blocked: the branch has diverged. Choose a strategy manually."));
-        await RunAsync(repository.Path, ["pull", "--ff-only"], allowFailure: false);
+        var current = await InspectAsync(repository.Path);
+        EnsureRepositoryUsable(current);
+        EnsureBranchUnchanged(repository, current);
+        if (!current.HasUpstream)
+            throw new InvalidOperationException(UiLanguage.Choose(
+                "La rama actual no tiene upstream configurado.",
+                "The current branch has no configured upstream.",
+                "La branca actual no té upstream configurat."));
+        if (current.IsDirty)
+            throw new InvalidOperationException(UiLanguage.Choose(
+                "Pull bloqueado: el repositorio ha cambiado y ahora contiene cambios locales sin commit.",
+                "Pull blocked: the repository changed and now contains uncommitted local changes.",
+                "Pull bloquejat: el repositori ha canviat i ara conté canvis locals sense commit."));
+        if (current.Ahead > 0 && current.Behind > 0)
+            throw new InvalidOperationException(UiLanguage.Choose(
+                "Pull automático bloqueado: la rama ha divergido. Resuelve la estrategia manualmente.",
+                "Automatic pull blocked: the branch has diverged. Choose a strategy manually.",
+                "Pull automàtic bloquejat: la branca ha divergit. Resol l'estratègia manualment."));
+        await RunAsync(current.Path, ["pull", "--ff-only"], allowFailure: false);
     }
 
     public async Task PushAsync(GitRepositoryInfo repository)
     {
         EnsureRepositoryUsable(repository);
-        if (!repository.HasUpstream) throw new InvalidOperationException(UiLanguage.Choose("La rama actual no tiene upstream configurado.", "The current branch has no configured upstream."));
-        if (repository.Behind > 0) throw new InvalidOperationException(UiLanguage.Choose("Push bloqueado: el remoto contiene commits que todavía no tienes localmente.", "Push blocked: the remote has commits missing locally."));
-        if (repository.Ahead <= 0) throw new InvalidOperationException(UiLanguage.Choose("No hay commits locales pendientes de push.", "There are no local commits to push."));
-        await RunAsync(repository.Path, ["push"], allowFailure: false);
+        var current = await InspectAsync(repository.Path);
+        EnsureRepositoryUsable(current);
+        EnsureBranchUnchanged(repository, current);
+        if (!current.HasUpstream)
+            throw new InvalidOperationException(UiLanguage.Choose(
+                "La rama actual no tiene upstream configurado.",
+                "The current branch has no configured upstream.",
+                "La branca actual no té upstream configurat."));
+        if (current.Behind > 0)
+            throw new InvalidOperationException(UiLanguage.Choose(
+                "Push bloqueado: el remoto contiene commits que todavía no tienes localmente.",
+                "Push blocked: the remote has commits missing locally.",
+                "Push bloquejat: el remot conté commits que encara no tens localment."));
+        if (current.Ahead <= 0)
+            throw new InvalidOperationException(UiLanguage.Choose(
+                "No hay commits locales pendientes de push.",
+                "There are no local commits to push.",
+                "No hi ha commits locals pendents de push."));
+        await RunAsync(current.Path, ["push"], allowFailure: false);
+    }
+
+    private static void EnsureBranchUnchanged(GitRepositoryInfo displayed, GitRepositoryInfo current)
+    {
+        if (!string.Equals(displayed.Branch, current.Branch, StringComparison.Ordinal))
+            throw new InvalidOperationException(UiLanguage.Choose(
+                "La rama actual ha cambiado desde la última actualización. Refresca el repositorio antes de continuar.",
+                "The current branch changed since the last refresh. Refresh the repository before continuing.",
+                "La branca actual ha canviat des de l'última actualització. Actualitza el repositori abans de continuar."));
     }
 
     public async Task<IReadOnlyList<string>> GetLocalBranchesAsync(GitRepositoryInfo repository)
