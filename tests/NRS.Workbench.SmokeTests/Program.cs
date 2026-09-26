@@ -193,6 +193,14 @@ internal static class Program
             await StageAndCommitRemainingAsync(work);
             var ahead = await service.InspectAsync(work);
             Check("ahead state detected", ahead.Ahead > 0, $"ahead={ahead.Ahead}");
+
+            const string stalePushBranch = "smoke-stale-push";
+            await RunGitAsync(work, "branch", stalePushBranch);
+            await RunGitAsync(work, "switch", stalePushBranch);
+            var stalePushBlocked = await ThrowsAsync(() => service.PushAsync(ahead));
+            Check("push revalidates branch before writing", stalePushBlocked);
+            await RunGitAsync(work, "switch", clean.Branch);
+
             await service.PushAsync(ahead);
             var pushed = await service.InspectAsync(work);
             Check("push clears ahead", pushed.Ahead == 0, $"ahead={pushed.Ahead}");
@@ -206,6 +214,12 @@ internal static class Program
             await service.FetchAsync(await service.InspectAsync(work));
             var behind = await service.InspectAsync(work);
             Check("behind state detected after fetch", behind.Behind == 1 && behind.Ahead == 0, $"ahead={behind.Ahead} behind={behind.Behind}");
+
+            await File.AppendAllTextAsync(Path.Combine(work, "base.txt"), "local stale edit\n");
+            var stalePullBlocked = await ThrowsAsync(() => service.PullFastForwardAsync(behind));
+            Check("pull revalidates working tree before writing", stalePullBlocked);
+            await RunGitAsync(work, "restore", "--", "base.txt");
+
             await service.PullFastForwardAsync(behind);
             var pulled = await service.InspectAsync(work);
             Check("safe fast-forward pull returns clean sync", pulled.Ahead == 0 && pulled.Behind == 0);
