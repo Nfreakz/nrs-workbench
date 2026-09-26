@@ -177,7 +177,7 @@ public sealed class RunnerQueueCoordinator
                 {
                     var result = await StopIfStillIdleAsync(rotation);
                     if (!result.Success && !result.BecameBusy)
-                        return UiLanguage.Choose($"Cola: no se pudo rotar {rotation.Alias}. Comprueba permisos de administrador.", $"Queue: could not rotate {rotation.Alias}. Check administrator permissions.");
+                        return UiLanguage.Choose($"Cola: no se pudo rotar {rotation.Alias}. Comprueba permisos de administrador.", $"Queue: could not rotate {rotation.Alias}. Check administrator permissions.", $"Cua: no s\u0027ha pogut rotar {rotation.Alias}. Comprova els permisos d\u0027administrador.");
                     if (result.Success)
                     {
                         _lastScheduledIndex = ordered.IndexOf(rotation);
@@ -198,13 +198,13 @@ public sealed class RunnerQueueCoordinator
                         if (_stoppedByQueue.Remove(next.FolderPath)) PersistOwnedStops();
                         _lastScheduledIndex = ordered.IndexOf(next);
                         _readySince.Remove(next.FolderPath);
-                        return UiLanguage.Choose($"Cola: iniciando {next.Alias} · límite {limit}.", $"Queue: starting {next.Alias} · limit {limit}.");
+                        return UiLanguage.Choose($"Cola: iniciando {next.Alias} · límite {limit}.", $"Queue: starting {next.Alias} · limit {limit}.", $"Cua: iniciant {next.Alias} · límit {limit}.");
                     }
                     catch (Exception ex)
                     {
                         _pendingStarts.Remove(next.FolderPath);
                         AppLogger.Error($"Runner queue could not start '{next.Alias}'", ex);
-                        return UiLanguage.Choose($"Cola: no se pudo iniciar {next.Alias}. Comprueba permisos de administrador.", $"Queue: could not start {next.Alias}. Check administrator permissions.");
+                        return UiLanguage.Choose($"Cola: no se pudo iniciar {next.Alias}. Comprueba permisos de administrador.", $"Queue: could not start {next.Alias}. Check administrator permissions.", $"Cua: no s\u0027ha pogut iniciar {next.Alias}. Comprova els permisos d\u0027administrador.");
                     }
                 }
             }
@@ -272,8 +272,8 @@ public sealed class RunnerQueueCoordinator
         if (waitingForCapacity)
             return UiLanguage.Choose("Cola activa · dejando terminar los jobs activos antes de liberar puestos.", "Queue active · waiting for active jobs to finish before freeing slots.");
         if (changing)
-            return UiLanguage.Choose($"Cola activa · preparando {limit} runners a la vez", $"Queue active · preparing {limit} runners at a time");
-        return UiLanguage.Choose($"Cola activa · {busy}/{limit} jobs · {waiting} runners en espera", $"Queue active · {busy}/{limit} jobs · {waiting} runners waiting");
+            return UiLanguage.Choose($"Cola activa · preparando {limit} runners a la vez", $"Queue active · preparing {limit} runners at a time", $"Cua activa · preparant {limit} runners alhora");
+        return UiLanguage.Choose($"Cola activa · {busy}/{limit} jobs · {waiting} runners waiting", $"Queue active · {busy}/{limit} jobs · {waiting} runners waiting", $"Cua activa · {busy}/{limit} jobs · {waiting} runners en espera");
     }
 
     private sealed record StopResult(bool Success, bool BecameBusy);
