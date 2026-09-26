@@ -13,10 +13,10 @@
 - `v0.18.1` adds the optional 1/2-runner automatic queue and restores queue-managed runners on disabling it; the list of managed stops is only in memory in that version.
 - The `v0.18.1` tag and ZIP must remain immutable.
 
-## v0.18.2 candidate
+## v0.18.2 release candidate
 
-- Branch: `feat/v0.18.2-queue-safety-catalan`, based on verified `main` revision `372073062a56562e69a486606e02eef9a39e4b57`.
-- Version metadata in `Directory.Build.props` is set to `0.18.2` for candidate builds; **no v0.18.2 tag, Release or published ZIP exists until verified**.
+- Integrated into `main`; release-finalization branch is `release/v0.18.2-finalize`. The application and launcher changes have passed trusted Windows CI before release finalization.
+- Version metadata in `Directory.Build.props` is `0.18.2`; do not claim the version is downloadable until the `v0.18.2` release asset exists and its Release workflow succeeds.
 - Queue candidates are restricted to runners that were online on enable or subsequently became online; a stopped runner with no matching queue-owned stop entry remains manually stopped.
 - Queue stop ownership is journaled at `%LOCALAPPDATA%\NRSWorkbench\runner-queue-state.json`, outside portable settings. Recovery after closing the app requires a per-session confirmation before any persisted runner is eligible for restarting. Declining leaves runners stopped and clears the journal.
 - Catalan `ca` is available in the language selector. Resource `Localization/ca.json` covers all static `{local:Tr Source='...'}` keys; local and portable settings retain `ca`. Changing the language still requires an application restart.
