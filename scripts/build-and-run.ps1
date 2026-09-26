@@ -25,12 +25,14 @@ function Update-RepositorySafely {
         throw 'Este checkout contiene .git pero Git no esta disponible en PATH. Instala Git for Windows para actualizar antes de compilar.'
     }
 
-    $insideWorkTree = (& git -C $root rev-parse --is-inside-work-tree 2>$null).Trim()
+    $insideWorkTree = [string](& git -C $root rev-parse --is-inside-work-tree 2>$null)
+    $insideWorkTree = $insideWorkTree.Trim()
     if ($LASTEXITCODE -ne 0 -or $insideWorkTree -ne 'true') {
         throw 'La carpeta contiene metadatos Git pero no se puede validar como working tree.'
     }
 
-    $branch = (& git -C $root symbolic-ref --quiet --short HEAD 2>$null).Trim()
+    $branch = [string](& git -C $root symbolic-ref --quiet --short HEAD 2>$null)
+    $branch = $branch.Trim()
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($branch)) {
         throw 'El repositorio esta en detached HEAD. No se actualizara automaticamente para evitar cambiar de revision sin permiso.'
     }
@@ -43,12 +45,14 @@ function Update-RepositorySafely {
         throw "Hay cambios locales en '$branch'. RUN_ME_FIRST no hara pull ni descartara archivos. Guarda, haz commit o stash y vuelve a ejecutarlo."
     }
 
-    $upstream = (& git -C $root rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>$null).Trim()
+    $upstream = [string](& git -C $root rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>$null)
+    $upstream = $upstream.Trim()
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($upstream)) {
         throw "La rama '$branch' no tiene upstream configurado. No puedo garantizar que sea la ultima version sin elegir un remoto por ti."
     }
 
-    $before = (& git -C $root rev-parse --short HEAD).Trim()
+    $before = [string](& git -C $root rev-parse --short HEAD)
+    $before = $before.Trim()
     if ($LASTEXITCODE -ne 0) {
         throw 'No se ha podido leer la revision Git actual.'
     }
@@ -64,7 +68,8 @@ function Update-RepositorySafely {
         throw "git pull --ff-only ha fallado con codigo $LASTEXITCODE. No se han hecho merges, rebase ni reset automaticos."
     }
 
-    $after = (& git -C $root rev-parse --short HEAD).Trim()
+    $after = [string](& git -C $root rev-parse --short HEAD)
+    $after = $after.Trim()
     if ($LASTEXITCODE -ne 0) {
         throw 'El repositorio se ha actualizado pero no se ha podido leer la revision final.'
     }
