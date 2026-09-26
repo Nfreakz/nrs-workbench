@@ -14,6 +14,7 @@ internal static class RunnerQueueSmoke
         QueueRotatesOnlyRunnersItStopped();
         RecoveryRequiresExplicitApproval();
         DeclinedRecoveryPreservesStoppedRunners();
+        RecoveryOnDisableRestoresOnlyApprovedRunners();
         ExternallyStoppedRunnersLeaveTheQueue();
         LocalJournalSurvivesRestartAndIsLocalOnly();
         ExistingBusyJobsAreNeverStopped();
@@ -89,6 +90,25 @@ internal static class RunnerQueueSmoke
             DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
         Assert(control.Started.Count == 0 && store.Paths.Count == 0,
             "declining recovery leaves previous queue-managed runners stopped");
+    }
+
+    private static void RecoveryOnDisableRestoresOnlyApprovedRunners()
+    {
+        var owned = Runner("owned", RunnerState.Stopped);
+        var manual = Runner("manual", RunnerState.Stopped);
+        var store = new FakeQueueStateStore([owned.FolderPath]);
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control, store);
+        var disabled = new RunnerSettings { RunnerQueueEnabled = false };
+
+        queue.ReconcileAsync([owned, manual], disabled, DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
+        Assert(control.Started.Count == 0,
+            "disabling the queue on startup never restores journal entries before confirmation");
+        queue.ApproveRecoveredQueueStops();
+        queue.ReconcileAsync([owned, manual], disabled,
+            DateTimeOffset.UnixEpoch.AddSeconds(5)).GetAwaiter().GetResult();
+        Assert(control.Started.SequenceEqual(["owned"]) && store.Paths.Count == 0,
+            "disabling the queue after approval restores only journal-owned stopped runners");
     }
 
     private static void ExternallyStoppedRunnersLeaveTheQueue()
