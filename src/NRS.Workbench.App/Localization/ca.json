@@ -329,5 +329,8 @@
   "Si se supera un límite, la cola no inicia ni rota runners nuevos. Los jobs BUSY siguen ejecutándose.": "Si se supera un límit, la cua no inicia ni rota runners nous. Els jobs BUSY continuen executant-se.",
   "ACCIÓN SEGURA": "ACCIÓ SEGURA",
   "ACTIVIDAD DE ESTA SESIÓN": "ACTIVITAT D'AQUESTA SESSIÓ",
-  "Solo actividad iniciada desde NRS Workbench": "Només activitat iniciada des de NRS Workbench"
+  "Solo actividad iniciada desde NRS Workbench": "Només activitat iniciada des de NRS Workbench",
+  "Apoyar NRS Workbench": "Donar suport a NRS Workbench",
+  "Si NRS Workbench te resulta útil, puedes apoyar su desarrollo con un café. Es completamente opcional y no cambia la licencia ni las funciones de la aplicación.": "Si NRS Workbench et resulta útil, pots donar suport al seu desenvolupament amb un cafè. És completament opcional i no canvia la llicència ni cap funció de l'aplicació.",
+  "Abre la página de apoyo de Neo RS en Buy Me a Coffee.": "Obre la pàgina de suport de Neo RS a Buy Me a Coffee."
 }
