@@ -397,7 +397,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <TextBlock x:Name="IdleProgress" Text="—" Foreground="#60758D" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="IdleProgress" Text="—" Foreground="#7F8893" VerticalAlignment="Center"/>
                                     <StackPanel x:Name="BusyProgress" Visibility="Collapsed" VerticalAlignment="Center" ToolTip="{Binding Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}">
                                         <Grid Margin="0,0,0,3">
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
@@ -405,7 +405,7 @@
                                             <TextBlock Grid.Column="1" Text="{Binding Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold" Foreground="#C59A4A" Margin="8,0,0,0"/>
                                         </Grid>
                                         <ProgressBar Height="6" Minimum="0" Maximum="100" Value="{Binding Progress.Percent, Mode=OneWay}"
-                                                     Foreground="#C59A4A" Background="#1A2A3E" BorderThickness="0">
+                                                     Foreground="#C59A4A" Background="#242931" BorderThickness="0">
                                             <ProgressBar.Style>
                                                 <Style TargetType="ProgressBar">
                                                     <Setter Property="IsIndeterminate" Value="True"/>
@@ -417,7 +417,7 @@
                                                 </Style>
                                             </ProgressBar.Style>
                                         </ProgressBar>
-                                        <TextBlock Text="{Binding Progress.CompactMetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#7F95AC" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Progress.CompactMetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8F97A1" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Grid>
                                 <DataTemplate.Triggers>
@@ -434,7 +434,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" Foreground="#72B7FF" FontSize="13" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" Foreground="#6F91C4" FontSize="13" Margin="0,0,7,0" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding ModeDisplay, Converter={StaticResource LocalizedText}}"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -491,7 +491,7 @@
 
                     <StackPanel Grid.Row="1" Margin="0,0,0,14">
                         <TextBlock Text="{Binding SelectedRunner.Alias, TargetNullValue=Selecciona un runner}" FontSize="23" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding SelectedRunner.GitHubTarget}" Foreground="#78B9FF" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding SelectedRunner.GitHubTarget}" Foreground="#6F91C4" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
 
                     <Border Grid.Row="2" x:Name="SelectedProgressCard" Background="#191C21" BorderBrush="#5A4D32" BorderThickness="1" CornerRadius="9" Padding="11" Margin="0,0,0,12">
@@ -509,14 +509,14 @@
                             <Grid Margin="0,0,0,7">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Text="{local:Tr Source='Trabajo en curso'}" FontSize="11" Foreground="#A89355" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding SelectedRunner.Progress.JobDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8FB6DE" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                                    <TextBlock Text="{local:Tr Source='Trabajo en curso'}" FontSize="11" Foreground="#A08B5A" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding SelectedRunner.Progress.JobDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8FA0B3" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
                                     <TextBlock Text="{Binding SelectedRunner.Progress.PhaseDisplay, Converter={StaticResource LocalizedText}}" FontSize="13" FontWeight="SemiBold" Foreground="#F6F8FB" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
                                 </StackPanel>
                                 <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" Foreground="#C59A4A" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
                             </Grid>
                             <ProgressBar Height="8" Minimum="0" Maximum="100" Value="{Binding SelectedRunner.Progress.Percent, Mode=OneWay}"
-                                         Foreground="#C59A4A" Background="#213044" BorderThickness="0">
+                                         Foreground="#C59A4A" Background="#242931" BorderThickness="0">
                                 <ProgressBar.Style>
                                     <Style TargetType="ProgressBar">
                                         <Setter Property="IsIndeterminate" Value="True"/>
@@ -530,7 +530,7 @@
                             </ProgressBar>
                             <Grid Margin="0,7,0,0">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding SelectedRunner.Progress.MetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#AFC0D2"/>
+                                <TextBlock Text="{Binding SelectedRunner.Progress.MetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#A7AEB7"/>
                                 <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8F97A1" Margin="10,0,0,0"/>
                             </Grid>
                         </StackPanel>
@@ -616,7 +616,7 @@
                         <TextBlock Text="CPU" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Grid.Column="1" Text="{Binding CpuUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding CpuPercent, Mode=OneWay}" Foreground="#6F91C4" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding CpuPercent, Mode=OneWay}" Foreground="#6F91C4" Background="#242931" BorderThickness="0" Margin="0,5,0,3"/>
                     <TextBlock Text="{Binding CpuCapacityText}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2" Margin="12,0,18,0">
@@ -624,7 +624,7 @@
                         <TextBlock Text="RAM" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Grid.Column="1" Text="{Binding MemoryUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding MemoryPercent, Mode=OneWay}" Foreground="#67AF87" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding MemoryPercent, Mode=OneWay}" Foreground="#67AF87" Background="#242931" BorderThickness="0" Margin="0,5,0,3"/>
                     <TextBlock Text="{local:Tr Source='Memoria usada / total'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="3" Margin="12,0,0,0">
@@ -632,7 +632,7 @@
                         <TextBlock Text="{local:Tr Source='DISCO DEL SISTEMA'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Grid.Column="1" Text="{Binding DiskUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding DiskPercent, Mode=OneWay}" Foreground="#C59A4A" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding DiskPercent, Mode=OneWay}" Foreground="#C59A4A" Background="#242931" BorderThickness="0" Margin="0,5,0,3"/>
                     <TextBlock Text="{local:Tr Source='Espacio usado / total'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
             </Grid>
@@ -648,7 +648,7 @@
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="{Binding LastUpdatedText}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"/>
-                <TextBlock Text="  ·  " Foreground="#3D5873" VerticalAlignment="Center"/>
+                <TextBlock Text="  ·  " Foreground="#4A515B" VerticalAlignment="Center"/>
                 <TextBlock FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="{local:Tr Source='Acerca de · Neo RS'}">
                     <Hyperlink Click="About_Click" Foreground="{StaticResource MutedBrush}" TextDecorations="{x:Null}">Neo RS</Hyperlink>
                 </TextBlock>
