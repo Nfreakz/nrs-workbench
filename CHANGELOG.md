@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Planned for v0.18.3
-- Fixes the all-stopped queue deadlock: when the queue is enabled with no runner online, stopped runners become initial queue candidates so work can start without disabling the optimizer first. Once a candidate has been online, a later manual stop is still respected.
+- Fixes the all-stopped queue deadlock: when the queue is enabled with no runner online, stopped runners become initial queue candidates so work can start without disabling the optimizer first. Once a candidate has been online, a later manual stop is still respected. Starting one stopped runner manually remains available as an explicit queue opt-in.
 - Improves window layout at normal Windows scaling: the main runner table gets more vertical space, Statistics no longer clips the third history-scope row, Repositories shows the full safe-sync guidance, and Settings is resizable and opens at the top.
 - Adds a visible smart-queue dashboard showing BUSY runners, the next queued runner, queue-owned waiting runners, and runners that remain manually stopped.
 - Adds a session-only Pause/Resume control that freezes queue scheduling without stopping active jobs.
