@@ -14,6 +14,9 @@ public sealed class RunnerQueueCoordinator
     private readonly IRunnerControlService _control;
     private readonly Dictionary<string, DateTimeOffset> _readySince = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DateTimeOffset> _pendingStarts = new(StringComparer.OrdinalIgnoreCase);
+    // Only restore runners this coordinator actually stopped. Users may have
+    // intentionally left other runners stopped before enabling the queue.
+    private readonly HashSet<string> _stoppedByQueue = new(StringComparer.OrdinalIgnoreCase);
     private readonly SemaphoreSlim _gate = new(1, 1);
     private int _lastScheduledIndex = -1;
     private bool _queueWasEnabled;
@@ -28,18 +31,33 @@ public sealed class RunnerQueueCoordinator
         {
             if (!settings.RunnerQueueEnabled)
             {
-                if (!_queueWasEnabled) return string.Empty;
+                if (!_queueWasEnabled && _stoppedByQueue.Count == 0) return string.Empty;
                 _readySince.Clear();
-                var runnersToRestore = runners.Where(runner => runner.State == RunnerState.Stopped).ToList();
+                _pendingStarts.Clear();
+                var runnersToRestore = runners.Where(runner =>
+                    runner.State == RunnerState.Stopped && _stoppedByQueue.Contains(runner.FolderPath)).ToList();
                 var outcomes = await Task.WhenAll(runnersToRestore.Select(async runner =>
                 {
-                    try { await _control.StartAsync(runner, cancellationToken); return true; }
-                    catch (Exception ex) { AppLogger.Error($"Runner queue could not restore '{runner.Alias}'", ex); return false; }
+                    try
+                    {
+                        await _control.StartAsync(runner, cancellationToken);
+                        _stoppedByQueue.Remove(runner.FolderPath);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        AppLogger.Error($"Runner queue could not restore '{runner.Alias}'", ex);
+                        return false;
+                    }
                 }));
+                // A runner that is no longer stopped needs no restoration.
+                var stillStopped = runners.Where(runner => runner.State == RunnerState.Stopped)
+                    .Select(runner => runner.FolderPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                _stoppedByQueue.RemoveWhere(path => !stillStopped.Contains(path));
                 _queueWasEnabled = false;
                 return outcomes.Any(success => !success)
-                    ? UiLanguage.Choose("Cola desactivada · algunos runners no se pudieron iniciar.", "Queue disabled · some runners could not be started.")
-                    : UiLanguage.Choose("Cola desactivada · runners reiniciados.", "Queue disabled · runners restarted.");
+                    ? UiLanguage.Choose("Cola desactivada · algunos runners gestionados no se pudieron iniciar.", "Queue disabled · some queue-managed runners could not be started.")
+                    : UiLanguage.Choose("Cola desactivada · runners gestionados restaurados; los detenidos manualmente siguen detenidos.", "Queue disabled · queue-managed runners restored; manually stopped runners remain stopped.");
             }
 
             _queueWasEnabled = true;
@@ -50,6 +68,7 @@ public sealed class RunnerQueueCoordinator
                 _readySince.Remove(stale);
             foreach (var stale in _pendingStarts.Keys.Where(path => !knownPaths.Contains(path)).ToList())
                 _pendingStarts.Remove(stale);
+            _stoppedByQueue.RemoveWhere(path => !knownPaths.Contains(path));
 
             foreach (var runner in ordered)
             {
@@ -60,6 +79,8 @@ public sealed class RunnerQueueCoordinator
                     _readySince.TryAdd(runner.FolderPath, timestamp);
                 else
                     _readySince.Remove(runner.FolderPath);
+                if (runner.State != RunnerState.Stopped)
+                    _stoppedByQueue.Remove(runner.FolderPath);
             }
 
             var limit = Math.Clamp(settings.RunnerQueueLimit, 1, 2);
@@ -140,7 +161,11 @@ public sealed class RunnerQueueCoordinator
         try
         {
             var stopped = await _control.StopIfIdleAsync(runner);
-            if (stopped) _readySince.Remove(runner.FolderPath);
+            if (stopped)
+            {
+                _readySince.Remove(runner.FolderPath);
+                _stoppedByQueue.Add(runner.FolderPath);
+            }
             return new StopResult(stopped, !stopped);
         }
         catch (Exception ex)
