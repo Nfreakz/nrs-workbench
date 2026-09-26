@@ -18,7 +18,7 @@
                 <Image Source="/Assets/NRSWorkbench.png" Stretch="Uniform" Margin="3"/>
             </Border>
             <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                <TextBlock Text="NRS Workbench" FontSize="28" FontWeight="Bold"/>
+                <TextBlock Text="NRS Workbench" FontSize="24" FontWeight="Bold"/>
                 <TextBlock x:Name="VersionText" Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="1,4,0,0"/>
             </StackPanel>
         </StackPanel>
