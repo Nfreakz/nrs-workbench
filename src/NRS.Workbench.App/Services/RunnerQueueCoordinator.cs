@@ -18,6 +18,7 @@ public sealed class RunnerQueueCoordinator
     // intentionally left other runners stopped before enabling the queue.
     private readonly HashSet<string> _stoppedByQueue = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _eligiblePaths = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, DateTimeOffset> _stopRequestedAt = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _recoveryPending = new(StringComparer.OrdinalIgnoreCase);
     private readonly IRunnerQueueStateStore? _stateStore;
     private bool _eligibleInitialized;
@@ -65,6 +66,7 @@ public sealed class RunnerQueueCoordinator
                 if (!_queueWasEnabled && _stoppedByQueue.Count == 0) return string.Empty;
                 _readySince.Clear();
                 _pendingStarts.Clear();
+                _stopRequestedAt.Clear();
                 _eligibleInitialized = false;
                 _eligiblePaths.Clear();
                 var runnersToRestore = runners.Where(runner =>
@@ -108,6 +110,8 @@ public sealed class RunnerQueueCoordinator
             // A runner started outside the queue is an explicit new participant.
             _eligiblePaths.UnionWith(ordered.Where(IsOnline).Select(runner => runner.FolderPath));
             _eligiblePaths.RemoveWhere(path => !knownPaths.Contains(path));
+            foreach (var stale in _stopRequestedAt.Keys.Where(path => !knownPaths.Contains(path)).ToList())
+                _stopRequestedAt.Remove(stale);
             foreach (var stale in _readySince.Keys.Where(path => !knownPaths.Contains(path)).ToList())
                 _readySince.Remove(stale);
             foreach (var stale in _pendingStarts.Keys.Where(path => !knownPaths.Contains(path)).ToList())
@@ -126,8 +130,25 @@ public sealed class RunnerQueueCoordinator
                     _readySince.Remove(runner.FolderPath);
                 // The first snapshot after StopIfIdleAsync may still report READY.
                 // BUSY means a job was accepted and the stop did not complete.
-                if (runner.State == RunnerState.Busy && _stoppedByQueue.Remove(runner.FolderPath))
+                if (runner.State == RunnerState.Stopped)
+                    _stopRequestedAt.Remove(runner.FolderPath);
+                // READY immediately after StopIfIdleAsync may be a stale snapshot.
+                // If it stays READY for 30 seconds, assume the stop did not
+                // take effect or the user has subsequently restarted it.
+                if (runner.State == RunnerState.Ready &&
+                    _stoppedByQueue.Contains(runner.FolderPath) &&
+                    (!_stopRequestedAt.TryGetValue(runner.FolderPath, out var stoppedAt) ||
+                     timestamp - stoppedAt >= TimeSpan.FromSeconds(30)))
+                {
+                    _stopRequestedAt.Remove(runner.FolderPath);
+                    _stoppedByQueue.Remove(runner.FolderPath);
                     PersistOwnedStops();
+                }
+                if (runner.State == RunnerState.Busy && _stoppedByQueue.Remove(runner.FolderPath))
+                {
+                    _stopRequestedAt.Remove(runner.FolderPath);
+                    PersistOwnedStops();
+                }
                 // An eligible runner stopped outside the queue is now manually
                 // stopped. Never reclaim it until the user starts it again.
                 if (runner.State == RunnerState.Stopped &&
@@ -151,14 +172,15 @@ public sealed class RunnerQueueCoordinator
             var excess = managedActiveCount - limit;
             if (excess > 0)
             {
-                var idleToStop = ordered.Where(runner => runner.State == RunnerState.Ready)
+                var idleToStop = ordered.Where(runner => runner.State == RunnerState.Ready &&
+                        !_stopRequestedAt.ContainsKey(runner.FolderPath))
                     .Reverse().Take(excess).ToList();
                 if (idleToStop.Count == 0)
                     return Summary(active.Count, busyCount, stopped.Count, limit, waitingForCapacity: true);
 
                 var stoppedResults = new List<StopResult>();
                 foreach (var runner in idleToStop)
-                    stoppedResults.Add(await StopIfStillIdleAsync(runner));
+                    stoppedResults.Add(await StopIfStillIdleAsync(runner, timestamp));
                 var failures = stoppedResults.Where(result => !result.Success && !result.BecameBusy).ToList();
                 if (failures.Count > 0)
                     return UiLanguage.Choose("Cola: no se pudo detener un runner libre. Comprueba permisos de administrador.", "Queue: could not stop an idle runner. Check administrator permissions.");
@@ -170,12 +192,13 @@ public sealed class RunnerQueueCoordinator
             if (stopped.Count > 0 && managedActiveCount >= limit)
             {
                 var rotation = ordered.Where(runner => runner.State == RunnerState.Ready &&
+                        !_stopRequestedAt.ContainsKey(runner.FolderPath) &&
                         _readySince.TryGetValue(runner.FolderPath, out var since) && timestamp - since >= IdleRotationDelay)
                     .OrderBy(runner => _readySince[runner.FolderPath])
                     .FirstOrDefault();
                 if (rotation is not null)
                 {
-                    var result = await StopIfStillIdleAsync(rotation);
+                    var result = await StopIfStillIdleAsync(rotation, timestamp);
                     if (!result.Success && !result.BecameBusy)
                         return UiLanguage.Choose($"Cola: no se pudo rotar {rotation.Alias}. Comprueba permisos de administrador.", $"Queue: could not rotate {rotation.Alias}. Check administrator permissions.", $"Cua: no s\u0027ha pogut rotar {rotation.Alias}. Comprova els permisos d\u0027administrador.");
                     if (result.Success)
@@ -195,6 +218,7 @@ public sealed class RunnerQueueCoordinator
                     {
                         _pendingStarts[next.FolderPath] = timestamp;
                         await _control.StartAsync(next, cancellationToken);
+                        _stopRequestedAt.Remove(next.FolderPath);
                         if (_stoppedByQueue.Remove(next.FolderPath)) PersistOwnedStops();
                         _lastScheduledIndex = ordered.IndexOf(next);
                         _readySince.Remove(next.FolderPath);
@@ -214,13 +238,14 @@ public sealed class RunnerQueueCoordinator
         finally { _gate.Release(); }
     }
 
-    private async Task<StopResult> StopIfStillIdleAsync(RunnerInfo runner)
+    private async Task<StopResult> StopIfStillIdleAsync(RunnerInfo runner, DateTimeOffset timestamp)
     {
         try
         {
             // Journal intent before stopping: a crash between the process stop
             // and the next refresh must never lose the recovery information.
             _stoppedByQueue.Add(runner.FolderPath);
+            _stopRequestedAt[runner.FolderPath] = timestamp;
             PersistOwnedStops();
             var stopped = await _control.StopIfIdleAsync(runner);
             if (stopped)
@@ -228,6 +253,7 @@ public sealed class RunnerQueueCoordinator
             else
             {
                 _stoppedByQueue.Remove(runner.FolderPath);
+                _stopRequestedAt.Remove(runner.FolderPath);
                 PersistOwnedStops();
             }
             return new StopResult(stopped, !stopped);
@@ -235,6 +261,7 @@ public sealed class RunnerQueueCoordinator
         catch (Exception ex)
         {
             _stoppedByQueue.Remove(runner.FolderPath);
+            _stopRequestedAt.Remove(runner.FolderPath);
             try { PersistOwnedStops(); }
             catch (Exception journalError) { AppLogger.Error("Runner queue journal cleanup failed", journalError); }
             AppLogger.Error($"Runner queue could not stop '{runner.Alias}'", ex);
