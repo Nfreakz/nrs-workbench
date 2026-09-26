@@ -2,15 +2,17 @@
 
 ## [Unreleased]
 
-### Planned for v0.18.3
-- Fixes the all-stopped queue deadlock: when the queue is enabled with no runner online, stopped runners become initial queue candidates so work can start without disabling the optimizer first. Once a candidate has been online, a later manual stop is still respected. Starting one stopped runner manually remains available as an explicit queue opt-in.
-- Improves window layout at normal Windows scaling: the main runner table gets more vertical space, Statistics no longer clips the third history-scope row, Repositories shows the full safe-sync guidance, and Settings is resizable and opens at the top.
-- Adds a visible smart-queue dashboard showing BUSY runners, the next queued runner, queue-owned waiting runners, and runners that remain manually stopped.
-- Adds a session-only Pause/Resume control that freezes queue scheduling without stopping active jobs.
-- Adds an optional host-resource guard, enabled by default, that blocks new queue starts and idle rotations while CPU or physical RAM are above configurable thresholds. Existing BUSY jobs are never interrupted by the guard. A 5-point recovery margin prevents rapid on/off flapping when host load hovers near a threshold.
-- Adds portable settings for the resource guard and its CPU/RAM thresholds, with validation and smoke coverage.
-- Adds smoke coverage for CPU/RAM holds, pause behavior and queue dashboard classification.
-- Reworks the dark UI from a blue-heavy dashboard palette to a restrained graphite system, reduces decorative status chrome, removes script branding, increases microtext legibility and documents the shared visual rules.
+## [0.18.3] - 2026-09-27
+
+### Added
+- Adds a Smart Queue dashboard showing active, queued and manually stopped runners.
+- Adds Pause/Resume for queue scheduling without interrupting active jobs.
+- Adds configurable CPU and RAM limits so the queue can wait before starting more work when the host is under load.
+
+### Improved
+- The queue can now start work when all runners are stopped, without requiring the optimizer to be disabled first.
+- Manual runner starts remain available while Smart Queue is active, and later manual stops are respected.
+- Refreshes the interface with a more restrained graphite visual system and improves layout in the main, Statistics, Repositories and Settings windows.
 
 
 ## [0.18.2] - 2026-09-26

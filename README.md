@@ -6,21 +6,19 @@
 
 **A local Windows dashboard for Git repositories and GitHub Actions self-hosted runners.**
 
-**Latest published release: [v0.18.2 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.2)** · [Download Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.2/NRSWorkbench-v0.18.2-win-x64.zip) · [What's new](CHANGELOG.md)
+**Latest published release: [v0.18.3 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.3)** · [Download Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.3/NRSWorkbench-v0.18.3-win-x64.zip) · [What's new](CHANGELOG.md)
 
-**New in v0.18.2:** Catalan interface, safer runner-queue recovery across app restarts, stronger protection for manually stopped runners, and guarded repository updating from `RUN_ME_FIRST.cmd`.
+**New in v0.18.3:** Smart Queue dashboard, Pause/Resume scheduling, configurable CPU/RAM limits, reliable startup when all runners are stopped, and a cleaner graphite interface with layout fixes.
 
-**In development: v0.18.3.** The next queue iteration adds an at-a-glance queue dashboard, session Pause/Resume, configurable CPU/RAM guards that delay new starts instead of overloading the host, and an all-stopped bootstrap so enabling the queue can start initial candidates without first disabling the optimizer. A single stopped runner can also be started manually as an explicit queue opt-in; later manual stops remain respected. The published v0.18.2 ZIP does not include these changes yet.
-
-NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.2 Public Preview**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The published v0.18.2 interface is available in Spanish, English and Catalan.
+NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.3 Public Preview**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
 
 **New in v0.18.1:** The optional automatic runner queue can keep one or two runners connected and rotate idle runners while GitHub holds jobs for stopped runners. Active jobs are not intentionally interrupted. This feature is absent from the v0.18.0 ZIP. See [Automatic runner queue](#automatic-runner-queue) for operational limits.
 
 **Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-**En español:** La v0.18.2 ya está publicada con catalán, recuperación segura de la cola y actualización protegida del repositorio desde `RUN_ME_FIRST.cmd`.
+**En español:** La v0.18.3 ya está publicada con mejoras en Smart Queue, control de carga del equipo y una interfaz más limpia.
 
-**En català:** La v0.18.2 ja està publicada amb interfície en català, recuperació segura de la cua i actualització protegida del repositori des de `RUN_ME_FIRST.cmd`.
+**En català:** La v0.18.3 ja està publicada amb millores a Smart Queue, control de càrrega de l'equip i una interfície més neta.
 
 ### Main window
 
@@ -34,7 +32,7 @@ Screenshot from Windows. Computer, runner and repository names, paths and log co
 - **People managing several local Git repositories:** inspect working-tree state and use guarded Fetch, Pull, Push, Commit and local branch switching without jumping between folders.
 - **Small homelab and development setups:** keep host CPU, memory and disk usage visible next to runner activity, with an optional one- or two-runner queue to limit simultaneous listeners.
 
-The current **v0.18.2 Public Preview** adds Catalan, safer queue recovery across app restarts and guarded repository updating from `RUN_ME_FIRST.cmd`.
+The current **v0.18.3 Public Preview** adds smarter queue control, host resource limits and the refreshed graphite interface.
 
 **Try it:** [Download the latest Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/latest) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
 
