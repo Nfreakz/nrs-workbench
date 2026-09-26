@@ -48,6 +48,20 @@ jobs:
           dotnet --info
           git --version
 
+      - name: Validate local launcher PowerShell syntax
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path '.\scripts\build-and-run.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host "::error::$($_.Message)" }
+            throw "build-and-run.ps1 contains PowerShell syntax errors."
+          }
+
       - name: Setup Git identity for smoke tests
         run: |
           git config --global user.name "NRS Workbench CI"

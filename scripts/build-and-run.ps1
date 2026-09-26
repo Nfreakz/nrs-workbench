@@ -13,6 +13,79 @@ function Test-IsAdministrator {
     return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
+function Update-RepositorySafely {
+    $gitMetadata = Join-Path $root '.git'
+    if (-not (Test-Path -LiteralPath $gitMetadata)) {
+        Write-Host 'No es un checkout Git; se usaran los archivos actuales sin intentar actualizar.' -ForegroundColor Yellow
+        return
+    }
+
+    $git = Get-Command git -ErrorAction SilentlyContinue
+    if (-not $git) {
+        throw 'Este checkout contiene .git pero Git no esta disponible en PATH. Instala Git for Windows para actualizar antes de compilar.'
+    }
+
+    $insideWorkTree = [string](& git -C $root rev-parse --is-inside-work-tree 2>$null)
+    $insideWorkTree = $insideWorkTree.Trim()
+    if ($LASTEXITCODE -ne 0 -or $insideWorkTree -ne 'true') {
+        throw 'La carpeta contiene metadatos Git pero no se puede validar como working tree.'
+    }
+
+    $branch = [string](& git -C $root symbolic-ref --quiet --short HEAD 2>$null)
+    $branch = $branch.Trim()
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($branch)) {
+        throw 'El repositorio esta en detached HEAD. No se actualizara automaticamente para evitar cambiar de revision sin permiso.'
+    }
+
+    $changes = @(& git -C $root status --porcelain --untracked-files=normal)
+    if ($LASTEXITCODE -ne 0) {
+        throw 'No se ha podido comprobar el estado local del repositorio.'
+    }
+    if ($changes.Count -gt 0) {
+        throw "Hay cambios locales en '$branch'. RUN_ME_FIRST no hara pull ni descartara archivos. Guarda, haz commit o stash y vuelve a ejecutarlo."
+    }
+
+    $upstream = [string](& git -C $root rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>$null)
+    $upstream = $upstream.Trim()
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($upstream)) {
+        throw "La rama '$branch' no tiene upstream configurado. No puedo garantizar que sea la ultima version sin elegir un remoto por ti."
+    }
+
+    if ($branch -ne 'main') {
+        Write-Host "Nota: estas en '$branch'. Se actualizara contra '$upstream'; RUN_ME_FIRST no cambiara automaticamente a main." -ForegroundColor Yellow
+    }
+
+    $before = [string](& git -C $root rev-parse --short HEAD)
+    $before = $before.Trim()
+    if ($LASTEXITCODE -ne 0) {
+        throw 'No se ha podido leer la revision Git actual.'
+    }
+
+    Write-Host "Actualizando repositorio: $branch <- $upstream"
+    & git -C $root fetch --prune
+    if ($LASTEXITCODE -ne 0) {
+        throw "git fetch ha fallado con codigo $LASTEXITCODE. No se compilara una copia potencialmente desactualizada."
+    }
+
+    & git -C $root pull --ff-only
+    if ($LASTEXITCODE -ne 0) {
+        throw "git pull --ff-only ha fallado con codigo $LASTEXITCODE. No se han hecho merges, rebase ni reset automaticos."
+    }
+
+    $after = [string](& git -C $root rev-parse --short HEAD)
+    $after = $after.Trim()
+    if ($LASTEXITCODE -ne 0) {
+        throw 'El repositorio se ha actualizado pero no se ha podido leer la revision final.'
+    }
+
+    if ($before -eq $after) {
+        Write-Host "Repositorio al dia ($after)." -ForegroundColor Green
+    }
+    else {
+        Write-Host "Repositorio actualizado: $before -> $after" -ForegroundColor Green
+    }
+}
+
 if (-not (Test-IsAdministrator)) {
     $quotedScript = '"{0}"' -f $PSCommandPath
     Start-Process -FilePath 'powershell.exe' `
@@ -39,6 +112,10 @@ try {
     if (-not (Test-Path -LiteralPath $appProject -PathType Leaf)) {
         throw "La estructura del proyecto esta incompleta. Falta: $appProject"
     }
+
+    Write-Host 'Comprobando actualizaciones del repositorio...'
+    Update-RepositorySafely
+    Write-Host ''
 
     $dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
     if (-not $dotnet) {
