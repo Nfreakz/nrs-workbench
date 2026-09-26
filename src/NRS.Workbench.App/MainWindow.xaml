@@ -147,7 +147,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="60" Height="60" CornerRadius="16" Background="#111419" BorderBrush="#4E6685" BorderThickness="1" ClipToBounds="True">
+                <Border Width="60" Height="60" CornerRadius="10" Background="#111419" BorderBrush="#4E6685" BorderThickness="1" ClipToBounds="True">
                     <Image Source="/Assets/NRSWorkbench.png" Stretch="Uniform" Margin="3"/>
                 </Border>
                 <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
@@ -494,7 +494,7 @@
                         <TextBlock Text="{Binding SelectedRunner.GitHubTarget}" Foreground="#78B9FF" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
 
-                    <Border Grid.Row="2" x:Name="SelectedProgressCard" Background="#111E2E" BorderBrush="#5B4A1C" BorderThickness="1" CornerRadius="9" Padding="11" Margin="0,0,0,12">
+                    <Border Grid.Row="2" x:Name="SelectedProgressCard" Background="#191C21" BorderBrush="#5A4D32" BorderThickness="1" CornerRadius="9" Padding="11" Margin="0,0,0,12">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -574,7 +574,7 @@
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{local:Tr Source='Último log'}" Style="{StaticResource SectionTitle}"/>
-                                    <Border Margin="9,1,0,0" Padding="6,2" CornerRadius="7" Background="#103524" BorderBrush="#217A4B" BorderThickness="1">
+                                    <Border Margin="9,1,0,0" Padding="6,2" CornerRadius="7" Background="#223229" BorderBrush="#3D6F53" BorderThickness="1">
                                         <StackPanel Orientation="Horizontal">
                                             <Ellipse Width="6" Height="6" Fill="#5AA878" Margin="0,0,5,0" VerticalAlignment="Center"/>
                                             <TextBlock Text="LIVE" FontSize="11" FontWeight="Bold" Foreground="#67AF87"/>
@@ -588,7 +588,7 @@
                             <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE74D;"/><TextBlock Text="{local:Tr Source='Limpiar vista'}"/></StackPanel>
                         </Button>
                     </Grid>
-                    <Border Grid.Row="1" Background="#07111D" BorderBrush="#263F5C" BorderThickness="1" CornerRadius="8" Padding="1">
+                    <Border Grid.Row="1" Background="#111419" BorderBrush="#303640" BorderThickness="1" CornerRadius="8" Padding="1">
                         <TextBox Text="{Binding LogText, Mode=OneWay}" IsReadOnly="True" TextWrapping="NoWrap"
                                  FontFamily="Cascadia Mono, Consolas" FontSize="11.5" Padding="12" AcceptsReturn="True"
                                  Background="Transparent" BorderThickness="0"
@@ -650,7 +650,7 @@
                 <TextBlock Text="{Binding LastUpdatedText}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"/>
                 <TextBlock Text="  ·  " Foreground="#3D5873" VerticalAlignment="Center"/>
                 <TextBlock FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="{local:Tr Source='Acerca de · Neo RS'}">
-                    <Hyperlink Click="About_Click" Foreground="#6F8DB5" TextDecorations="{x:Null}">Neo RS</Hyperlink>
+                    <Hyperlink Click="About_Click" Foreground="{StaticResource MutedBrush}" TextDecorations="{x:Null}">Neo RS</Hyperlink>
                 </TextBlock>
             </StackPanel>
         </Grid>
