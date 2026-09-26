@@ -89,7 +89,7 @@ public sealed class RepositoriesViewModel : ObservableObject
 
             StatusText = paths.Count == 0
                 ? UiLanguage.Choose("Añade un repositorio o escanea una carpeta para empezar.", "Add a repository or scan a folder to get started.")
-                : UiLanguage.Choose($"Actualizando {paths.Count} repositorio{(paths.Count == 1 ? string.Empty : "s")}...", $"Refreshing {paths.Count} repositories...");
+                : UiLanguage.Choose($"Actualizando {paths.Count} repositorio{(paths.Count == 1 ? string.Empty : "s")}...", $"Refreshing {paths.Count} repositories...", $"Actualitzant {paths.Count} repositori{(paths.Count == 1 ? string.Empty : "s")}...");
 
             var rows = new List<GitRepositoryInfo>();
             using var gate = new SemaphoreSlim(4, 4);
@@ -122,7 +122,7 @@ public sealed class RepositoriesViewModel : ObservableObject
             _lastUpdated = DateTimeOffset.Now;
             StatusText = rows.Count == 0
                 ? UiLanguage.Choose("Sin repositorios configurados. Usa Añadir repositorio o Escanear carpeta.", "No repositories configured. Use Add repository or Scan folder.")
-                : UiLanguage.Choose($"{rows.Count} repositorio{(rows.Count == 1 ? string.Empty : "s")} · {CleanCount} clean · {ChangesCount} con cambios · {AttentionCount} con atención", $"{rows.Count} repositories · {CleanCount} clean · {ChangesCount} changed · {AttentionCount} need attention");
+                : UiLanguage.Choose($"{rows.Count} repositorio{(rows.Count == 1 ? string.Empty : "s")} · {CleanCount} clean · {ChangesCount} con cambios · {AttentionCount} con atención", $"{rows.Count} repositories · {CleanCount} clean · {ChangesCount} changed · {AttentionCount} need attention", $"{rows.Count} repositori{(rows.Count == 1 ? string.Empty : "s")} · {CleanCount} nets · {ChangesCount} amb canvis · {AttentionCount} requereixen atenció");
             RaiseSummary();
             RaiseCommandStates();
         }
@@ -151,7 +151,7 @@ public sealed class RepositoriesViewModel : ObservableObject
                 settings.RepositoryPaths.Add(info.Path);
                 _settings.Save(settings);
             }
-            StatusText = UiLanguage.Choose($"Añadido {info.Name}.", $"Added {info.Name}.");
+            StatusText = UiLanguage.Choose($"Añadido {info.Name}.", $"Added {info.Name}.", $"Afegit {info.Name}.");
             await RefreshAsync();
             SelectedRepository = Repositories.FirstOrDefault(x => string.Equals(x.Path, info.Path, StringComparison.OrdinalIgnoreCase));
         }
@@ -166,7 +166,7 @@ public sealed class RepositoriesViewModel : ObservableObject
     {
         try
         {
-            StatusText = UiLanguage.Choose($"Buscando repositorios en {rootPath}...", $"Finding repositories in {rootPath}...");
+            StatusText = UiLanguage.Choose($"Buscando repositorios en {rootPath}...", $"Finding repositories in {rootPath}...", $"Cercant repositoris a {rootPath}...");
             var found = await _git.FindRepositoriesAsync(rootPath, 3);
             var settings = _settings.Load();
             var before = settings.RepositoryPaths.Count;
@@ -180,7 +180,7 @@ public sealed class RepositoriesViewModel : ObservableObject
             await RefreshAsync();
             StatusText = found.Count == 0
                 ? UiLanguage.Choose("No se encontraron repositorios Git en la carpeta seleccionada.", "No Git repositories found in the selected folder.")
-                : UiLanguage.Choose($"Escaneo completado · {found.Count} encontrados · {added} añadidos.", $"Scan complete · {found.Count} found · {added} added.");
+                : UiLanguage.Choose($"Escaneo completado · {found.Count} encontrados · {added} añadidos.", $"Scan complete · {found.Count} found · {added} added.", $"Exploració completada · {found.Count} trobats · {added} afegits.");
             return added;
         }
         catch (Exception ex)
@@ -200,14 +200,14 @@ public sealed class RepositoriesViewModel : ObservableObject
     private async Task PullSelectedAsync()
     {
         if (SelectedRepository is null) return;
-        if (!_dialogs.Confirm(UiLanguage.Choose($"Se ejecutará git pull --ff-only en:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nEl pull se bloqueará si requiere merge o rebase.\n\n¿Continuar?", $"Run git pull --ff-only in:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nPull will stop if a merge or rebase is required.\n\nContinue?"), UiLanguage.Choose("Pull seguro", "Safe pull"))) return;
+        if (!_dialogs.Confirm(UiLanguage.Choose($"Se ejecutará git pull --ff-only en:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nEl pull se bloqueará si requiere merge o rebase.\n\n¿Continuar?", $"Run git pull --ff-only in:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nPull will stop if a merge or rebase is required.\n\nContinue?", $"S\u0027executarà git pull --ff-only a:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nEl pull es bloquejarà si requereix merge o rebase.\n\nVols continuar?"), UiLanguage.Choose("Pull seguro", "Safe pull"))) return;
         await ExecuteGitActionAsync(() => _git.PullFastForwardAsync(SelectedRepository), $"Pull · {SelectedRepository.Name}");
     }
 
     private async Task PushSelectedAsync()
     {
         if (SelectedRepository is null) return;
-        if (!_dialogs.Confirm(UiLanguage.Choose($"Se enviarán {SelectedRepository.Ahead} commit{(SelectedRepository.Ahead == 1 ? string.Empty : "s")} a {SelectedRepository.Upstream}.\n\nRepositorio: {SelectedRepository.Name}\nRama: {SelectedRepository.Branch}\n\n¿Hacer push?", $"Send {SelectedRepository.Ahead} commits to {SelectedRepository.Upstream}.\n\nRepository: {SelectedRepository.Name}\nBranch: {SelectedRepository.Branch}\n\nPush?"), UiLanguage.Choose("Confirmar push", "Confirm push"))) return;
+        if (!_dialogs.Confirm(UiLanguage.Choose($"Se enviarán {SelectedRepository.Ahead} commit{(SelectedRepository.Ahead == 1 ? string.Empty : "s")} a {SelectedRepository.Upstream}.\n\nRepositorio: {SelectedRepository.Name}\nRama: {SelectedRepository.Branch}\n\n¿Hacer push?", $"Send {SelectedRepository.Ahead} commits to {SelectedRepository.Upstream}.\n\nRepository: {SelectedRepository.Name}\nBranch: {SelectedRepository.Branch}\n\nPush?", $"S\u0027enviaran {SelectedRepository.Ahead} commit{(SelectedRepository.Ahead == 1 ? string.Empty : "s")} a {SelectedRepository.Upstream}.\n\nRepositori: {SelectedRepository.Name}\nBranca: {SelectedRepository.Branch}\n\nVols fer push?"), UiLanguage.Choose("Confirmar push", "Confirm push"))) return;
         await ExecuteGitActionAsync(() => _git.PushAsync(SelectedRepository), $"Push · {SelectedRepository.Name}");
     }
 
@@ -232,7 +232,7 @@ public sealed class RepositoriesViewModel : ObservableObject
     {
         if (SelectedRepository is null) return;
         var repo = SelectedRepository;
-        if (!_dialogs.Confirm(UiLanguage.Choose($"Quitar '{repo.Name}' del NRS Workbench?\n\nNo se borrará ninguna carpeta ni dato Git.", $"Remove '{repo.Name}' from NRS Workbench?\n\nNo folder or Git data will be deleted."), UiLanguage.Choose("Quitar repositorio", "Remove repository"))) return;
+        if (!_dialogs.Confirm(UiLanguage.Choose($"Quitar '{repo.Name}' del NRS Workbench?\n\nNo se borrará ninguna carpeta ni dato Git.", $"Remove '{repo.Name}' from NRS Workbench?\n\nNo folder or Git data will be deleted.", $"Treure '{repo.Name}' de NRS Workbench?\n\nNo s\u0027esborrarà cap carpeta ni dada de Git."), UiLanguage.Choose("Quitar repositorio", "Remove repository"))) return;
 
         var settings = _settings.Load();
         settings.RepositoryPaths.RemoveAll(x => string.Equals(x, repo.Path, StringComparison.OrdinalIgnoreCase));
