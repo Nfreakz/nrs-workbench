@@ -8,6 +8,7 @@
 - Records queue-managed stops in a local journal outside portable configuration. On relaunch, previously managed runners remain stopped until the user explicitly confirms their recovery; declining clears the journal.
 - Adds queue and localization smoke scenarios for manual stops, recovery consent and persistent state. Actual Windows build, smoke tests and release packaging must pass before publication.
 - Updates README download links to the already published v0.18.1 ZIP.
+- Updates `RUN_ME_FIRST.cmd` / `build-and-run.ps1` so Git clones fetch and fast-forward their current tracked branch before compiling, while refusing to discard local changes, switch branches or perform merge/rebase/reset operations automatically.
 
 
 ## [0.18.1] - 2026-09-26
