@@ -28,11 +28,11 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="REPOS" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding TotalCount}" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="CLEAN" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding CleanCount}" Foreground="#5AA878" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='CAMBIOS'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding ChangesCount}" Foreground="#C59A4A" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="AHEAD" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AheadCount}" Foreground="#6F91C4" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AttentionCount}" Foreground="#D2636D" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="REPOS" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding TotalCount}" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="CLEAN" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding CleanCount}" Foreground="#5AA878" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='CAMBIOS'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding ChangesCount}" Foreground="#C59A4A" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="AHEAD" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AheadCount}" Foreground="#6F91C4" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AttentionCount}" Foreground="#D2636D" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
             </StackPanel>
         </Grid>
 
@@ -82,17 +82,17 @@
                                         <Style TargetType="Border">
                                             <Setter Property="Background" Value="#20252B"/><Setter Property="BorderBrush" Value="#3B424C"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding State}" Value="Clean"><Setter Property="Background" Value="#0D3B28"/><Setter Property="BorderBrush" Value="#1E9A59"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Changes"><Setter Property="Background" Value="#4A3810"/><Setter Property="BorderBrush" Value="#A47B18"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Ahead"><Setter Property="Background" Value="#123B62"/><Setter Property="BorderBrush" Value="#367FBE"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Behind"><Setter Property="Background" Value="#26365A"/><Setter Property="BorderBrush" Value="#5B78B5"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Diverged"><Setter Property="Background" Value="#4A2810"/><Setter Property="BorderBrush" Value="#D07A20"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Clean"><Setter Property="Background" Value="#24362C"/><Setter Property="BorderBrush" Value="#56846A"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Changes"><Setter Property="Background" Value="#3A3323"/><Setter Property="BorderBrush" Value="#8A723D"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Ahead"><Setter Property="Background" Value="#263445"/><Setter Property="BorderBrush" Value="#5B718F"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Behind"><Setter Property="Background" Value="#2C3340"/><Setter Property="BorderBrush" Value="#68768D"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Diverged"><Setter Property="Background" Value="#382B22"/><Setter Property="BorderBrush" Value="#A5703E"/></DataTrigger>
                                                 <DataTrigger Binding="{Binding State}" Value="Conflict"><Setter Property="Background" Value="#3A2025"/><Setter Property="BorderBrush" Value="#B85B64"/></DataTrigger>
                                                 <DataTrigger Binding="{Binding State}" Value="Error"><Setter Property="Background" Value="#3A2025"/><Setter Property="BorderBrush" Value="#B85B64"/></DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
-                                    <TextBlock Text="{Binding StateLabel, Converter={StaticResource LocalizedText}}" FontSize="10" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding StateLabel, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold"/>
                                 </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -148,7 +148,7 @@
                 <StackPanel>
                     <TextBlock Text="{local:Tr Source='Sincronización segura'}" Style="{StaticResource SectionTitle}"/>
                     <TextBlock Text="{local:Tr Source='La aplicación usa el Git instalado en Windows. No implementa Git ni hace merges automáticos.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,8,0,14"/>
-                    <Border Background="#0B1B2C" BorderBrush="#303640" BorderThickness="1" CornerRadius="9" Padding="12">
+                    <Border Background="#15181C" BorderBrush="#303640" BorderThickness="1" CornerRadius="9" Padding="12">
                         <StackPanel>
                             <TextBlock Text="COMMIT" Foreground="#7697C8" FontWeight="Bold"/>
                             <TextBlock Text="{local:Tr Source='Selecciona archivos, revisa el diff y confirma el mensaje antes de modificar el índice de Git.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
