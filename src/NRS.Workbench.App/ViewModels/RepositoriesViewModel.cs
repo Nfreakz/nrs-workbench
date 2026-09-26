@@ -36,7 +36,7 @@ public sealed class RepositoriesViewModel : ObservableObject
 
     public int TotalCount => Repositories.Count;
     public int CleanCount => Repositories.Count(x => x.State == GitRepositoryState.Clean);
-    public int ChangesCount => Repositories.Count(x => x.State == GitRepositoryState.Changes);
+    public int ChangesCount => Repositories.Count(x => x.IsDirty);
     public int AheadCount => Repositories.Count(x => x.Ahead > 0 && x.Behind == 0);
     public int BehindCount => Repositories.Count(x => x.Behind > 0 && x.Ahead == 0);
     public int AttentionCount => Repositories.Count(x => x.State is GitRepositoryState.Diverged or GitRepositoryState.Conflict or GitRepositoryState.Error);
