@@ -199,5 +199,6 @@
   "Último log": "Últim log",
   "☕ Apoyar desarrollo": "☕ Donar suport al desenvolupament",
   "Hay runners pendientes de revisión tras reiniciar NRS Workbench.": "Hi ha runners pendents de revisió després de reiniciar NRS Workbench.",
-  "Revisar runners tras reiniciar": "Revisar els runners després de reiniciar"
+  "Revisar runners tras reiniciar": "Revisar els runners després de reiniciar",
+  "La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. Los runners que ya estaban detenidos manualmente no se iniciarán por la cola. Los jobs activos no se detienen. NRS Workbench debe permanecer abierto o en la bandeja.": "L'aplicació manté com a màxim aquest nombre de runners connectats i rota els que estan lliures cada 45 segons. La cua no iniciarà runners que ja estiguessin aturats manualment. Els jobs actius no s'interrompen. NRS Workbench ha de continuar obert o a la safata del sistema."
 }
