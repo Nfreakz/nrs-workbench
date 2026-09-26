@@ -69,6 +69,19 @@
                         </StackPanel>
                         <TextBlock Text="{local:Tr Source='La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. Los runners que ya estaban detenidos manualmente no se iniciarán por la cola. Los jobs activos no se detienen. NRS Workbench debe permanecer abierto o en la bandeja.'}"
                                    Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="22,7,0,0"/>
+                        <CheckBox x:Name="RunnerQueueResourceGuardCheck" Content="{local:Tr Source='Esperar si el PC está demasiado cargado'}"
+                                  Foreground="{StaticResource TextBrush}" Margin="22,12,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="42,8,0,0">
+                            <TextBlock Text="{local:Tr Source='No iniciar por encima de'}" Style="{StaticResource MutedLabel}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBlock Text="CPU" Style="{StaticResource MutedLabel}" VerticalAlignment="Center"/>
+                            <TextBox x:Name="RunnerQueueCpuThresholdText" Width="54" Padding="7,4" Margin="7,0,4,0" HorizontalContentAlignment="Right"/>
+                            <TextBlock Text="%" Style="{StaticResource MutedLabel}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                            <TextBlock Text="RAM" Style="{StaticResource MutedLabel}" VerticalAlignment="Center"/>
+                            <TextBox x:Name="RunnerQueueMemoryThresholdText" Width="54" Padding="7,4" Margin="7,0,4,0" HorizontalContentAlignment="Right"/>
+                            <TextBlock Text="%" Style="{StaticResource MutedLabel}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{local:Tr Source='Si se supera un límite, la cola no inicia ni rota runners nuevos. Los jobs BUSY siguen ejecutándose.'}"
+                                   Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="42,7,0,0"/>
                     </StackPanel>
                 </Border>
 
