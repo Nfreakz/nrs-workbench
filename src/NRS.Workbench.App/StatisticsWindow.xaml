@@ -175,7 +175,7 @@
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="48" Height="48" CornerRadius="13" Background="#242C36" BorderBrush="#4E6685" BorderThickness="1">
+                <Border Width="48" Height="48" CornerRadius="10" Background="#242C36" BorderBrush="#4E6685" BorderThickness="1">
                     <TextBlock Text="&#xE9D2;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="#7697C8"
                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
@@ -200,11 +200,11 @@
         <!-- Runner KPI cards -->
         <UniformGrid Grid.Row="1" Columns="7" Margin="0,0,0,12">
             <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='JOBS LOCALES'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding TotalRuns}" Style="{StaticResource MetricValue}"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#3D6F53"><StackPanel><TextBlock Text="OK" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SucceededRuns}" Style="{StaticResource MetricValue}" Foreground="#67AF87"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#704047"><StackPanel><TextBlock Text="{local:Tr Source='FALLOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding FailedRuns}" Style="{StaticResource MetricValue}" Foreground="#D56B75"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#6B5932"><StackPanel><TextBlock Text="{local:Tr Source='CANCELADAS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding CancelledRuns}" Style="{StaticResource MetricValue}" Foreground="#C59A4A"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="OK" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SucceededRuns}" Style="{StaticResource MetricValue}" Foreground="#67AF87"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='FALLOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding FailedRuns}" Style="{StaticResource MetricValue}" Foreground="#D56B75"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='CANCELADAS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding CancelledRuns}" Style="{StaticResource MetricValue}" Foreground="#C59A4A"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='SIN CLASIFICAR'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding UnknownRuns}" Style="{StaticResource MetricValue}" Foreground="#A8B5C4"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#4E6580"><StackPanel><TextBlock Text="{local:Tr Source='EN CURSO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding ActiveRuns}" Style="{StaticResource MetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='EN CURSO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding ActiveRuns}" Style="{StaticResource MetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}" Margin="0"><StackPanel><TextBlock Text="{local:Tr Source='TASA DE ÉXITO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SuccessRate}" Style="{StaticResource MetricValue}" Foreground="#67AF87"/></StackPanel></Border>
         </UniformGrid>
 
@@ -225,11 +225,11 @@
 
                 <UniformGrid Grid.Row="1" Columns="6" Margin="12,10,12,7">
                     <Border Style="{StaticResource RepoMetricCard}"><StackPanel><TextBlock Text="REPOS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryTotalCount}" Style="{StaticResource RepoMetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#3D6F53"><StackPanel><TextBlock Text="CLEAN" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryCleanCount}" Style="{StaticResource RepoMetricValue}" Foreground="#67AF87"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#6B5932"><StackPanel><TextBlock Text="{local:Tr Source='CON CAMBIOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryChangesCount}" Style="{StaticResource RepoMetricValue}" Foreground="#C59A4A"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#4E6580"><StackPanel><TextBlock Text="AHEAD" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAheadCount}" Style="{StaticResource RepoMetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#4B5663"><StackPanel><TextBlock Text="BEHIND" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryBehindCount}" Style="{StaticResource RepoMetricValue}" Foreground="#AAB2BC"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" Margin="0" BorderBrush="#704047"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAttentionCount}" Style="{StaticResource RepoMetricValue}" Foreground="#D56B75"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}"><StackPanel><TextBlock Text="CLEAN" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryCleanCount}" Style="{StaticResource RepoMetricValue}" Foreground="#67AF87"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='CON CAMBIOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryChangesCount}" Style="{StaticResource RepoMetricValue}" Foreground="#C59A4A"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}"><StackPanel><TextBlock Text="AHEAD" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAheadCount}" Style="{StaticResource RepoMetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}"><StackPanel><TextBlock Text="BEHIND" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryBehindCount}" Style="{StaticResource RepoMetricValue}" Foreground="#AAB2BC"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" Margin="0"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAttentionCount}" Style="{StaticResource RepoMetricValue}" Foreground="#D56B75"/></StackPanel></Border>
                 </UniformGrid>
 
                 <Grid Grid.Row="2" Margin="14,0,14,9">
@@ -534,7 +534,7 @@
                            Foreground="#848C96" FontSize="11" VerticalAlignment="Center"/>
                 <TextBlock Text="  ·  " Foreground="#3D5873" VerticalAlignment="Center"/>
                 <TextBlock FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="{local:Tr Source='Acerca de · Neo RS'}">
-                    <Hyperlink Click="About_Click" Foreground="#6F8DB5" TextDecorations="{x:Null}">Neo RS</Hyperlink>
+                    <Hyperlink Click="About_Click" Foreground="{StaticResource MutedBrush}" TextDecorations="{x:Null}">Neo RS</Hyperlink>
                 </TextBlock>
             </StackPanel>
         </Grid>
