@@ -203,7 +203,7 @@
             <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="OK" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SucceededRuns}" Style="{StaticResource MetricValue}" Foreground="#67AF87"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='FALLOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding FailedRuns}" Style="{StaticResource MetricValue}" Foreground="#D56B75"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='CANCELADAS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding CancelledRuns}" Style="{StaticResource MetricValue}" Foreground="#C59A4A"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='SIN CLASIFICAR'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding UnknownRuns}" Style="{StaticResource MetricValue}" Foreground="#A8B5C4"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='SIN CLASIFICAR'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding UnknownRuns}" Style="{StaticResource MetricValue}" Foreground="#9BA3AE"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='EN CURSO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding ActiveRuns}" Style="{StaticResource MetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}" Margin="0"><StackPanel><TextBlock Text="{local:Tr Source='TASA DE ÉXITO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SuccessRate}" Style="{StaticResource MetricValue}" Foreground="#67AF87"/></StackPanel></Border>
         </UniformGrid>
@@ -492,13 +492,13 @@
                         <DataGridTemplateColumn Header="{local:Tr Source='RESULTADO'}" Width="120">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border x:Name="OutcomeBadge" Background="#2A3442" BorderBrush="#536273" BorderThickness="1" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
-                                        <TextBlock x:Name="OutcomeText" Text="{Binding OutcomeDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold" Foreground="#D8E1EA"/>
+                                    <Border x:Name="OutcomeBadge" Background="#242931" BorderBrush="#4A515B" BorderThickness="1" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
+                                        <TextBlock x:Name="OutcomeText" Text="{Binding OutcomeDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold" Foreground="#D6DBE1"/>
                                     </Border>
                                     <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Succeeded}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#123A27"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#258653"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#67AF87"/></DataTrigger>
-                                        <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Failed}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#451E25"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#9C404B"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#D56B75"/></DataTrigger>
-                                        <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Cancelled}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#463A17"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#9B7A26"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#C59A4A"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Succeeded}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#24362C"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#56846A"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#67AF87"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Failed}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#3A2025"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#B85B64"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#D56B75"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Cancelled}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#3A3323"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#8A723D"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#C59A4A"/></DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -532,7 +532,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
                 <TextBlock Text="{local:Tr Source='Runners: _diag/Worker_*.log · repos: estado Git local'}"
                            Foreground="#848C96" FontSize="11" VerticalAlignment="Center"/>
-                <TextBlock Text="  ·  " Foreground="#3D5873" VerticalAlignment="Center"/>
+                <TextBlock Text="  ·  " Foreground="#4A515B" VerticalAlignment="Center"/>
                 <TextBlock FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="{local:Tr Source='Acerca de · Neo RS'}">
                     <Hyperlink Click="About_Click" Foreground="{StaticResource MutedBrush}" TextDecorations="{x:Null}">Neo RS</Hyperlink>
                 </TextBlock>
