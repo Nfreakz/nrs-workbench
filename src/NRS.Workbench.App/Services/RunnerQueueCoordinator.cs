@@ -26,6 +26,15 @@ public sealed class RunnerQueueCoordinator
     private int _lastScheduledIndex = -1;
     private bool _queueWasEnabled;
 
+    public bool IsPaused { get; private set; }
+    public RunnerQueueSnapshot Snapshot { get; private set; } = RunnerQueueSnapshot.Disabled();
+
+    public bool TogglePaused()
+    {
+        IsPaused = !IsPaused;
+        return IsPaused;
+    }
+
     public RunnerQueueCoordinator(IRunnerControlService control, IRunnerQueueStateStore? stateStore = null)
     {
         _control = control;
@@ -53,13 +62,18 @@ public sealed class RunnerQueueCoordinator
     private void PersistOwnedStops() => _stateStore?.Save(_stoppedByQueue.ToList());
 
     public async Task<string> ReconcileAsync(IReadOnlyList<RunnerInfo> runners, RunnerSettings settings,
-        DateTimeOffset? now = null, CancellationToken cancellationToken = default)
+        DateTimeOffset? now = null, SystemResourceSnapshot? resources = null,
+        CancellationToken cancellationToken = default)
     {
         await _gate.WaitAsync(cancellationToken);
         try
         {
             if (_recoveryPending.Count > 0)
-                return UiLanguage.Text("Hay runners pendientes de revisión tras reiniciar NRS Workbench.");
+            {
+                var recoveryStatus = UiLanguage.Text("Hay runners pendientes de revisión tras reiniciar NRS Workbench.");
+                Snapshot = BuildSnapshot(runners, settings, resources, RunnerQueueHoldReason.Recovering, recoveryStatus);
+                return recoveryStatus;
+            }
 
             if (!settings.RunnerQueueEnabled)
             {
@@ -90,9 +104,12 @@ public sealed class RunnerQueueCoordinator
                 // A stop may still be in flight when a snapshot says READY.
                 // Retain the marker until the stopped state is observed and restored.
                 _queueWasEnabled = false;
-                return outcomes.Any(success => !success)
+                IsPaused = false;
+                var disabledStatus = outcomes.Any(success => !success)
                     ? UiLanguage.Choose("Cola desactivada · algunos runners gestionados no se pudieron iniciar.", "Queue disabled · some queue-managed runners could not be started.")
                     : UiLanguage.Choose("Cola desactivada · runners gestionados restaurados; los detenidos manualmente siguen detenidos.", "Queue disabled · queue-managed runners restored; manually stopped runners remain stopped.");
+                Snapshot = BuildSnapshot(runners, settings, resources, RunnerQueueHoldReason.Disabled, disabledStatus);
+                return disabledStatus;
             }
 
             _queueWasEnabled = true;
@@ -172,6 +189,16 @@ public sealed class RunnerQueueCoordinator
                 !_pendingStarts.ContainsKey(runner.FolderPath)).ToList();
             var managedActiveCount = Math.Max(0, active.Count - pendingStopCount) + pendingStartCount;
 
+            if (IsPaused)
+            {
+                var pausedStatus = UiLanguage.Choose(
+                    "Cola pausada · no se iniciarán ni rotarán runners hasta reanudarla.",
+                    "Queue paused · runners will not start or rotate until resumed.",
+                    "Cua pausada · no s'iniciaran ni es rotaran runners fins que es reprengui.");
+                Snapshot = BuildSnapshot(ordered, settings, resources, RunnerQueueHoldReason.Paused, pausedStatus);
+                return pausedStatus;
+            }
+
             // When enabling the queue with more listeners already online, drain
             // idle listeners first. Busy jobs are never stopped by the queue.
             var excess = managedActiveCount - limit;
@@ -181,15 +208,33 @@ public sealed class RunnerQueueCoordinator
                         !_stopRequestedAt.ContainsKey(runner.FolderPath))
                     .Reverse().Take(excess).ToList();
                 if (idleToStop.Count == 0)
-                    return Summary(active.Count, busyCount, stopped.Count, limit, waitingForCapacity: true);
+                {
+                    var capacityStatus = Summary(active.Count, busyCount, stopped.Count, limit, waitingForCapacity: true);
+                    Snapshot = BuildSnapshot(ordered, settings, resources, RunnerQueueHoldReason.BusyCapacity, capacityStatus);
+                    return capacityStatus;
+                }
 
                 var stoppedResults = new List<StopResult>();
                 foreach (var runner in idleToStop)
                     stoppedResults.Add(await StopIfStillIdleAsync(runner, timestamp));
                 var failures = stoppedResults.Where(result => !result.Success && !result.BecameBusy).ToList();
                 if (failures.Count > 0)
-                    return UiLanguage.Choose("Cola: no se pudo detener un runner libre. Comprueba permisos de administrador.", "Queue: could not stop an idle runner. Check administrator permissions.");
-                return Summary(active.Count, busyCount, stopped.Count, limit, changing: true);
+                {
+                    var stopError = UiLanguage.Choose("Cola: no se pudo detener un runner libre. Comprueba permisos de administrador.", "Queue: could not stop an idle runner. Check administrator permissions.");
+                    Snapshot = BuildSnapshot(ordered, settings, resources, RunnerQueueHoldReason.None, stopError);
+                    return stopError;
+                }
+                var drainingStatus = Summary(active.Count, busyCount, stopped.Count, limit, changing: true);
+                Snapshot = BuildSnapshot(ordered, settings, resources, RunnerQueueHoldReason.None, drainingStatus);
+                return drainingStatus;
+            }
+
+            var resourceHold = DetermineResourceHold(settings, resources);
+            if (resourceHold != RunnerQueueHoldReason.None)
+            {
+                var resourceStatus = ResourceHoldStatus(resourceHold, settings, resources);
+                Snapshot = BuildSnapshot(ordered, settings, resources, resourceHold, resourceStatus);
+                return resourceStatus;
             }
 
             // Rotate an idle slot after a grace period. This lets jobs for other
@@ -205,11 +250,17 @@ public sealed class RunnerQueueCoordinator
                 {
                     var result = await StopIfStillIdleAsync(rotation, timestamp);
                     if (!result.Success && !result.BecameBusy)
-                        return UiLanguage.Choose($"Cola: no se pudo rotar {rotation.Alias}. Comprueba permisos de administrador.", $"Queue: could not rotate {rotation.Alias}. Check administrator permissions.", $"Cua: no s\u0027ha pogut rotar {rotation.Alias}. Comprova els permisos d\u0027administrador.");
+                    {
+                        var rotateError = UiLanguage.Choose($"Cola: no se pudo rotar {rotation.Alias}. Comprueba permisos de administrador.", $"Queue: could not rotate {rotation.Alias}. Check administrator permissions.", $"Cua: no s\u0027ha pogut rotar {rotation.Alias}. Comprova els permisos d\u0027administrador.");
+                        Snapshot = BuildSnapshot(ordered, settings, resources, RunnerQueueHoldReason.None, rotateError);
+                        return rotateError;
+                    }
                     if (result.Success)
                     {
                         _lastScheduledIndex = ordered.IndexOf(rotation);
-                        return Summary(active.Count, busyCount, stopped.Count, limit, changing: true);
+                        var rotatingStatus = Summary(active.Count, busyCount, stopped.Count, limit, changing: true);
+                        Snapshot = BuildSnapshot(ordered, settings, resources, RunnerQueueHoldReason.None, rotatingStatus);
+                        return rotatingStatus;
                     }
                 }
             }
@@ -227,20 +278,105 @@ public sealed class RunnerQueueCoordinator
                         if (_stoppedByQueue.Remove(next.FolderPath)) PersistOwnedStops();
                         _lastScheduledIndex = ordered.IndexOf(next);
                         _readySince.Remove(next.FolderPath);
-                        return UiLanguage.Choose($"Cola: iniciando {next.Alias} · límite {limit}.", $"Queue: starting {next.Alias} · limit {limit}.", $"Cua: iniciant {next.Alias} · límit {limit}.");
+                        var startingStatus = UiLanguage.Choose($"Cola: iniciando {next.Alias} · límite {limit}.", $"Queue: starting {next.Alias} · limit {limit}.", $"Cua: iniciant {next.Alias} · límit {limit}.");
+                        Snapshot = BuildSnapshot(ordered, settings, resources, RunnerQueueHoldReason.None, startingStatus);
+                        return startingStatus;
                     }
                     catch (Exception ex)
                     {
                         _pendingStarts.Remove(next.FolderPath);
                         AppLogger.Error($"Runner queue could not start '{next.Alias}'", ex);
-                        return UiLanguage.Choose($"Cola: no se pudo iniciar {next.Alias}. Comprueba permisos de administrador.", $"Queue: could not start {next.Alias}. Check administrator permissions.", $"Cua: no s\u0027ha pogut iniciar {next.Alias}. Comprova els permisos d\u0027administrador.");
+                        var startError = UiLanguage.Choose($"Cola: no se pudo iniciar {next.Alias}. Comprueba permisos de administrador.", $"Queue: could not start {next.Alias}. Check administrator permissions.", $"Cua: no s\u0027ha pogut iniciar {next.Alias}. Comprova els permisos d\u0027administrador.");
+                        Snapshot = BuildSnapshot(ordered, settings, resources, RunnerQueueHoldReason.None, startError);
+                        return startError;
                     }
                 }
             }
 
-            return Summary(managedActiveCount, busyCount, stopped.Count, limit);
+            var summary = Summary(managedActiveCount, busyCount, stopped.Count, limit);
+            Snapshot = BuildSnapshot(ordered, settings, resources, RunnerQueueHoldReason.None, summary);
+            return summary;
         }
         finally { _gate.Release(); }
+    }
+
+    private RunnerQueueSnapshot BuildSnapshot(IReadOnlyList<RunnerInfo> runners, RunnerSettings settings,
+        SystemResourceSnapshot? resources, RunnerQueueHoldReason reason, string status)
+    {
+        var ordered = OrderRunners(runners, settings.RunnerDisplayOrder);
+        var running = ordered.Where(runner => runner.State == RunnerState.Busy)
+            .Select(runner => runner.Alias).ToList();
+        var waiting = ordered.Where(runner => runner.State == RunnerState.Stopped &&
+                _eligiblePaths.Contains(runner.FolderPath) &&
+                !_pendingStarts.ContainsKey(runner.FolderPath))
+            .Select(runner => runner.Alias).ToList();
+        var manual = ordered.Where(runner => runner.State == RunnerState.Stopped &&
+                !_eligiblePaths.Contains(runner.FolderPath) &&
+                !_stoppedByQueue.Contains(runner.FolderPath))
+            .Select(runner => runner.Alias).ToList();
+        var next = FindNextStopped(ordered)?.Alias ?? string.Empty;
+        return new RunnerQueueSnapshot(
+            settings.RunnerQueueEnabled,
+            IsPaused,
+            reason,
+            running,
+            next,
+            waiting,
+            manual,
+            Math.Clamp(settings.RunnerQueueLimit, 1, 2),
+            resources?.CpuPercent,
+            MemoryPercent(resources),
+            Math.Clamp(settings.RunnerQueueCpuStartThreshold, 50, 100),
+            Math.Clamp(settings.RunnerQueueMemoryStartThreshold, 50, 100),
+            settings.RunnerQueueResourceGuardEnabled,
+            status);
+    }
+
+    private static RunnerQueueHoldReason DetermineResourceHold(RunnerSettings settings, SystemResourceSnapshot? resources)
+    {
+        if (!settings.RunnerQueueResourceGuardEnabled || resources is null)
+            return RunnerQueueHoldReason.None;
+
+        var cpuHigh = resources.CpuPercent is double cpu &&
+            cpu >= Math.Clamp(settings.RunnerQueueCpuStartThreshold, 50, 100);
+        var memoryPercent = MemoryPercent(resources);
+        var memoryHigh = memoryPercent is double memory &&
+            memory >= Math.Clamp(settings.RunnerQueueMemoryStartThreshold, 50, 100);
+
+        if (cpuHigh && memoryHigh) return RunnerQueueHoldReason.HighCpuAndMemory;
+        if (cpuHigh) return RunnerQueueHoldReason.HighCpu;
+        if (memoryHigh) return RunnerQueueHoldReason.HighMemory;
+        return RunnerQueueHoldReason.None;
+    }
+
+    private static double? MemoryPercent(SystemResourceSnapshot? resources)
+    {
+        if (resources?.UsedMemoryBytes is not ulong used ||
+            resources.TotalMemoryBytes is not ulong total || total == 0)
+            return null;
+        return 100d * used / total;
+    }
+
+    private static string ResourceHoldStatus(RunnerQueueHoldReason reason, RunnerSettings settings,
+        SystemResourceSnapshot? resources)
+    {
+        var cpu = resources?.CpuPercent is double cpuValue ? $"{cpuValue:N0}%" : "—";
+        var memory = MemoryPercent(resources) is double memoryValue ? $"{memoryValue:N0}%" : "—";
+        return reason switch
+        {
+            RunnerQueueHoldReason.HighCpu => UiLanguage.Choose(
+                $"Cola en espera · CPU {cpu} (límite {settings.RunnerQueueCpuStartThreshold}%).",
+                $"Queue waiting · CPU {cpu} (limit {settings.RunnerQueueCpuStartThreshold}%).",
+                $"Cua en espera · CPU {cpu} (límit {settings.RunnerQueueCpuStartThreshold}%)."),
+            RunnerQueueHoldReason.HighMemory => UiLanguage.Choose(
+                $"Cola en espera · RAM {memory} (límite {settings.RunnerQueueMemoryStartThreshold}%).",
+                $"Queue waiting · RAM {memory} (limit {settings.RunnerQueueMemoryStartThreshold}%).",
+                $"Cua en espera · RAM {memory} (límit {settings.RunnerQueueMemoryStartThreshold}%)."),
+            _ => UiLanguage.Choose(
+                $"Cola en espera · CPU {cpu} / RAM {memory} por encima de los límites.",
+                $"Queue waiting · CPU {cpu} / RAM {memory} above limits.",
+                $"Cua en espera · CPU {cpu} / RAM {memory} per sobre dels límits.")
+        };
     }
 
     private async Task<StopResult> StopIfStillIdleAsync(RunnerInfo runner, DateTimeOffset timestamp)
