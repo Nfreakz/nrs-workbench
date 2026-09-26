@@ -44,7 +44,7 @@ public sealed class MainViewModel : ObservableObject
     public int IssueCount => StoppedCount + ErrorCount;
     public string HealthLabel => TotalCount == 0 ? UiLanguage.Choose("SIN DATOS", "NO DATA") : ErrorCount > 0 ? UiLanguage.Choose("ALERTA", "ALERT") : StoppedCount > 0 ? UiLanguage.Text("ATENCIÓN") : "OK";
     public string HealthKind => TotalCount == 0 ? "Unknown" : ErrorCount > 0 ? "Alert" : StoppedCount > 0 ? "Warning" : "Healthy";
-    public string HealthDetail => TotalCount == 0 ? "0 runners" : IssueCount == 0 ? UiLanguage.Choose($"{TotalCount} operativos", $"{TotalCount} operational") : UiLanguage.Choose($"{IssueCount} con atención", $"{IssueCount} need attention");
+    public string HealthDetail => TotalCount == 0 ? "0 runners" : IssueCount == 0 ? UiLanguage.Choose($"{TotalCount} operativos", $"{TotalCount} operational", $"{TotalCount} operatius") : UiLanguage.Choose($"{IssueCount} con atención", $"{IssueCount} need attention", $"{IssueCount} requereixen atenció");
     public IReadOnlyList<RunnerSortOption> SortOptions { get; } =
     [
         new("manual", UiLanguage.Choose("Orden manual", "Manual order")),
@@ -82,7 +82,7 @@ public sealed class MainViewModel : ObservableObject
 
     public string RunnerViewSummary => string.IsNullOrWhiteSpace(RunnerSearchText)
         ? UiLanguage.Choose($"{TotalCount} runners", $"{TotalCount} runners")
-        : UiLanguage.Choose($"{Runners.Count} de {TotalCount} runners", $"{Runners.Count} of {TotalCount} runners");
+        : UiLanguage.Choose($"{Runners.Count} de {TotalCount} runners", $"{Runners.Count} of {TotalCount} runners", $"{Runners.Count} de {TotalCount} runners");
 
     public RunnerInfo? SelectedRunner
     {
@@ -115,7 +115,7 @@ public sealed class MainViewModel : ObservableObject
     public double CpuPercent { get => _cpuPercent; private set => SetProperty(ref _cpuPercent, value); }
     public double MemoryPercent { get => _memoryPercent; private set => SetProperty(ref _memoryPercent, value); }
     public double DiskPercent { get => _diskPercent; private set => SetProperty(ref _diskPercent, value); }
-    public string CpuCapacityText => UiLanguage.Choose($"{Environment.ProcessorCount} procesadores lógicos", $"{Environment.ProcessorCount} logical processors");
+    public string CpuCapacityText => UiLanguage.Choose($"{Environment.ProcessorCount} procesadores lógicos", $"{Environment.ProcessorCount} logical processors", $"{Environment.ProcessorCount} processadors lògics");
     public int RefreshIntervalSeconds => _settingsService.Load().RefreshIntervalSeconds;
 
     public void UpdateSystemResources(SystemResourceSnapshot snapshot)
@@ -196,7 +196,7 @@ public sealed class MainViewModel : ObservableObject
             _lastUpdated = DateTimeOffset.Now;
             StatusText = rows.Count == 0
                 ? UiLanguage.Choose("No se han detectado runners · revisa Configuración > Detectar automáticamente", "No runners detected · check Settings > Detect automatically")
-                : UiLanguage.Choose($"Sistema listo · {rows.Count} runner{(rows.Count == 1 ? "" : "s")} detectado{(rows.Count == 1 ? "" : "s")}", $"System ready · {rows.Count} runner{(rows.Count == 1 ? "" : "s")} detected");
+                : UiLanguage.Choose($"Sistema listo · {rows.Count} runner{(rows.Count == 1 ? "" : "s")} detectado{(rows.Count == 1 ? "" : "s")}", $"System ready · {rows.Count} runner{(rows.Count == 1 ? "" : "s")} detected", $"Sistema a punt · {rows.Count} runner{(rows.Count == 1 ? "" : "s")} detectat{(rows.Count == 1 ? "" : "s")}");
             RaiseCounts();
             RaiseCommandStates();
         }
@@ -287,21 +287,21 @@ public sealed class MainViewModel : ObservableObject
     private async Task StartSelectedAsync()
     {
         if (SelectedRunner is null) return;
-        await ExecuteAction(() => _control.StartAsync(SelectedRunner), UiLanguage.Choose($"Iniciando {SelectedRunner.Alias}...", $"Starting {SelectedRunner.Alias}..."));
+        await ExecuteAction(() => _control.StartAsync(SelectedRunner), UiLanguage.Choose($"Iniciando {SelectedRunner.Alias}...", $"Starting {SelectedRunner.Alias}...", $"Iniciant {SelectedRunner.Alias}..."));
     }
 
     private async Task StopSelectedAsync()
     {
         if (SelectedRunner is null || !CanStop(SelectedRunner)) return;
         if (!ConfirmBusy(SelectedRunner)) return;
-        await ExecuteAction(() => _control.StopAsync(SelectedRunner), UiLanguage.Choose($"Parando {SelectedRunner.Alias}...", $"Stopping {SelectedRunner.Alias}..."));
+        await ExecuteAction(() => _control.StopAsync(SelectedRunner), UiLanguage.Choose($"Parando {SelectedRunner.Alias}...", $"Stopping {SelectedRunner.Alias}...", $"Aturant {SelectedRunner.Alias}..."));
     }
 
     private async Task RestartSelectedAsync()
     {
         if (SelectedRunner is null) return;
         if (!ConfirmBusy(SelectedRunner)) return;
-        await ExecuteAction(() => _control.RestartAsync(SelectedRunner), UiLanguage.Choose($"Reiniciando {SelectedRunner.Alias}...", $"Restarting {SelectedRunner.Alias}..."));
+        await ExecuteAction(() => _control.RestartAsync(SelectedRunner), UiLanguage.Choose($"Reiniciando {SelectedRunner.Alias}...", $"Restarting {SelectedRunner.Alias}...", $"Reiniciant {SelectedRunner.Alias}..."));
     }
 
     private async Task StartAllAsync()
@@ -310,7 +310,7 @@ public sealed class MainViewModel : ObservableObject
             UiLanguage.Choose("Hay una búsqueda activa. Iniciar todos actuará sobre todos los runners, incluidos los que no se ven. ¿Continuar?", "A search is active. Start all will affect every runner, including those not shown. Continue?"),
             UiLanguage.Text("Iniciar todos"))) return;
         foreach (var runner in _allRunners.Where(x => x.State == RunnerState.Stopped).ToList())
-            await ExecuteAction(() => _control.StartAsync(runner), UiLanguage.Choose($"Iniciando {runner.Alias}...", $"Starting {runner.Alias}..."), refreshAfter: false);
+            await ExecuteAction(() => _control.StartAsync(runner), UiLanguage.Choose($"Iniciando {runner.Alias}...", $"Starting {runner.Alias}...", $"Iniciant {runner.Alias}..."), refreshAfter: false);
         await RefreshAsync();
     }
 
@@ -323,7 +323,7 @@ public sealed class MainViewModel : ObservableObject
                 $"{(!string.IsNullOrWhiteSpace(RunnerSearchText) ? "Hay una búsqueda activa. Parar todos actuará sobre todos los runners, incluidos los que no se ven.\n\n" : "")}{(hasBusy ? "Hay runners BUSY. Parar todos puede interrumpir jobs en ejecución.\n\n" : "")}¿Continuar?",
                 $"{(!string.IsNullOrWhiteSpace(RunnerSearchText) ? "A search is active. Stop all will affect every runner, including those not shown.\n\n" : "")}{(hasBusy ? "Some runners are BUSY. Stopping all may interrupt running jobs.\n\n" : "")}Continue?"), UiLanguage.Text("Parar todos"))) return;
         foreach (var runner in active)
-            await ExecuteAction(() => _control.StopAsync(runner), UiLanguage.Choose($"Parando {runner.Alias}...", $"Stopping {runner.Alias}..."), refreshAfter: false);
+            await ExecuteAction(() => _control.StopAsync(runner), UiLanguage.Choose($"Parando {runner.Alias}...", $"Stopping {runner.Alias}...", $"Aturant {runner.Alias}..."), refreshAfter: false);
         await RefreshAsync();
     }
 
@@ -342,7 +342,7 @@ public sealed class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLogger.Error(status, ex);
-            _dialogs.ShowError(UiLanguage.Choose($"No se pudo completar la acción.\n\n{ex.Message}\n\nSi el runner está instalado como servicio, prueba a ejecutar NRS Workbench como administrador.", $"Could not complete the action.\n\n{ex.Message}\n\nIf the runner is installed as a service, try running NRS Workbench as administrator."));
+            _dialogs.ShowError(UiLanguage.Choose($"No se pudo completar la acción.\n\n{ex.Message}\n\nSi el runner está instalado como servicio, prueba a ejecutar NRS Workbench como administrador.", $"Could not complete the action.\n\n{ex.Message}\n\nIf the runner is installed as a service, try running NRS Workbench as administrator.", $"No s\u0027ha pogut completar l\u0027acció.\n\n{ex.Message}\n\nSi el runner està instal·lat com a servei, prova d\u0027executar NRS Workbench com a administrador."));
             StatusText = UiLanguage.Choose("La acción ha fallado", "Action failed");
         }
     }
@@ -350,7 +350,7 @@ public sealed class MainViewModel : ObservableObject
     private bool ConfirmBusy(RunnerInfo runner)
     {
         if (runner.State != RunnerState.Busy || !_settingsService.Load().ConfirmStopBusy) return true;
-        return _dialogs.Confirm(UiLanguage.Choose($"El runner '{runner.Alias}' está ejecutando un job.\n\nLa operación puede interrumpirlo y marcarlo como fallido.\n\n¿Continuar?", $"Runner '{runner.Alias}' is running a job.\n\nThis action may interrupt it and mark it as failed.\n\nContinue?"), "Runner BUSY");
+        return _dialogs.Confirm(UiLanguage.Choose($"El runner '{runner.Alias}' está ejecutando un job.\n\nLa operación puede interrumpirlo y marcarlo como fallido.\n\n¿Continuar?", $"Runner '{runner.Alias}' is running a job.\n\nThis action may interrupt it and mark it as failed.\n\nContinue?", $"El runner '{runner.Alias}' està executant un job.\n\nL\u0027operació pot interrompre\u0027l i marcar-lo com a fallit.\n\nVols continuar?"), "Runner BUSY");
     }
 
     private bool CanStartSelected() => !_settingsService.Load().RunnerQueueEnabled && SelectedRunner?.State == RunnerState.Stopped;

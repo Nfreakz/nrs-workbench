@@ -108,7 +108,7 @@ public partial class SettingsWindow : Window
         catch (Exception ex)
         {
             MessageBox.Show(
-                UiLanguage.Choose($"No se pudo exportar la configuración.\n\n{ex.Message}", $"Could not export settings.\n\n{ex.Message}"),
+                UiLanguage.Choose($"No se pudo exportar la configuración.\n\n{ex.Message}", $"Could not export settings.\n\n{ex.Message}", $"No s\u0027ha pogut exportar la configuració.\n\n{ex.Message}"),
                 UiLanguage.Choose("Exportar configuración", "Export settings"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -137,12 +137,12 @@ public partial class SettingsWindow : Window
             {
                 var detectedRoots = _settingsService.DetectRunnerRoots(imported.FolderPattern);
                 if (PortableRepositoryPaths.RepairRunnerRoots(imported, detectedRoots))
-                    automaticNotes.Add(UiLanguage.Choose($"Runners ajustados automáticamente a este PC: {string.Join(", ", imported.RunnerRoots)}.", $"Runner roots adjusted for this PC: {string.Join(", ", imported.RunnerRoots)}."));
+                    automaticNotes.Add(UiLanguage.Choose($"Runners ajustados automáticamente a este PC: {string.Join(", ", imported.RunnerRoots)}.", $"Runner roots adjusted for this PC: {string.Join(", ", imported.RunnerRoots)}.", $"Runners ajustats automàticament a aquest PC: {string.Join(", ", imported.RunnerRoots)}."));
             }
 
             var repairedRepositories = PortableRepositoryPaths.Repair(imported);
             if (repairedRepositories > 0)
-                automaticNotes.Add(UiLanguage.Choose($"Repositorios reparados automáticamente por cambio de unidad: {repairedRepositories}.", $"Repository paths repaired by drive substitution: {repairedRepositories}."));
+                automaticNotes.Add(UiLanguage.Choose($"Repositorios reparados automáticamente por cambio de unidad: {repairedRepositories}.", $"Repository paths repaired by drive substitution: {repairedRepositories}.", $"Repositoris reparats automàticament pel canvi d\u0027unitat: {repairedRepositories}."));
 
             var existingRepositories = _workingSettings.RepositoryPaths.ToList();
             var importedSet = imported.RepositoryPaths.ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -151,7 +151,7 @@ public partial class SettingsWindow : Window
             if (excluded.Count > 0)
             {
                 var preview = string.Join(Environment.NewLine, excluded.Take(6).Select(path => "  " + path));
-                if (excluded.Count > 6) preview += UiLanguage.Choose($"{Environment.NewLine}  ... y {excluded.Count - 6} más.", $"{Environment.NewLine}  ... and {excluded.Count - 6} more.");
+                if (excluded.Count > 6) preview += UiLanguage.Choose($"{Environment.NewLine}  ... y {excluded.Count - 6} más.", $"{Environment.NewLine}  ... and {excluded.Count - 6} more.", $"{Environment.NewLine}  ... i {excluded.Count - 6} més.");
                 var choice = MessageBox.Show(
                     this,
                     UiLanguage.Choose(
@@ -165,9 +165,9 @@ public partial class SettingsWindow : Window
                 if (choice == MessageBoxResult.No)
                 {
                     var kept = PortableRepositoryPaths.PreserveExisting(imported, existingRepositories);
-                    automaticNotes.Add(UiLanguage.Choose($"Repositorios locales conservados: {kept}.", $"Local repositories retained: {kept}."));
+                    automaticNotes.Add(UiLanguage.Choose($"Repositorios locales conservados: {kept}.", $"Local repositories retained: {kept}.", $"Repositoris locals conservats: {kept}."));
                 }
-                else automaticNotes.Add(UiLanguage.Choose($"Al guardar se reemplazará la lista local; {excluded.Count} registro(s) dejarán de figurar (no se borrarán carpetas).", $"Saving will replace the local list; {excluded.Count} registrations will be removed (no folders are deleted)."));
+                else automaticNotes.Add(UiLanguage.Choose($"Al guardar se reemplazará la lista local; {excluded.Count} registro(s) dejarán de figurar (no se borrarán carpetas).", $"Saving will replace the local list; {excluded.Count} registrations will be removed (no folders are deleted).", $"En desar se substituirà la llista local; {excluded.Count} registre(s) deixaran de figurar (no s\u0027esborrarà cap carpeta)."));
             }
 
             _workingSettings = imported;
@@ -177,14 +177,14 @@ public partial class SettingsWindow : Window
             var missingRepositories = imported.RepositoryPaths.Count(path => !Directory.Exists(path));
             var pathNote = missingRunnerRoots == 0 && missingRepositories == 0
                 ? UiLanguage.Choose("Todas las rutas importadas existen en este PC.", "All imported paths exist on this PC.")
-                : UiLanguage.Choose($"Rutas no encontradas en este PC: {missingRunnerRoots} de runners y {missingRepositories} de repositorios.", $"Paths not found on this PC: {missingRunnerRoots} runner roots and {missingRepositories} repositories.");
+                : UiLanguage.Choose($"Rutas no encontradas en este PC: {missingRunnerRoots} de runners y {missingRepositories} de repositorios.", $"Paths not found on this PC: {missingRunnerRoots} runner roots and {missingRepositories} repositories.", $"Rutes no trobades en aquest PC: {missingRunnerRoots} de runners i {missingRepositories} de repositoris.");
 
             var automaticNote = automaticNotes.Count == 0
                 ? string.Empty
                 : string.Join(Environment.NewLine, automaticNotes) + Environment.NewLine + Environment.NewLine;
 
             MessageBox.Show(
-                UiLanguage.Choose($"Configuración cargada para revisar.\n\n{automaticNote}{pathNote}\n\nPulsa Guardar para aplicarla o Cancelar para descartarla.", $"Settings loaded for review.\n\n{automaticNote}{pathNote}\n\nSelect Save to apply them or Cancel to discard them."),
+                UiLanguage.Choose($"Configuración cargada para revisar.\n\n{automaticNote}{pathNote}\n\nPulsa Guardar para aplicarla o Cancelar para descartarla.", $"Settings loaded for review.\n\n{automaticNote}{pathNote}\n\nSelect Save to apply them or Cancel to discard them.", $"Configuració carregada per revisar.\n\n{automaticNote}{pathNote}\n\nPrem Desar per aplicar-la o Cancel·lar per descartar-la."),
                 UiLanguage.Choose("Importar configuración", "Import settings"),
                 MessageBoxButton.OK,
                 missingRunnerRoots == 0 && missingRepositories == 0 ? MessageBoxImage.Information : MessageBoxImage.Warning);
@@ -192,7 +192,7 @@ public partial class SettingsWindow : Window
         catch (Exception ex)
         {
             MessageBox.Show(
-                UiLanguage.Choose($"No se pudo importar la configuración.\n\n{ex.Message}", $"Could not import settings.\n\n{ex.Message}"),
+                UiLanguage.Choose($"No se pudo importar la configuración.\n\n{ex.Message}", $"Could not import settings.\n\n{ex.Message}", $"No s\u0027ha pogut importar la configuració.\n\n{ex.Message}"),
                 UiLanguage.Choose("Importar configuración", "Import settings"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);

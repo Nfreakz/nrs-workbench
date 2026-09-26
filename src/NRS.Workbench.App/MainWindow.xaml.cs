@@ -34,7 +34,8 @@ public partial class MainWindow : Window
         _statistics = new RunnerStatisticsService();
         IRunnerDiscoveryService discovery = new RunnerDiscoveryService(_settings, processService, serviceController, progress);
         IRunnerControlService control = new RunnerControlService(processService, serviceController);
-        _runnerQueue = new RunnerQueueCoordinator(control);
+        _runnerQueue = new RunnerQueueCoordinator(control,
+            new FileRunnerQueueStateStore(_settings.SettingsDirectory));
         ILogReaderService logs = new LogReaderService();
         var dialogs = new DialogService(_settings);
 
@@ -56,6 +57,7 @@ public partial class MainWindow : Window
 
         Loaded += async (_, _) =>
         {
+            ReviewRecoveredQueueStops();
             ApplyTimerInterval();
             ApplyTraySetting();
             _timer.Start();
@@ -77,6 +79,27 @@ public partial class MainWindow : Window
             _resourceTimer.Stop();
             _tray.Dispose();
         };
+    }
+
+    private void ReviewRecoveredQueueStops()
+    {
+        var recovered = _runnerQueue.RecoveredQueuePaths;
+        if (recovered.Count == 0) return;
+        var folderNames = string.Join(Environment.NewLine,
+            recovered.Take(8).Select(path => "  • " + Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar))));
+        if (recovered.Count > 8) folderNames += Environment.NewLine + "  …";
+
+        var answer = MessageBox.Show(this,
+            UiLanguage.Choose(
+                $"NRS Workbench recuerda {recovered.Count} runner(s) que la cola gestionaba antes de cerrar la aplicación:{Environment.NewLine}{folderNames}{Environment.NewLine}{Environment.NewLine}¿Permitir que la cola los recupere? Comprueba que no los hayas detenido manualmente después. Si eliges No, seguirán detenidos.",
+                $"NRS Workbench remembers {recovered.Count} runner(s) managed by the queue before the app closed:{Environment.NewLine}{folderNames}{Environment.NewLine}{Environment.NewLine}Allow the queue to resume them? Check that you have not manually stopped them since. Choosing No leaves them stopped.",
+                $"NRS Workbench recorda {recovered.Count} runner(s) que la cua gestionava abans de tancar l'aplicació:{Environment.NewLine}{folderNames}{Environment.NewLine}{Environment.NewLine}Vols permetre que la cua els recuperi? Comprova que no els hagis aturat manualment després. Si tries No, continuaran aturats."),
+            UiLanguage.Text("Revisar runners tras reiniciar"),
+            MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+        if (answer == MessageBoxResult.Yes)
+            _runnerQueue.ApproveRecoveredQueueStops();
+        else
+            _runnerQueue.DiscardRecoveredQueueStops();
     }
 
     private async Task RefreshAndUpdateTrayAsync()
@@ -115,20 +138,20 @@ public partial class MainWindow : Window
                 if (settings.NotifyJobStarted && previous == RunnerState.Ready && runner.State == RunnerState.Busy)
                 {
                     _tray.ShowNotification(
-                        UiLanguage.Choose($"{runner.Alias} · job iniciado", $"{runner.Alias} · job started"),
-                        string.IsNullOrWhiteSpace(runner.GitHubTarget) ? UiLanguage.Choose("El runner ha empezado a procesar un job.", "The runner started processing a job.") : UiLanguage.Choose($"{runner.GitHubTarget} está en ejecución.", $"{runner.GitHubTarget} is running."));
+                        UiLanguage.Choose($"{runner.Alias} · job iniciado", $"{runner.Alias} · job started", $"{runner.Alias} · job iniciat"),
+                        string.IsNullOrWhiteSpace(runner.GitHubTarget) ? UiLanguage.Choose("El runner ha empezado a procesar un job.", "The runner started processing a job.") : UiLanguage.Choose($"{runner.GitHubTarget} está en ejecución.", $"{runner.GitHubTarget} is running.", $"{runner.GitHubTarget} està en execució."));
                 }
                 else if (settings.NotifyJobCompleted && previous == RunnerState.Busy && runner.State == RunnerState.Ready)
                 {
                     _tray.ShowNotification(
-                        UiLanguage.Choose($"{runner.Alias} · job finalizado", $"{runner.Alias} · job completed"),
+                        UiLanguage.Choose($"{runner.Alias} · job finalizado", $"{runner.Alias} · job completed", $"{runner.Alias} · job finalitzat"),
                         UiLanguage.Choose("El runner ha vuelto a READY y está disponible para el siguiente trabajo.", "The runner is READY and available for the next job."));
                 }
                 else if (settings.NotifyRunnerIssues && runner.State is RunnerState.Error or RunnerState.Unregistered)
                 {
                     _tray.ShowNotification(
-                        UiLanguage.Choose($"{runner.Alias} · requiere atención", $"{runner.Alias} · needs attention"),
-                        UiLanguage.Choose($"El runner ha cambiado de {previous.ToString().ToUpperInvariant()} a {runner.State.ToString().ToUpperInvariant()}.", $"Runner changed from {previous.ToString().ToUpperInvariant()} to {runner.State.ToString().ToUpperInvariant()}."),
+                        UiLanguage.Choose($"{runner.Alias} · requiere atención", $"{runner.Alias} · needs attention", $"{runner.Alias} · requereix atenció"),
+                        UiLanguage.Choose($"El runner ha cambiado de {previous.ToString().ToUpperInvariant()} a {runner.State.ToString().ToUpperInvariant()}.", $"Runner changed from {previous.ToString().ToUpperInvariant()} to {runner.State.ToString().ToUpperInvariant()}.", $"El runner ha canviat de {previous.ToString().ToUpperInvariant()} a {runner.State.ToString().ToUpperInvariant()}."),
                         System.Windows.Forms.ToolTipIcon.Warning);
                 }
             }

@@ -249,7 +249,12 @@ public sealed class SettingsService
         if (string.IsNullOrWhiteSpace(settings.FolderPattern)) settings.FolderPattern = "actions-runner*";
         if (settings.RunnerRoots.Count == 0) settings.RunnerRoots.Add(FindFallbackRoot());
         settings.RefreshIntervalSeconds = Math.Clamp(settings.RefreshIntervalSeconds, 2, 300);
-        settings.Language = string.Equals(settings.Language, "en", StringComparison.OrdinalIgnoreCase) ? "en" : "es";
+        settings.Language = settings.Language?.ToLowerInvariant() switch
+        {
+            "en" => "en",
+            "ca" => "ca",
+            _ => "es"
+        };
     }
 
     private sealed class PortableSettingsEnvelope

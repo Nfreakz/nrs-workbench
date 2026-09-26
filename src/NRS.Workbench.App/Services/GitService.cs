@@ -136,7 +136,7 @@ public sealed class GitService : IGitService
         if (stagedOutsideSelection.Count > 0)
         {
             var preview = string.Join("\r\n", stagedOutsideSelection.Take(8).Select(x => "• " + x));
-            if (stagedOutsideSelection.Count > 8) preview += UiLanguage.Choose($"\r\n• … y {stagedOutsideSelection.Count - 8} más", $"\r\n• … and {stagedOutsideSelection.Count - 8} more");
+            if (stagedOutsideSelection.Count > 8) preview += UiLanguage.Choose($"\r\n• … y {stagedOutsideSelection.Count - 8} más", $"\r\n• … and {stagedOutsideSelection.Count - 8} more", $"\r\n• … i {stagedOutsideSelection.Count - 8} més");
             throw new InvalidOperationException(UiLanguage.Choose("Hay cambios ya staged que no están seleccionados. Para evitar incluirlos por accidente, el commit se ha bloqueado.\r\n\r\n", "Other staged changes were not selected. The commit is blocked to avoid including them by accident.\r\n\r\n") + preview);
         }
 
@@ -284,7 +284,7 @@ public sealed class GitService : IGitService
                 return UiLanguage.Choose("Vista previa omitida para enlaces o reparse points por seguridad.", "Preview skipped for links or reparse points for safety.");
 
             var info = new FileInfo(fullPath);
-            if (info.Length > 512 * 1024) return UiLanguage.Choose($"Archivo nuevo de {info.Length / 1024:N0} KB. Vista previa omitida por tamaño.", $"New file of {info.Length / 1024:N0} KB. Preview skipped due to size.");
+            if (info.Length > 512 * 1024) return UiLanguage.Choose($"Archivo nuevo de {info.Length / 1024:N0} KB. Vista previa omitida por tamaño.", $"New file of {info.Length / 1024:N0} KB. Preview skipped due to size.", $"Fitxer nou de {info.Length / 1024:N0} KB. Vista prèvia omesa per la mida.");
 
             await using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             using var reader = new StreamReader(stream, detectEncodingFromByteOrderMarks: true);
@@ -292,8 +292,8 @@ public sealed class GitService : IGitService
             if (text.IndexOf('\0') >= 0) return UiLanguage.Choose("Archivo nuevo binario. No hay diff textual disponible.", "New binary file. No text diff is available.");
             var lines = text.Replace("\r\n", "\n").Split('\n');
             var preview = string.Join("\r\n", lines.Take(800).Select(line => "+ " + line));
-            if (lines.Length > 800) preview += UiLanguage.Choose($"\r\n… vista previa truncada ({lines.Length - 800} líneas más)", $"\r\n… preview truncated ({lines.Length - 800} more lines)");
-            return UiLanguage.Choose($"=== ARCHIVO NUEVO ===\r\n+++ {relativePath}\r\n\r\n{preview}", $"=== NEW FILE ===\r\n+++ {relativePath}\r\n\r\n{preview}");
+            if (lines.Length > 800) preview += UiLanguage.Choose($"\r\n… vista previa truncada ({lines.Length - 800} líneas más)", $"\r\n… preview truncated ({lines.Length - 800} more lines)", $"\r\n… vista prèvia truncada ({lines.Length - 800} línies més)");
+            return UiLanguage.Choose($"=== ARCHIVO NUEVO ===\r\n+++ {relativePath}\r\n\r\n{preview}", $"=== NEW FILE ===\r\n+++ {relativePath}\r\n\r\n{preview}", $"=== FITXER NOU ===\r\n+++ {relativePath}\r\n\r\n{preview}");
         }
         catch (Exception ex)
         {
@@ -495,7 +495,7 @@ public sealed class GitService : IGitService
             {
                 var message = string.IsNullOrWhiteSpace(result.StdErr) ? result.StdOut : result.StdErr;
                 var safeMessage = SensitiveDataRedactor.Redact(message.Trim());
-                throw new InvalidOperationException(UiLanguage.Choose($"Git devolvió código {result.ExitCode}: {safeMessage}", $"Git exited with code {result.ExitCode}: {safeMessage}"));
+                throw new InvalidOperationException(UiLanguage.Choose($"Git devolvió código {result.ExitCode}: {safeMessage}", $"Git exited with code {result.ExitCode}: {safeMessage}", $"Git ha retornat el codi {result.ExitCode}: {safeMessage}"));
             }
             return result;
         }

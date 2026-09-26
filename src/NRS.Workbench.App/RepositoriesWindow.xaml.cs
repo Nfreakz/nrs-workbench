@@ -74,7 +74,7 @@ public partial class RepositoriesWindow : Window
             window.SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(window);
             if (window.ShowDialog() != true || picker.SelectedItem is not string target) return;
 
-            if (!_dialogs.Confirm(UiLanguage.Choose($"Repositorio: {repository.Name}\nRama actual: {repository.Branch}\nNueva rama local: {target}\n\nNo se descargará ni fusionará nada. ¿Cambiar de rama?", $"Repository: {repository.Name}\nCurrent branch: {repository.Branch}\nNew local branch: {target}\n\nNothing will be downloaded or merged. Switch branch?"), UiLanguage.Choose("Confirmar cambio de rama", "Confirm branch switch"))) return;
+            if (!_dialogs.Confirm(UiLanguage.Choose($"Repositorio: {repository.Name}\nRama actual: {repository.Branch}\nNueva rama local: {target}\n\nNo se descargará ni fusionará nada. ¿Cambiar de rama?", $"Repository: {repository.Name}\nCurrent branch: {repository.Branch}\nNew local branch: {target}\n\nNothing will be downloaded or merged. Switch branch?", $"Repositori: {repository.Name}\nBranca actual: {repository.Branch}\nNova branca local: {target}\n\nNo es descarregarà ni fusionarà res. Vols canviar de branca?"), UiLanguage.Choose("Confirmar cambio de rama", "Confirm branch switch"))) return;
             await _git.SwitchLocalBranchAsync(repository, target);
             await _viewModel.RefreshAsync();
         }

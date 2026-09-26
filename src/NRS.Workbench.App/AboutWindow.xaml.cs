@@ -54,7 +54,7 @@ public partial class AboutWindow : Window
     {
         try
         {
-            var text = UiLanguage.Choose($"NRS Workbench {VersionText.Text}\nCreado por Neo RS\n{RuntimeText.Text}\n{SystemText.Text}\nDatos: {_settings.SettingsDirectory}", $"NRS Workbench {VersionText.Text}\nCreated by Neo RS\n{RuntimeText.Text}\n{SystemText.Text}\nData: {_settings.SettingsDirectory}");
+            var text = UiLanguage.Choose($"NRS Workbench {VersionText.Text}\nCreado por Neo RS\n{RuntimeText.Text}\n{SystemText.Text}\nDatos: {_settings.SettingsDirectory}", $"NRS Workbench {VersionText.Text}\nCreated by Neo RS\n{RuntimeText.Text}\n{SystemText.Text}\nData: {_settings.SettingsDirectory}", $"NRS Workbench {VersionText.Text}\nCreat per Neo RS\n{RuntimeText.Text}\n{SystemText.Text}\nDades: {_settings.SettingsDirectory}");
             Clipboard.SetText(text);
         }
         catch (Exception ex)

@@ -88,7 +88,7 @@ public sealed class CommitViewModel : ObservableObject
             SelectedChange = Changes.FirstOrDefault();
             StatusText = Changes.Count == 0
                 ? UiLanguage.Choose("El repositorio está limpio. No hay cambios para commitear.", "The repository is clean. There is nothing to commit.")
-                : UiLanguage.Choose($"{Changes.Count} archivo{(Changes.Count == 1 ? string.Empty : "s")} con cambios · {SelectedCount} seleccionado{(SelectedCount == 1 ? string.Empty : "s")}.", $"{Changes.Count} changed files · {SelectedCount} selected.");
+                : UiLanguage.Choose($"{Changes.Count} archivo{(Changes.Count == 1 ? string.Empty : "s")} con cambios · {SelectedCount} seleccionado{(SelectedCount == 1 ? string.Empty : "s")}.", $"{Changes.Count} changed files · {SelectedCount} selected.", $"{Changes.Count} fitxer{(Changes.Count == 1 ? string.Empty : "s")} amb canvis · {SelectedCount} seleccionat{(SelectedCount == 1 ? string.Empty : "s")}.");
             RaiseSelectionSummary();
             if (SelectedChange is not null) await LoadDiffAsync();
         }
@@ -157,12 +157,12 @@ public sealed class CommitViewModel : ObservableObject
 
         var action = pushAfter ? "Commit & Push" : "Commit";
         var preview = string.Join("\r\n", selected.Take(10).Select(x => "• " + x.DisplayPath));
-        if (selected.Count > 10) preview += UiLanguage.Choose($"\r\n• … y {selected.Count - 10} más", $"\r\n• … and {selected.Count - 10} more");
+        if (selected.Count > 10) preview += UiLanguage.Choose($"\r\n• … y {selected.Count - 10} más", $"\r\n• … and {selected.Count - 10} more", $"\r\n• … i {selected.Count - 10} més");
         var warning = selected.Any(x => x.IsStaged && x.HasUnstagedChanges)
             ? UiLanguage.Choose("\r\n\r\nNota: algún archivo tiene cambios staged y sin stage. Al estar seleccionado, se incluirá su contenido actual completo.", "\r\n\r\nNote: some files have both staged and unstaged changes. Selecting them includes their full current content.")
             : string.Empty;
 
-        if (!_dialogs.Confirm(UiLanguage.Choose($"{action} en {Repository.Name} · {BranchText}\r\n\r\nMensaje:\r\n{message}\r\n\r\nArchivos ({selected.Count}):\r\n{preview}{warning}\r\n\r\n¿Continuar?", $"{action} in {Repository.Name} · {BranchText}\r\n\r\nMessage:\r\n{message}\r\n\r\nFiles ({selected.Count}):\r\n{preview}{warning}\r\n\r\nContinue?"), action))
+        if (!_dialogs.Confirm(UiLanguage.Choose($"{action} en {Repository.Name} · {BranchText}\r\n\r\nMensaje:\r\n{message}\r\n\r\nArchivos ({selected.Count}):\r\n{preview}{warning}\r\n\r\n¿Continuar?", $"{action} in {Repository.Name} · {BranchText}\r\n\r\nMessage:\r\n{message}\r\n\r\nFiles ({selected.Count}):\r\n{preview}{warning}\r\n\r\nContinue?", $"{action} a {Repository.Name} · {BranchText}\r\n\r\nMissatge:\r\n{message}\r\n\r\nFitxers ({selected.Count}):\r\n{preview}{warning}\r\n\r\nVols continuar?"), action))
             return false;
 
         IsBusy = true;
@@ -204,7 +204,7 @@ public sealed class CommitViewModel : ObservableObject
         RaisePropertyChanged(nameof(HasConflicts));
         StatusText = Changes.Count == 0
             ? UiLanguage.Choose("El repositorio está limpio.", "The repository is clean.")
-            : UiLanguage.Choose($"{SelectedCount} de {Changes.Count} archivo{(Changes.Count == 1 ? string.Empty : "s")} seleccionado{(SelectedCount == 1 ? string.Empty : "s")}.", $"{SelectedCount} of {Changes.Count} files selected.");
+            : UiLanguage.Choose($"{SelectedCount} de {Changes.Count} archivo{(Changes.Count == 1 ? string.Empty : "s")} seleccionado{(SelectedCount == 1 ? string.Empty : "s")}.", $"{SelectedCount} of {Changes.Count} files selected.", $"{SelectedCount} de {Changes.Count} fitxer{(Changes.Count == 1 ? string.Empty : "s")} seleccionat{(SelectedCount == 1 ? string.Empty : "s")}.");
     }
 
     private static string LimitDiff(string text)

@@ -10,7 +10,13 @@ internal static class RunnerQueueSmoke
     [ModuleInitializer]
     internal static void Run()
     {
-        StartLimitQueuesExtraRunners();
+        ManuallyStoppedRunnersAreNotStartedAutomatically();
+        QueueRotatesOnlyRunnersItStopped();
+        RecoveryRequiresExplicitApproval();
+        DeclinedRecoveryPreservesStoppedRunners();
+        RecoveryOnDisableRestoresOnlyApprovedRunners();
+        ExternallyStoppedRunnersLeaveTheQueue();
+        LocalJournalSurvivesRestartAndIsLocalOnly();
         ExistingBusyJobsAreNeverStopped();
         ExistingBusyJobsMayTemporarilyExceedTheLimit();
         IdleSlotsRotateToReachOtherRunnerTargets();
@@ -19,7 +25,7 @@ internal static class RunnerQueueSmoke
         StaleReadySnapshotDoesNotLoseQueueStopOwnership();
     }
 
-    private static void StartLimitQueuesExtraRunners()
+    private static void ManuallyStoppedRunnersAreNotStartedAutomatically()
     {
         var control = new FakeRunnerControl();
         var queue = new RunnerQueueCoordinator(control);
@@ -27,10 +33,95 @@ internal static class RunnerQueueSmoke
         var runners = new[] { Runner("a", RunnerState.Stopped), Runner("b", RunnerState.Stopped), Runner("c", RunnerState.Stopped) };
 
         queue.ReconcileAsync(runners, settings, DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
-        queue.ReconcileAsync(runners, settings, DateTimeOffset.UnixEpoch.AddSeconds(5)).GetAwaiter().GetResult();
+        queue.ReconcileAsync(runners, settings, DateTimeOffset.UnixEpoch.AddSeconds(46)).GetAwaiter().GetResult();
 
-        Assert(control.Started.SequenceEqual([runners[0].Alias, runners[1].Alias]) && control.Stopped.Count == 0,
-            "runner queue starts only the configured number and leaves remaining runners queued");
+        Assert(control.Started.Count == 0 && control.Stopped.Count == 0,
+            "runners stopped before the queue was enabled remain stopped");
+    }
+
+    private static void QueueRotatesOnlyRunnersItStopped()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
+        var initiallyStopped = Runner("manual", RunnerState.Stopped);
+        var first = Runner("first", RunnerState.Ready);
+        var second = Runner("second", RunnerState.Ready);
+        var now = DateTimeOffset.UnixEpoch;
+
+        queue.ReconcileAsync([first, second, initiallyStopped], settings, now).GetAwaiter().GetResult();
+        queue.ReconcileAsync([first, Runner("second", RunnerState.Stopped), initiallyStopped],
+            settings, now.AddSeconds(46)).GetAwaiter().GetResult();
+        queue.ReconcileAsync([Runner("first", RunnerState.Stopped), Runner("second", RunnerState.Stopped), initiallyStopped],
+            settings, now.AddSeconds(51)).GetAwaiter().GetResult();
+
+        Assert(control.Stopped.SequenceEqual(["second", "first"]) &&
+            control.Started.SequenceEqual(["second"]),
+            "the queue rotates owned runners without starting a manually stopped runner");
+    }
+
+    private static void RecoveryRequiresExplicitApproval()
+    {
+        var store = new FakeQueueStateStore([Runner("owned", RunnerState.Stopped).FolderPath]);
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control, store);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
+        var owned = Runner("owned", RunnerState.Stopped);
+        var manual = Runner("manual", RunnerState.Stopped);
+
+        queue.ReconcileAsync([owned, manual], settings, DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
+        Assert(queue.RecoveredQueuePaths.Count == 1 && control.Started.Count == 0,
+            "a persisted queue journal never starts a runner without confirmation");
+        queue.ApproveRecoveredQueueStops();
+        queue.ReconcileAsync([owned, manual], settings, DateTimeOffset.UnixEpoch.AddSeconds(5)).GetAwaiter().GetResult();
+        Assert(control.Started.SequenceEqual(["owned"]) && store.Paths.Count == 0,
+            "approved recovery starts only the previously managed runner and clears its journal entry");
+    }
+
+    private static void DeclinedRecoveryPreservesStoppedRunners()
+    {
+        var store = new FakeQueueStateStore([Runner("owned", RunnerState.Stopped).FolderPath]);
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control, store);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
+
+        queue.DiscardRecoveredQueueStops();
+        queue.ReconcileAsync([Runner("owned", RunnerState.Stopped)], settings,
+            DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
+        Assert(control.Started.Count == 0 && store.Paths.Count == 0,
+            "declining recovery leaves previous queue-managed runners stopped");
+    }
+
+    private static void RecoveryOnDisableRestoresOnlyApprovedRunners()
+    {
+        var owned = Runner("owned", RunnerState.Stopped);
+        var manual = Runner("manual", RunnerState.Stopped);
+        var store = new FakeQueueStateStore([owned.FolderPath]);
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control, store);
+        var disabled = new RunnerSettings { RunnerQueueEnabled = false };
+
+        queue.ReconcileAsync([owned, manual], disabled, DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
+        Assert(control.Started.Count == 0,
+            "disabling the queue on startup never restores journal entries before confirmation");
+        queue.ApproveRecoveredQueueStops();
+        queue.ReconcileAsync([owned, manual], disabled,
+            DateTimeOffset.UnixEpoch.AddSeconds(5)).GetAwaiter().GetResult();
+        Assert(control.Started.SequenceEqual(["owned"]) && store.Paths.Count == 0,
+            "disabling the queue after approval restores only journal-owned stopped runners");
+    }
+
+    private static void ExternallyStoppedRunnersLeaveTheQueue()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 2 };
+        queue.ReconcileAsync([Runner("first", RunnerState.Ready)], settings,
+            DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
+        queue.ReconcileAsync([Runner("first", RunnerState.Stopped)], settings,
+            DateTimeOffset.UnixEpoch.AddSeconds(5)).GetAwaiter().GetResult();
+        Assert(control.Started.Count == 0,
+            "a runner stopped outside the queue is no longer auto-started");
     }
 
     private static void ExistingBusyJobsAreNeverStopped()
@@ -56,15 +147,16 @@ internal static class RunnerQueueSmoke
         var queue = new RunnerQueueCoordinator(control);
         var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
         var idle = Runner("idle", RunnerState.Ready);
-        var waiting = Runner("waiting", RunnerState.Stopped);
+        var waiting = Runner("waiting", RunnerState.Ready);
         var start = DateTimeOffset.UnixEpoch;
 
         queue.ReconcileAsync([idle, waiting], settings, start).GetAwaiter().GetResult();
-        queue.ReconcileAsync([idle, waiting], settings, start.AddSeconds(46)).GetAwaiter().GetResult();
-        queue.ReconcileAsync([Runner("idle", RunnerState.Stopped), waiting], settings, start.AddSeconds(51)).GetAwaiter().GetResult();
+        queue.ReconcileAsync([idle, Runner("waiting", RunnerState.Stopped)], settings, start.AddSeconds(46)).GetAwaiter().GetResult();
+        queue.ReconcileAsync([Runner("idle", RunnerState.Stopped), Runner("waiting", RunnerState.Stopped)],
+            settings, start.AddSeconds(51)).GetAwaiter().GetResult();
 
-        Assert(control.Stopped.SequenceEqual(["idle"]) && control.Started.SequenceEqual(["waiting"]),
-            "runner queue rotates an idle slot to the next stopped runner");
+        Assert(control.Stopped.SequenceEqual(["waiting", "idle"]) && control.Started.SequenceEqual(["waiting"]),
+            "runner queue rotates an idle slot to a runner previously stopped by the queue");
     }
 
     private static void ExistingBusyJobsMayTemporarilyExceedTheLimit()
@@ -131,8 +223,30 @@ internal static class RunnerQueueSmoke
         queue.ReconcileAsync([first, Runner("second", RunnerState.Stopped)],
             settings, now.AddSeconds(2)).GetAwaiter().GetResult();
 
-        Assert(control.Started.SequenceEqual(["second"]),
-            "a stale READY snapshot after an asynchronous stop does not lose queue stop ownership");
+        Assert(control.Stopped.SequenceEqual(["second"]) && control.Started.SequenceEqual(["second"]),
+            "a stale READY snapshot does not repeat the stop or lose queue stop ownership");
+    }
+
+    private static void LocalJournalSurvivesRestartAndIsLocalOnly()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "nrs-queue-smoke-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var path = Runner("persisted", RunnerState.Stopped).FolderPath;
+            var first = new FileRunnerQueueStateStore(directory);
+            first.Save([path]);
+            var reopened = new FileRunnerQueueStateStore(directory);
+            Assert(reopened.Load().SequenceEqual([path]),
+                "local runner queue ownership journal survives a new application session");
+            reopened.Save([]);
+            Assert(reopened.Load().Count == 0 &&
+                !File.Exists(Path.Combine(directory, "runner-queue-state.json")),
+                "clearing the queue journal deletes its local state file");
+        }
+        finally
+        {
+            if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
+        }
     }
 
     private static RunnerInfo Runner(string name, RunnerState state) => new()
@@ -145,6 +259,14 @@ internal static class RunnerQueueSmoke
     private static void Assert(bool condition, string message)
     {
         if (!condition) throw new InvalidOperationException(message);
+    }
+
+    private sealed class FakeQueueStateStore : IRunnerQueueStateStore
+    {
+        public List<string> Paths { get; private set; }
+        public FakeQueueStateStore(IEnumerable<string> paths) => Paths = paths.ToList();
+        public IReadOnlyCollection<string> Load() => Paths.ToList();
+        public void Save(IReadOnlyCollection<string> paths) => Paths = paths.ToList();
     }
 
     private sealed class FakeRunnerControl : IRunnerControlService
