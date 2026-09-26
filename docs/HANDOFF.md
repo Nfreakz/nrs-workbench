@@ -44,4 +44,4 @@
 
 ## Other open work
 
-- PR #13 is a README-only public-showcase update based on the published v0.18.2. Keep it independent from v0.18.3 functional work unless it is already merged into `main` before final reconciliation.
+- The README-only public-showcase change from PR #13 is already merged into `main`. The v0.18.3 branch has reconciled that README content while keeping the smart-queue implementation independent.
