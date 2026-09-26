@@ -16,7 +16,7 @@ The smoke-test executable uses temporary local repositories and a temporary bare
 dotnet run --project .\tests\NRS.Workbench.SmokeTests\NRS.Workbench.SmokeTests.csproj -c Release
 ```
 
-It also covers portable-settings privacy and round-trip checks plus unambiguous, ambiguous and invalid repository-path relocation. The queue smoke tests cover the connected-runner limit, active-job protection, idle rotation among eligible runners, exclusion of manually stopped runners, persistence of queue-owned stops, confirmation/decline after app restart, restoring only approved runners when disabling the queue, smart CPU/RAM holds, session pause and queue dashboard classification. Catalan resource and portable-language round-trip checks are also included. Review/Cancel UI behavior and ZIP startup must still be checked manually.
+It also covers portable-settings privacy and round-trip checks plus unambiguous, ambiguous and invalid repository-path relocation. The queue smoke tests cover the connected-runner limit, active-job protection, idle rotation among eligible runners, the v0.18.3 all-stopped bootstrap, later manual-stop protection, persistence of queue-owned stops, confirmation/decline after app restart, restoring only approved runners when disabling the queue, smart CPU/RAM holds, session pause and queue dashboard classification. Catalan resource and portable-language round-trip checks are also included. Review/Cancel UI behavior and ZIP startup must still be checked manually.
 
 It covers clean/dirty inspection, empty-message protection, partial commits, staged-file protection, unusual filenames, rename/delete handling, ahead/push, behind/fast-forward pull, divergence blocking and remote-credential redaction.
 
@@ -56,9 +56,13 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 
 ## v0.18.3 manual smart-queue checks
 
-1. Enable the queue with a limit of 1 and verify the dashboard distinguishes **running**, **next**, **waiting** and **manually stopped** runners.
-2. Pause the queue while a runner is BUSY. Verify the job continues and no READY/STOPPED runner is started, stopped or rotated until Resume is pressed.
-3. Enable the resource guard and temporarily set a low CPU threshold. While CPU is above it, verify the dashboard reports the hold and no waiting runner starts. Lower host load just below the configured limit and verify the hold remains until CPU clears the 5-point recovery margin; then verify scheduling resumes without manual intervention.
-4. Repeat with the RAM threshold and its 5-point recovery margin. Existing BUSY jobs must continue in both cases.
-5. Disable the resource guard and verify CPU/RAM no longer block queue starts. Re-enable it and confirm thresholds persist after restarting the app.
-6. Export/import portable settings and confirm the resource-guard toggle plus CPU/RAM thresholds round-trip.
+1. Stop every runner, enable the queue with a limit of 1, and verify it starts one candidate automatically without disabling the optimizer first. With limit 2, it must work toward two connected candidates without exceeding the configured limit.
+2. With the queue active, select a stopped runner and verify **Start** remains available as an explicit opt-in. **Stop**, **Restart**, **Start all** and **Stop all** remain guarded while the queue manages capacity.
+3. After a bootstrapped runner has reached READY, stop it manually/outside the queue and verify it is not reclaimed automatically; another eligible candidate may be started instead.
+4. After restarting with queue-owned stops in the recovery journal, choose **No** in the recovery prompt. Even if every runner is stopped, the declined runner must remain excluded from automatic bootstrap during that app session.
+5. Enable the queue with a limit of 1 and verify the dashboard distinguishes **running**, **next**, **waiting** and **manually stopped** runners.
+6. Pause the queue while a runner is BUSY. Verify the job continues and no READY/STOPPED runner is started, stopped or rotated until Resume is pressed.
+7. Enable the resource guard and temporarily set a low CPU threshold. While CPU is above it, verify the dashboard reports the hold and no waiting runner starts. Lower host load just below the configured limit and verify the hold remains until CPU clears the 5-point recovery margin; then verify scheduling resumes without manual intervention.
+8. Repeat with the RAM threshold and its 5-point recovery margin. Existing BUSY jobs must continue in both cases.
+9. Disable the resource guard and verify CPU/RAM no longer block queue starts. Re-enable it and confirm thresholds persist after restarting the app.
+10. Export/import portable settings and confirm the resource-guard toggle plus CPU/RAM thresholds round-trip.
