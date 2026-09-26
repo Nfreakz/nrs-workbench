@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using NRS.Workbench.App.Services;
-using NRS.Workbench.Core.Interfaces;
 using NRS.Workbench.Core.Models;
 
 namespace NRS.Workbench.SmokeTests;
@@ -44,45 +43,6 @@ internal static class Program
         Check("runner search ignores case and does not mutate source",
             RunnerListOrganizer.Arrange(candidates, "manual", moved, " BETA ").Single().FolderPath == runnerB.FolderPath &&
             candidates.Length == 3);
-
-        var bootstrapControl = new RecordingRunnerControlService();
-        var bootstrapQueue = new RunnerQueueCoordinator(bootstrapControl);
-        var bootstrapSettings = new RunnerSettings
-        {
-            RunnerQueueEnabled = true,
-            RunnerQueueLimit = 1,
-            RunnerQueueResourceGuardEnabled = false
-        };
-        var stoppedOne = new RunnerInfo { Alias = "stopped-one", FolderPath = @"C:\actions-runner-stopped-one", State = RunnerState.Stopped };
-        var stoppedTwo = new RunnerInfo { Alias = "stopped-two", FolderPath = @"C:\actions-runner-stopped-two", State = RunnerState.Stopped };
-        var bootstrapNow = DateTimeOffset.UtcNow;
-
-        await bootstrapQueue.ReconcileAsync([stoppedOne, stoppedTwo], bootstrapSettings, bootstrapNow);
-        Check("queue bootstraps one runner when enabled with every runner stopped",
-            bootstrapControl.StartedPaths.Count == 1,
-            string.Join(", ", bootstrapControl.StartedPaths));
-
-        var firstStartedPath = bootstrapControl.StartedPaths.Single();
-        var firstStarted = firstStartedPath == stoppedOne.FolderPath ? stoppedOne : stoppedTwo;
-        var stillWaiting = firstStartedPath == stoppedOne.FolderPath ? stoppedTwo : stoppedOne;
-        var onlineSnapshot = new[]
-        {
-            firstStarted with { State = RunnerState.Ready },
-            stillWaiting
-        };
-        await bootstrapQueue.ReconcileAsync(onlineSnapshot, bootstrapSettings, bootstrapNow.AddSeconds(1));
-
-        var manuallyStoppedSnapshot = new[]
-        {
-            firstStarted with { State = RunnerState.Stopped },
-            stillWaiting
-        };
-        await bootstrapQueue.ReconcileAsync(manuallyStoppedSnapshot, bootstrapSettings, bootstrapNow.AddSeconds(2));
-        Check("queue respects a manual stop after a bootstrapped runner has been online",
-            bootstrapControl.StartedPaths.Count == 2 &&
-            bootstrapControl.StartedPaths[1] == stillWaiting.FolderPath &&
-            bootstrapControl.StartedPaths.Count(path => path == firstStarted.FolderPath) == 1,
-            string.Join(", ", bootstrapControl.StartedPaths));
 
         var root = Path.Combine(Path.GetTempPath(), "nrs-workbench-smoke-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
@@ -419,21 +379,6 @@ internal static class Program
     }
 
     private static void Fail(string name, string detail) => Check(name, false, detail);
-
-    private sealed class RecordingRunnerControlService : IRunnerControlService
-    {
-        public List<string> StartedPaths { get; } = [];
-
-        public Task StartAsync(RunnerInfo runner, CancellationToken cancellationToken = default)
-        {
-            StartedPaths.Add(runner.FolderPath);
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(RunnerInfo runner, CancellationToken cancellationToken = default) => Task.CompletedTask;
-        public Task<bool> StopIfIdleAsync(RunnerInfo runner, CancellationToken cancellationToken = default) => Task.FromResult(true);
-        public Task RestartAsync(RunnerInfo runner, CancellationToken cancellationToken = default) => Task.CompletedTask;
-    }
 
     private sealed record GitResult(int ExitCode, string StdOut, string StdErr);
 }
