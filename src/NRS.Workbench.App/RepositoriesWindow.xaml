@@ -19,7 +19,7 @@
         <Grid Grid.Row="0" Margin="0,0,0,17">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="58" Height="58" CornerRadius="15" Background="#242C36" BorderBrush="#4E6685" BorderThickness="1">
+                <Border Width="58" Height="58" CornerRadius="10" Background="#242C36" BorderBrush="#4E6685" BorderThickness="1">
                     <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="#7697C8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel Margin="15,0,0,0" VerticalAlignment="Center">
