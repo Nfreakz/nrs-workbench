@@ -138,20 +138,20 @@ public partial class MainWindow : Window
                 if (settings.NotifyJobStarted && previous == RunnerState.Ready && runner.State == RunnerState.Busy)
                 {
                     _tray.ShowNotification(
-                        UiLanguage.Choose($"{runner.Alias} · job iniciado", $"{runner.Alias} · job started"),
-                        string.IsNullOrWhiteSpace(runner.GitHubTarget) ? UiLanguage.Choose("El runner ha empezado a procesar un job.", "The runner started processing a job.") : UiLanguage.Choose($"{runner.GitHubTarget} está en ejecución.", $"{runner.GitHubTarget} is running."));
+                        UiLanguage.Choose($"{runner.Alias} · job iniciado", $"{runner.Alias} · job started", $"{runner.Alias} · job iniciat"),
+                        string.IsNullOrWhiteSpace(runner.GitHubTarget) ? UiLanguage.Choose("El runner ha empezado a procesar un job.", "The runner started processing a job.") : UiLanguage.Choose($"{runner.GitHubTarget} está en ejecución.", $"{runner.GitHubTarget} is running.", $"{runner.GitHubTarget} està en execució."));
                 }
                 else if (settings.NotifyJobCompleted && previous == RunnerState.Busy && runner.State == RunnerState.Ready)
                 {
                     _tray.ShowNotification(
-                        UiLanguage.Choose($"{runner.Alias} · job finalizado", $"{runner.Alias} · job completed"),
+                        UiLanguage.Choose($"{runner.Alias} · job finalizado", $"{runner.Alias} · job completed", $"{runner.Alias} · job finalitzat"),
                         UiLanguage.Choose("El runner ha vuelto a READY y está disponible para el siguiente trabajo.", "The runner is READY and available for the next job."));
                 }
                 else if (settings.NotifyRunnerIssues && runner.State is RunnerState.Error or RunnerState.Unregistered)
                 {
                     _tray.ShowNotification(
-                        UiLanguage.Choose($"{runner.Alias} · requiere atención", $"{runner.Alias} · needs attention"),
-                        UiLanguage.Choose($"El runner ha cambiado de {previous.ToString().ToUpperInvariant()} a {runner.State.ToString().ToUpperInvariant()}.", $"Runner changed from {previous.ToString().ToUpperInvariant()} to {runner.State.ToString().ToUpperInvariant()}."),
+                        UiLanguage.Choose($"{runner.Alias} · requiere atención", $"{runner.Alias} · needs attention", $"{runner.Alias} · requereix atenció"),
+                        UiLanguage.Choose($"El runner ha cambiado de {previous.ToString().ToUpperInvariant()} a {runner.State.ToString().ToUpperInvariant()}.", $"Runner changed from {previous.ToString().ToUpperInvariant()} to {runner.State.ToString().ToUpperInvariant()}.", $"El runner ha canviat de {previous.ToString().ToUpperInvariant()} a {runner.State.ToString().ToUpperInvariant()}."),
                         System.Windows.Forms.ToolTipIcon.Warning);
                 }
             }
