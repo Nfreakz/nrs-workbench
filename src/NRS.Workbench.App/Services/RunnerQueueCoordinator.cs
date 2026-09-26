@@ -230,7 +230,7 @@ public sealed class RunnerQueueCoordinator
             }
 
             var resourceHold = DetermineResourceHold(settings, resources);
-            if (resourceHold != RunnerQueueHoldReason.None)
+            if (stopped.Count > 0 && resourceHold != RunnerQueueHoldReason.None)
             {
                 var resourceStatus = ResourceHoldStatus(resourceHold, settings, resources);
                 Snapshot = BuildSnapshot(ordered, settings, resources, resourceHold, resourceStatus);
