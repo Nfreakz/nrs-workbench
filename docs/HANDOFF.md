@@ -21,6 +21,7 @@
 - Queue stop ownership is journaled at `%LOCALAPPDATA%\NRSWorkbench\runner-queue-state.json`, outside portable settings. Recovery after closing the app requires a per-session confirmation before any persisted runner is eligible for restarting. Declining leaves runners stopped and clears the journal.
 - Catalan `ca` is available in the language selector. Resource `Localization/ca.json` covers all static `{local:Tr Source='...'}` keys; local and portable settings retain `ca`. Changing the language still requires an application restart.
 - Test additions: manual-stop protection, owned rotation, recovery confirmation/decline, journal round-trip and Catalan settings/resources.
+- `RUN_ME_FIRST.cmd` now delegates to a launcher that, when executed from a Git clone, requires a clean working tree and configured upstream, runs `git fetch --prune` plus `git pull --ff-only` on the current branch, and never changes branches or performs automatic reset/rebase/merge/stash/discard operations. Non-Git source archives are built as extracted.
 
 ## Verify before publication
 
