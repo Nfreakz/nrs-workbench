@@ -23,7 +23,7 @@
                     <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="#7697C8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel Margin="15,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="{local:Tr Source='Repositorios'}" FontSize="29" FontWeight="Bold"/>
+                    <TextBlock Text="{local:Tr Source='Repositorios'}" FontSize="26" FontWeight="Bold"/>
                     <TextBlock Text="{local:Tr Source='Estado Git, sincronización segura y acceso rápido a tus proyectos locales'}" FontSize="13.5" Foreground="{StaticResource MutedBrush}" Margin="1,3,0,0"/>
                 </StackPanel>
             </StackPanel>
@@ -172,7 +172,7 @@
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <TextBlock Text="{Binding LastUpdatedText}" Foreground="{StaticResource MutedBrush}"/>
-                <TextBlock Text="  ·  Neo RS" FontFamily="Segoe UI" FontSize="12" Foreground="#6F8DB5" Opacity="0.76"/>
+                <TextBlock Text="  ·  Neo RS" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource MutedBrush}" Opacity="0.70"/>
             </StackPanel>
         </Grid>
     </Grid>
