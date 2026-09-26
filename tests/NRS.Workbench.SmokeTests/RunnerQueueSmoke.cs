@@ -223,8 +223,8 @@ internal static class RunnerQueueSmoke
         queue.ReconcileAsync([first, Runner("second", RunnerState.Stopped)],
             settings, now.AddSeconds(2)).GetAwaiter().GetResult();
 
-        Assert(control.Started.SequenceEqual(["second"]),
-            "a stale READY snapshot after an asynchronous stop does not lose queue stop ownership");
+        Assert(control.Stopped.SequenceEqual(["second"]) && control.Started.SequenceEqual(["second"]),
+            "a stale READY snapshot does not repeat the stop or lose queue stop ownership");
     }
 
     private static void LocalJournalSurvivesRestartAndIsLocalOnly()
