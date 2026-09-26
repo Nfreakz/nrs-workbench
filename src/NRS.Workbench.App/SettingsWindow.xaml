@@ -67,7 +67,7 @@
                                 <ComboBoxItem Content="2" Tag="2"/>
                             </ComboBox>
                         </StackPanel>
-                        <TextBlock Text="{local:Tr Source='La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. GitHub conserva los jobs en cola para los runners detenidos. Los jobs activos no se detienen; al activar la cola, los runners libres sobrantes se apagan. NRS Workbench debe permanecer abierto o en la bandeja.'}"
+                        <TextBlock Text="{local:Tr Source='La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. Los runners que ya estaban detenidos manualmente no se iniciarán por la cola. Los jobs activos no se detienen. NRS Workbench debe permanecer abierto o en la bandeja.'}"
                                    Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="22,7,0,0"/>
                     </StackPanel>
                 </Border>
@@ -90,6 +90,7 @@
                     <ComboBox x:Name="LanguageChoice" Width="170" SelectedValuePath="Tag">
                         <ComboBoxItem Content="Español" Tag="es"/>
                         <ComboBoxItem Content="English" Tag="en"/>
+                        <ComboBoxItem Content="Català" Tag="ca"/>
                     </ComboBox>
                     <TextBlock Text="{local:Tr Source='Se aplica al reiniciar la aplicación.'}" Style="{StaticResource MutedLabel}" VerticalAlignment="Center" Margin="14,0,0,0"/>
                 </StackPanel>
