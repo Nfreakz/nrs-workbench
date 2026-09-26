@@ -15,9 +15,13 @@ public sealed class RepositoriesViewModel : ObservableObject
     private GitRepositoryInfo? _selectedRepository;
     private string _statusText = UiLanguage.Choose("Preparando repositorios...", "Preparing repositories...");
     private string _gitVersionText = UiLanguage.Choose("Comprobando Git...", "Checking Git...");
+    private string _selectedSyncTitle = UiLanguage.Choose("Selecciona un repositorio", "Select a repository", "Selecciona un repositori");
+    private string _selectedSyncAdvice = string.Empty;
+    private string _selectedSyncKind = "Info";
     private DateTimeOffset _lastUpdated;
 
     public ObservableCollection<GitRepositoryInfo> Repositories { get; } = [];
+    public ObservableCollection<RepositoryActionHistoryEntry> ActionHistory { get; } = [];
 
     public GitRepositoryInfo? SelectedRepository
     {
@@ -25,6 +29,7 @@ public sealed class RepositoriesViewModel : ObservableObject
         set
         {
             if (!SetProperty(ref _selectedRepository, value)) return;
+            UpdateSelectedGuidance();
             RaiseCommandStates();
         }
     }
@@ -38,6 +43,9 @@ public sealed class RepositoriesViewModel : ObservableObject
 
     public string StatusText { get => _statusText; private set => SetProperty(ref _statusText, value); }
     public string GitVersionText { get => _gitVersionText; private set => SetProperty(ref _gitVersionText, value); }
+    public string SelectedSyncTitle { get => _selectedSyncTitle; private set => SetProperty(ref _selectedSyncTitle, value); }
+    public string SelectedSyncAdvice { get => _selectedSyncAdvice; private set => SetProperty(ref _selectedSyncAdvice, value); }
+    public string SelectedSyncKind { get => _selectedSyncKind; private set => SetProperty(ref _selectedSyncKind, value); }
     public string LastUpdatedText => _lastUpdated == default ? string.Empty : _lastUpdated.ToString("dd MMM yyyy  HH:mm:ss");
 
     public AsyncRelayCommand RefreshCommand { get; }
@@ -194,38 +202,170 @@ public sealed class RepositoriesViewModel : ObservableObject
     private async Task FetchSelectedAsync()
     {
         if (SelectedRepository is null) return;
-        await ExecuteGitActionAsync(() => _git.FetchAsync(SelectedRepository), $"Fetch · {SelectedRepository.Name}");
+        var repository = SelectedRepository;
+        await ExecuteGitActionAsync(() => _git.FetchAsync(repository), "FETCH", repository.Name);
     }
 
     private async Task PullSelectedAsync()
     {
         if (SelectedRepository is null) return;
         if (!_dialogs.Confirm(UiLanguage.Choose($"Se ejecutará git pull --ff-only en:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nEl pull se bloqueará si requiere merge o rebase.\n\n¿Continuar?", $"Run git pull --ff-only in:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nPull will stop if a merge or rebase is required.\n\nContinue?", $"S\u0027executarà git pull --ff-only a:\n\n{SelectedRepository.Name} · {SelectedRepository.Branch}\n{SelectedRepository.Path}\n\nEl pull es bloquejarà si requereix merge o rebase.\n\nVols continuar?"), UiLanguage.Choose("Pull seguro", "Safe pull"))) return;
-        await ExecuteGitActionAsync(() => _git.PullFastForwardAsync(SelectedRepository), $"Pull · {SelectedRepository.Name}");
+        var repository = SelectedRepository;
+        await ExecuteGitActionAsync(() => _git.PullFastForwardAsync(repository), "PULL", repository.Name);
     }
 
     private async Task PushSelectedAsync()
     {
         if (SelectedRepository is null) return;
         if (!_dialogs.Confirm(UiLanguage.Choose($"Se enviarán {SelectedRepository.Ahead} commit{(SelectedRepository.Ahead == 1 ? string.Empty : "s")} a {SelectedRepository.Upstream}.\n\nRepositorio: {SelectedRepository.Name}\nRama: {SelectedRepository.Branch}\n\n¿Hacer push?", $"Send {SelectedRepository.Ahead} commits to {SelectedRepository.Upstream}.\n\nRepository: {SelectedRepository.Name}\nBranch: {SelectedRepository.Branch}\n\nPush?", $"S\u0027enviaran {SelectedRepository.Ahead} commit{(SelectedRepository.Ahead == 1 ? string.Empty : "s")} a {SelectedRepository.Upstream}.\n\nRepositori: {SelectedRepository.Name}\nBranca: {SelectedRepository.Branch}\n\nVols fer push?"), UiLanguage.Choose("Confirmar push", "Confirm push"))) return;
-        await ExecuteGitActionAsync(() => _git.PushAsync(SelectedRepository), $"Push · {SelectedRepository.Name}");
+        var repository = SelectedRepository;
+        await ExecuteGitActionAsync(() => _git.PushAsync(repository), "PUSH", repository.Name);
     }
 
-    private async Task ExecuteGitActionAsync(Func<Task> action, string label)
+    private async Task ExecuteGitActionAsync(Func<Task> action, string actionName, string repositoryName)
     {
+        var label = $"{actionName} · {repositoryName}";
         try
         {
             StatusText = label + "...";
             await action();
+            RecordAction(repositoryName, actionName, true);
             await RefreshAsync();
-            StatusText = label + UiLanguage.Choose(" completado.", " completed.");
+            StatusText = label + UiLanguage.Choose(" completado.", " completed.", " completat.");
         }
         catch (Exception ex)
         {
             AppLogger.Error(label, ex);
-            _dialogs.ShowError(ex.Message, label);
-            StatusText = label + UiLanguage.Choose(" ha fallado.", " failed.");
+            var safeMessage = SensitiveDataRedactor.Redact(ex.Message);
+            RecordAction(repositoryName, actionName, false, safeMessage);
+            _dialogs.ShowError(safeMessage, label);
+            StatusText = label + UiLanguage.Choose(" ha fallado.", " failed.", " ha fallat.");
+            UpdateSelectedGuidance();
         }
+    }
+
+    public void RecordAction(string repositoryName, string actionName, bool success, string detail = "")
+    {
+        ActionHistory.Insert(0, new RepositoryActionHistoryEntry(
+            DateTimeOffset.Now,
+            repositoryName,
+            actionName,
+            success,
+            SensitiveDataRedactor.Redact(detail)));
+        while (ActionHistory.Count > 12)
+            ActionHistory.RemoveAt(ActionHistory.Count - 1);
+    }
+
+    private void UpdateSelectedGuidance()
+    {
+        var repository = SelectedRepository;
+        if (repository is null)
+        {
+            SelectedSyncKind = "Info";
+            SelectedSyncTitle = UiLanguage.Choose("Selecciona un repositorio", "Select a repository", "Selecciona un repositori");
+            SelectedSyncAdvice = string.Empty;
+            return;
+        }
+
+        if (repository.State == GitRepositoryState.Error)
+        {
+            SelectedSyncKind = "Blocked";
+            SelectedSyncTitle = UiLanguage.Choose("Revisar error del repositorio", "Review repository error", "Revisar l'error del repositori");
+            SelectedSyncAdvice = string.IsNullOrWhiteSpace(repository.ErrorMessage)
+                ? UiLanguage.Choose("Git no ha podido inspeccionar este repositorio.", "Git could not inspect this repository.", "Git no ha pogut inspeccionar aquest repositori.")
+                : SensitiveDataRedactor.Redact(repository.ErrorMessage);
+            return;
+        }
+
+        if (repository.ConflictCount > 0)
+        {
+            SelectedSyncKind = "Blocked";
+            SelectedSyncTitle = UiLanguage.Choose("Resolver conflictos manualmente", "Resolve conflicts manually", "Resoldre conflictes manualment");
+            SelectedSyncAdvice = UiLanguage.Choose(
+                "Commit, Pull, Push y cambio de rama permanecen bloqueados hasta que Git vuelva a un estado seguro.",
+                "Commit, Pull, Push and branch switching remain blocked until Git returns to a safe state.",
+                "Commit, Pull, Push i canvi de branca continuen bloquejats fins que Git torni a un estat segur.");
+            return;
+        }
+
+        if (repository.Ahead > 0 && repository.Behind > 0)
+        {
+            SelectedSyncKind = "Blocked";
+            SelectedSyncTitle = UiLanguage.Choose(
+                $"Rama divergida · ↑ {repository.Ahead} / ↓ {repository.Behind}",
+                $"Diverged branch · ↑ {repository.Ahead} / ↓ {repository.Behind}",
+                $"Branca divergent · ↑ {repository.Ahead} / ↓ {repository.Behind}");
+            SelectedSyncAdvice = UiLanguage.Choose(
+                "NRS Workbench no elegirá merge ni rebase. Resuelve la estrategia en Git y después refresca el repositorio.",
+                "NRS Workbench will not choose merge or rebase. Resolve the strategy in Git, then refresh the repository.",
+                "NRS Workbench no triarà merge ni rebase. Resol l'estratègia amb Git i després actualitza el repositori.");
+            return;
+        }
+
+        if (repository.IsDirty)
+        {
+            SelectedSyncKind = "Warning";
+            SelectedSyncTitle = UiLanguage.Choose(
+                $"{repository.ChangeCount} cambio{(repository.ChangeCount == 1 ? string.Empty : "s")} local{(repository.ChangeCount == 1 ? string.Empty : "es")}",
+                $"{repository.ChangeCount} local change{(repository.ChangeCount == 1 ? string.Empty : "s")}",
+                $"{repository.ChangeCount} canvi{(repository.ChangeCount == 1 ? string.Empty : "s")} local{(repository.ChangeCount == 1 ? string.Empty : "s")}");
+            SelectedSyncAdvice = repository.Behind > 0
+                ? UiLanguage.Choose(
+                    $"El remoto va {repository.Behind} commit(s) por delante. Revisa/commitea tus cambios antes de hacer Pull.",
+                    $"Remote is {repository.Behind} commit(s) ahead. Review/commit local changes before Pull.",
+                    $"El remot va {repository.Behind} commit(s) per davant. Revisa o fes commit dels canvis abans de Pull.")
+                : UiLanguage.Choose(
+                    "Revisa los cambios y crea un commit selectivo si quieres conservarlos. Fetch sigue siendo seguro.",
+                    "Review changes and create a selective commit if you want to keep them. Fetch remains safe.",
+                    "Revisa els canvis i crea un commit selectiu si els vols conservar. Fetch continua sent segur.");
+            return;
+        }
+
+        if (repository.Behind > 0)
+        {
+            SelectedSyncKind = "Safe";
+            SelectedSyncTitle = UiLanguage.Choose(
+                $"Pull seguro disponible · ↓ {repository.Behind}",
+                $"Safe Pull available · ↓ {repository.Behind}",
+                $"Pull segur disponible · ↓ {repository.Behind}");
+            SelectedSyncAdvice = UiLanguage.Choose(
+                "El working tree está limpio y no hay commits locales por delante. Pull usará solo fast-forward.",
+                "The working tree is clean and there are no local commits ahead. Pull uses fast-forward only.",
+                "El working tree és net i no hi ha commits locals per davant. Pull només farà fast-forward.");
+            return;
+        }
+
+        if (repository.Ahead > 0)
+        {
+            SelectedSyncKind = "Safe";
+            SelectedSyncTitle = UiLanguage.Choose(
+                $"Push disponible · ↑ {repository.Ahead}",
+                $"Push available · ↑ {repository.Ahead}",
+                $"Push disponible · ↑ {repository.Ahead}");
+            SelectedSyncAdvice = UiLanguage.Choose(
+                "La rama local tiene commits pendientes y el remoto no aparece por delante. Push pedirá confirmación.",
+                "The local branch has pending commits and the remote is not shown ahead. Push will ask for confirmation.",
+                "La branca local té commits pendents i el remot no apareix per davant. Push demanarà confirmació.");
+            return;
+        }
+
+        if (!repository.HasRemote)
+        {
+            SelectedSyncKind = "Warning";
+            SelectedSyncTitle = UiLanguage.Choose("Sin remote origin", "No origin remote", "Sense remote origin");
+            SelectedSyncAdvice = UiLanguage.Choose(
+                "Puedes seguir trabajando localmente, pero Fetch/Pull/Push requieren un remote configurado.",
+                "You can keep working locally, but Fetch/Pull/Push require a configured remote.",
+                "Pots continuar treballant localment, però Fetch/Pull/Push requereixen un remote configurat.");
+            return;
+        }
+
+        SelectedSyncKind = "Safe";
+        SelectedSyncTitle = UiLanguage.Choose("Estado local limpio", "Local state clean", "Estat local net");
+        SelectedSyncAdvice = UiLanguage.Choose(
+            "No hay cambios ni divergencia detectados en las referencias locales. Fetch comprueba el remoto sin modificar archivos.",
+            "No changes or divergence are detected in local references. Fetch checks the remote without modifying files.",
+            "No hi ha canvis ni divergència detectats a les referències locals. Fetch comprova el remot sense modificar fitxers.");
     }
 
     private void RemoveSelected()
