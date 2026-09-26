@@ -17,11 +17,39 @@ public sealed class RunnerQueueCoordinator
     // Only restore runners this coordinator actually stopped. Users may have
     // intentionally left other runners stopped before enabling the queue.
     private readonly HashSet<string> _stoppedByQueue = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _eligiblePaths = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _recoveryPending = new(StringComparer.OrdinalIgnoreCase);
+    private readonly IRunnerQueueStateStore? _stateStore;
+    private bool _eligibleInitialized;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private int _lastScheduledIndex = -1;
     private bool _queueWasEnabled;
 
-    public RunnerQueueCoordinator(IRunnerControlService control) => _control = control;
+    public RunnerQueueCoordinator(IRunnerControlService control, IRunnerQueueStateStore? stateStore = null)
+    {
+        _control = control;
+        _stateStore = stateStore;
+        if (stateStore is not null)
+            _recoveryPending.UnionWith(stateStore.Load());
+    }
+
+    // Persisted entries are not trusted after an app restart: the user must
+    // explicitly review and approve restoring the recorded runner folders.
+    public IReadOnlyCollection<string> RecoveredQueuePaths => _recoveryPending.ToList();
+
+    public void ApproveRecoveredQueueStops()
+    {
+        _stoppedByQueue.UnionWith(_recoveryPending);
+        _recoveryPending.Clear();
+    }
+
+    public void DiscardRecoveredQueueStops()
+    {
+        _recoveryPending.Clear();
+        _stateStore?.Save([]);
+    }
+
+    private void PersistOwnedStops() => _stateStore?.Save(_stoppedByQueue.ToList());
 
     public async Task<string> ReconcileAsync(IReadOnlyList<RunnerInfo> runners, RunnerSettings settings,
         DateTimeOffset? now = null, CancellationToken cancellationToken = default)
@@ -29,11 +57,16 @@ public sealed class RunnerQueueCoordinator
         await _gate.WaitAsync(cancellationToken);
         try
         {
+            if (_recoveryPending.Count > 0)
+                return UiLanguage.Text("Hay runners pendientes de revisión tras reiniciar NRS Workbench.");
+
             if (!settings.RunnerQueueEnabled)
             {
                 if (!_queueWasEnabled && _stoppedByQueue.Count == 0) return string.Empty;
                 _readySince.Clear();
                 _pendingStarts.Clear();
+                _eligibleInitialized = false;
+                _eligiblePaths.Clear();
                 var runnersToRestore = runners.Where(runner =>
                     runner.State == RunnerState.Stopped && _stoppedByQueue.Contains(runner.FolderPath)).ToList();
                 var outcomes = new List<bool>();
@@ -43,6 +76,7 @@ public sealed class RunnerQueueCoordinator
                     {
                         await _control.StartAsync(runner, cancellationToken);
                         _stoppedByQueue.Remove(runner.FolderPath);
+                        PersistOwnedStops();
                         outcomes.Add(true);
                     }
                     catch (Exception ex)
@@ -63,11 +97,23 @@ public sealed class RunnerQueueCoordinator
             var timestamp = now ?? DateTimeOffset.UtcNow;
             var ordered = OrderRunners(runners, settings.RunnerDisplayOrder).ToList();
             var knownPaths = ordered.Select(runner => runner.FolderPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            if (!_eligibleInitialized)
+            {
+                // Online at enable-time or explicitly approved from the journal:
+                // an already-stopped runner is not an implicit queue candidate.
+                _eligiblePaths.UnionWith(ordered.Where(IsOnline).Select(runner => runner.FolderPath));
+                _eligiblePaths.UnionWith(_stoppedByQueue);
+                _eligibleInitialized = true;
+            }
+            // A runner started outside the queue is an explicit new participant.
+            _eligiblePaths.UnionWith(ordered.Where(IsOnline).Select(runner => runner.FolderPath));
+            _eligiblePaths.RemoveWhere(path => !knownPaths.Contains(path));
             foreach (var stale in _readySince.Keys.Where(path => !knownPaths.Contains(path)).ToList())
                 _readySince.Remove(stale);
             foreach (var stale in _pendingStarts.Keys.Where(path => !knownPaths.Contains(path)).ToList())
                 _pendingStarts.Remove(stale);
-            _stoppedByQueue.RemoveWhere(path => !knownPaths.Contains(path));
+            if (_stoppedByQueue.RemoveWhere(path => !knownPaths.Contains(path)) > 0)
+                PersistOwnedStops();
 
             foreach (var runner in ordered)
             {
@@ -80,8 +126,8 @@ public sealed class RunnerQueueCoordinator
                     _readySince.Remove(runner.FolderPath);
                 // The first snapshot after StopIfIdleAsync may still report READY.
                 // BUSY means a job was accepted and the stop did not complete.
-                if (runner.State == RunnerState.Busy)
-                    _stoppedByQueue.Remove(runner.FolderPath);
+                if (runner.State == RunnerState.Busy && _stoppedByQueue.Remove(runner.FolderPath))
+                    PersistOwnedStops();
             }
 
             var limit = Math.Clamp(settings.RunnerQueueLimit, 1, 2);
@@ -89,7 +135,9 @@ public sealed class RunnerQueueCoordinator
             var pendingStartCount = _pendingStarts.Keys.Count(path => ordered.Any(runner =>
                 string.Equals(runner.FolderPath, path, StringComparison.OrdinalIgnoreCase) && runner.State == RunnerState.Stopped));
             var busyCount = active.Count(runner => runner.State == RunnerState.Busy);
-            var stopped = ordered.Where(runner => runner.State == RunnerState.Stopped && !_pendingStarts.ContainsKey(runner.FolderPath)).ToList();
+            var stopped = ordered.Where(runner => runner.State == RunnerState.Stopped &&
+                _eligiblePaths.Contains(runner.FolderPath) &&
+                !_pendingStarts.ContainsKey(runner.FolderPath)).ToList();
             var managedActiveCount = active.Count + pendingStartCount;
 
             // When enabling the queue with more listeners already online, drain
@@ -141,7 +189,7 @@ public sealed class RunnerQueueCoordinator
                     {
                         _pendingStarts[next.FolderPath] = timestamp;
                         await _control.StartAsync(next, cancellationToken);
-                        _stoppedByQueue.Remove(next.FolderPath);
+                        if (_stoppedByQueue.Remove(next.FolderPath)) PersistOwnedStops();
                         _lastScheduledIndex = ordered.IndexOf(next);
                         _readySince.Remove(next.FolderPath);
                         return UiLanguage.Choose($"Cola: iniciando {next.Alias} · límite {limit}.", $"Queue: starting {next.Alias} · limit {limit}.");
@@ -164,16 +212,25 @@ public sealed class RunnerQueueCoordinator
     {
         try
         {
+            // Journal intent before stopping: a crash between the process stop
+            // and the next refresh must never lose the recovery information.
+            _stoppedByQueue.Add(runner.FolderPath);
+            PersistOwnedStops();
             var stopped = await _control.StopIfIdleAsync(runner);
             if (stopped)
-            {
                 _readySince.Remove(runner.FolderPath);
-                _stoppedByQueue.Add(runner.FolderPath);
+            else
+            {
+                _stoppedByQueue.Remove(runner.FolderPath);
+                PersistOwnedStops();
             }
             return new StopResult(stopped, !stopped);
         }
         catch (Exception ex)
         {
+            _stoppedByQueue.Remove(runner.FolderPath);
+            try { PersistOwnedStops(); }
+            catch (Exception journalError) { AppLogger.Error("Runner queue journal cleanup failed", journalError); }
             AppLogger.Error($"Runner queue could not stop '{runner.Alias}'", ex);
             return new StopResult(false, false);
         }
@@ -185,7 +242,8 @@ public sealed class RunnerQueueCoordinator
         for (var offset = 1; offset <= ordered.Count; offset++)
         {
             var index = (_lastScheduledIndex + offset) % ordered.Count;
-            if (ordered[index].State == RunnerState.Stopped) return ordered[index];
+            if (ordered[index].State == RunnerState.Stopped &&
+                _eligiblePaths.Contains(ordered[index].FolderPath)) return ordered[index];
         }
         return null;
     }
