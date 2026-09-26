@@ -34,7 +34,8 @@ public partial class MainWindow : Window
         _statistics = new RunnerStatisticsService();
         IRunnerDiscoveryService discovery = new RunnerDiscoveryService(_settings, processService, serviceController, progress);
         IRunnerControlService control = new RunnerControlService(processService, serviceController);
-        _runnerQueue = new RunnerQueueCoordinator(control);
+        _runnerQueue = new RunnerQueueCoordinator(control,
+            new FileRunnerQueueStateStore(_settings.SettingsDirectory));
         ILogReaderService logs = new LogReaderService();
         var dialogs = new DialogService(_settings);
 
@@ -56,6 +57,7 @@ public partial class MainWindow : Window
 
         Loaded += async (_, _) =>
         {
+            ReviewRecoveredQueueStops();
             ApplyTimerInterval();
             ApplyTraySetting();
             _timer.Start();
@@ -77,6 +79,26 @@ public partial class MainWindow : Window
             _resourceTimer.Stop();
             _tray.Dispose();
         };
+    }
+
+    private void ReviewRecoveredQueueStops()
+    {
+        var recovered = _runnerQueue.RecoveredQueuePaths;
+        if (recovered.Count == 0) return;
+        var folderNames = string.Join(Environment.NewLine,
+            recovered.Take(8).Select(path => "  • " + Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar))));
+        if (recovered.Count > 8) folderNames += Environment.NewLine + "  …";
+
+        var answer = MessageBox.Show(this,
+            UiLanguage.Choose(
+                $"NRS Workbench recuerda {recovered.Count} runner(s) que la cola gestionaba antes de cerrar la aplicación:{Environment.NewLine}{folderNames}{Environment.NewLine}{Environment.NewLine}¿Permitir que la cola los recupere? Comprueba que no los hayas detenido manualmente después. Si eliges No, seguirán detenidos.",
+                $"NRS Workbench remembers {recovered.Count} runner(s) managed by the queue before the app closed:{Environment.NewLine}{folderNames}{Environment.NewLine}{Environment.NewLine}Allow the queue to resume them? Check that you have not manually stopped them since. Choosing No leaves them stopped."),
+            UiLanguage.Text("Revisar runners tras reiniciar"),
+            MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+        if (answer == MessageBoxResult.Yes)
+            _runnerQueue.ApproveRecoveredQueueStops();
+        else
+            _runnerQueue.DiscardRecoveredQueueStops();
     }
 
     private async Task RefreshAndUpdateTrayAsync()
