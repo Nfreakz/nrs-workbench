@@ -15,20 +15,15 @@ NRS Workbench publishes pre-release builds before a stable `v1.0.0`.
 9. Verify import preview, keep/replace/cancel choices and missing-path warnings on the destination PC.
 10. Obtain explicit approval before merging to main, creating a tag or publishing a release.
 
-## Published v0.18.1 and approved v0.18.2 promotion
+## Published v0.18.1 and v0.18.2
 
-v0.18.1 was built, tested and published on 2026-09-26. Its one-time CI promotion
-workflow is retired. Never re-create or move the old tag.
-
-v0.18.2 uses a separate one-time workflow, `.github/workflows/promote-approved-v0.18.2.yml`.
-It may run only after a successful trusted push CI on the current `main` commit,
-verifies that `Directory.Build.props` identifies exactly v0.18.2, refuses to move
-an existing tag, and dispatches the normal tag-scoped Release workflow. Remove the
-one-time promoter after the ZIP has been verified.
+v0.18.1 and v0.18.2 were built, tested and published on 2026-09-26. Their
+one-time CI promotion workflows are retired after asset verification. Never
+re-create or move an existing release tag.
 
 A version number, tag or successful CI run alone is **not** a published binary.
-Confirm the `v0.18.2` GitHub release, successful Release workflow and
-`NRSWorkbench-v0.18.2-win-x64.zip` asset before announcing availability.
+For future versions, confirm the GitHub release, successful Release workflow and
+expected Windows ZIP asset before announcing availability.
 
 ## Tag release (only after explicit approval)
 
