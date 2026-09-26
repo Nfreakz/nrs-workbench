@@ -67,7 +67,7 @@
                                 <ComboBoxItem Content="2" Tag="2"/>
                             </ComboBox>
                         </StackPanel>
-                        <TextBlock Text="{local:Tr Source='La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. Si activas la cola con todos los runners detenidos, iniciará candidatos hasta alcanzar el límite. Después respetará los runners que detengas manualmente. Los jobs activos no se detienen. NRS Workbench debe permanecer abierto o en la bandeja.'}"
+                        <TextBlock Text="{local:Tr Source='La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. Si activas la cola con todos los runners detenidos, iniciará candidatos hasta alcanzar el límite. También puedes iniciar manualmente un runner detenido para incorporarlo a la cola. Después respetará los runners que detengas manualmente. Los jobs activos no se detienen. NRS Workbench debe permanecer abierto o en la bandeja.'}"
                                    Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="22,7,0,0"/>
                         <CheckBox x:Name="RunnerQueueResourceGuardCheck" Content="{local:Tr Source='Esperar si el PC está demasiado cargado'}"
                                   Foreground="{StaticResource TextBrush}" Margin="22,12,0,0"/>
