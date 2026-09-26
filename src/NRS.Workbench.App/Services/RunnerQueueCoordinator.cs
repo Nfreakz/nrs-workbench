@@ -24,6 +24,9 @@ public sealed class RunnerQueueCoordinator
     // admitted as bootstrap candidates but are not treated as manually stopped until
     // they have first come online.
     private readonly HashSet<string> _seenOnlinePaths = new(StringComparer.OrdinalIgnoreCase);
+    // A declined recovery is an explicit "keep stopped" decision for this app
+    // session and must not be overridden by the all-stopped bootstrap fallback.
+    private readonly HashSet<string> _bootstrapExcludedPaths = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DateTimeOffset> _stopRequestedAt = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _recoveryPending = new(StringComparer.OrdinalIgnoreCase);
     private readonly IRunnerQueueStateStore? _stateStore;
@@ -57,12 +60,14 @@ public sealed class RunnerQueueCoordinator
 
     public void ApproveRecoveredQueueStops()
     {
+        _bootstrapExcludedPaths.ExceptWith(_recoveryPending);
         _stoppedByQueue.UnionWith(_recoveryPending);
         _recoveryPending.Clear();
     }
 
     public void DiscardRecoveredQueueStops()
     {
+        _bootstrapExcludedPaths.UnionWith(_recoveryPending);
         _recoveryPending.Clear();
         _stateStore?.Save([]);
     }
@@ -143,7 +148,8 @@ public sealed class RunnerQueueCoordinator
                 // stop is respected and removes them from the queue again.
                 if (_eligiblePaths.Count == 0)
                     _eligiblePaths.UnionWith(ordered
-                        .Where(runner => runner.State == RunnerState.Stopped)
+                        .Where(runner => runner.State == RunnerState.Stopped &&
+                                         !_bootstrapExcludedPaths.Contains(runner.FolderPath))
                         .Select(runner => runner.FolderPath));
 
                 _eligibleInitialized = true;
@@ -151,10 +157,13 @@ public sealed class RunnerQueueCoordinator
 
             // A runner started outside the queue is an explicit new participant.
             var onlineNow = ordered.Where(IsOnline).ToList();
-            _eligiblePaths.UnionWith(onlineNow.Select(runner => runner.FolderPath));
-            _seenOnlinePaths.UnionWith(onlineNow.Select(runner => runner.FolderPath));
+            var onlinePaths = onlineNow.Select(runner => runner.FolderPath).ToList();
+            _bootstrapExcludedPaths.ExceptWith(onlinePaths);
+            _eligiblePaths.UnionWith(onlinePaths);
+            _seenOnlinePaths.UnionWith(onlinePaths);
             _eligiblePaths.RemoveWhere(path => !knownPaths.Contains(path));
             _seenOnlinePaths.RemoveWhere(path => !knownPaths.Contains(path));
+            _bootstrapExcludedPaths.RemoveWhere(path => !knownPaths.Contains(path));
             foreach (var stale in _stopRequestedAt.Keys.Where(path => !knownPaths.Contains(path)).ToList())
                 _stopRequestedAt.Remove(stale);
             foreach (var stale in _readySince.Keys.Where(path => !knownPaths.Contains(path)).ToList())
