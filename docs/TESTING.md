@@ -58,7 +58,7 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 
 1. Enable the queue with a limit of 1 and verify the dashboard distinguishes **running**, **next**, **waiting** and **manually stopped** runners.
 2. Pause the queue while a runner is BUSY. Verify the job continues and no READY/STOPPED runner is started, stopped or rotated until Resume is pressed.
-3. Enable the resource guard and temporarily set a low CPU threshold. While CPU is above it, verify the dashboard reports the hold and no waiting runner starts. Lower host load and verify scheduling resumes without manual intervention.
-4. Repeat with the RAM threshold. Existing BUSY jobs must continue in both cases.
+3. Enable the resource guard and temporarily set a low CPU threshold. While CPU is above it, verify the dashboard reports the hold and no waiting runner starts. Lower host load just below the configured limit and verify the hold remains until CPU clears the 5-point recovery margin; then verify scheduling resumes without manual intervention.
+4. Repeat with the RAM threshold and its 5-point recovery margin. Existing BUSY jobs must continue in both cases.
 5. Disable the resource guard and verify CPU/RAM no longer block queue starts. Re-enable it and confirm thresholds persist after restarting the app.
 6. Export/import portable settings and confirm the resource-guard toggle plus CPU/RAM thresholds round-trip.
