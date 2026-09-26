@@ -2,13 +2,16 @@
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-09-26
+
 ### Added
 - Adds an optional automatic runner queue that keeps only one or two configured runners connected at a time and rotates idle runners so jobs for other runner targets can be picked up. GitHub retains jobs until a matching runner comes online.
-- Leaves active jobs running when the queue is enabled, restores stopped runners when it is disabled, and keeps the app running by hiding the window to the system tray when it is closed.
+- Leaves active jobs running when the queue is enabled, restores runners it stopped during the current app session when it is disabled, and keeps the app running by hiding the window to the system tray when it is closed.
 - Includes queue settings in portable configuration exports and imports, with smoke coverage for queue limits, busy-runner protection and idle rotation.
 
 ### Improved
 - Vertically centers the runner table's text and mode indicators for consistent row alignment.
+- Disabling the queue restores only runners stopped by the queue in the current application session; it does not start runners that were already stopped manually. The queue's managed-stop list is in memory, so runners from an earlier app session may need to be started manually.
 
 ## [0.18.0] - 2026-09-23
 

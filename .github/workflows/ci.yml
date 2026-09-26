@@ -6,6 +6,12 @@ on:
       - '**'
   workflow_dispatch:
 
+# Keep only the newest validation for each branch. Older queued builds must not
+# monopolize the same physical self-hosted Windows machine.
+concurrency:
+  group: nrs-workbench-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 

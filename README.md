@@ -6,13 +6,17 @@
 
 **A local Windows dashboard for Git repositories and GitHub Actions self-hosted runners.**
 
-**Latest release: [v0.18.0 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.0)** · [Download the portable Windows ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.0/NRSWorkbench-v0.18.0-win-x64.zip) · [What's new](CHANGELOG.md)
+**Source version: v0.18.1 Public Preview** · [Releases and Windows ZIP downloads](https://github.com/Nfreakz/nrs-workbench/releases) · [What's new](CHANGELOG.md)
 
-NRS Workbench brings your local runners and Git working trees into one desktop app. Check runner status and current jobs, inspect locally retained job history, and see your PC's CPU, memory and disk usage. Search and sort runners, including a saved manual order. An optional automatic queue can keep one or two runners connected and rotate idle runners while GitHub holds jobs for stopped runners. Review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in English and Spanish.
+**Release availability:** v0.18.1 is ready in source once merged; the Windows ZIP becomes available only after the v0.18.1 release workflow has passed and uploaded its asset. Until then, the latest downloadable package is [v0.18.0](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.0), which does not include the automatic queue.
+
+NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.1 Public Preview**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in English and Spanish.
+
+**New in v0.18.1:** The optional automatic runner queue can keep one or two runners connected and rotate idle runners while GitHub holds jobs for stopped runners. Active jobs are not intentionally interrupted. This feature is absent from the v0.18.0 ZIP. See [Automatic runner queue](#automatic-runner-queue) for operational limits.
 
 **Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-**En español:** NRS Workbench reúne en Windows tus runners de GitHub Actions y repositorios Git locales. Muestra trabajos y recursos del PC; permite buscar y ordenar runners, limitar cuántos permanecen conectados con una cola automática y consultar repositorios. La interfaz está disponible en español e inglés.
+**En español:** La v0.18.1 incorpora la cola automática y conserva los trabajos activos. El ZIP de Windows estará disponible tras superar la compilación y las pruebas de publicación. Hasta entonces, la última descarga es v0.18.0 y no incluye la cola.
 
 ### Main window
 
@@ -118,7 +122,9 @@ The main window shows the application version and live host CPU, RAM and system 
 
 ### Automatic runner queue
 
-Enable the optional queue in **Settings** to keep at most one or two runners connected. When the limit is reached, idle runners rotate every 45 seconds so a runner with matching labels can come online; GitHub keeps jobs queued while no matching runner is available. Active jobs are left running. Keep NRS Workbench open or in the system tray for the queue to continue managing runners.
+> **Introduced in v0.18.1.** The downloadable v0.18.0 ZIP does not include this feature; check [Releases](https://github.com/Nfreakz/nrs-workbench/releases) for v0.18.1 binary availability.
+
+Enable the optional queue in **Settings** to keep at most one or two runners connected. When the limit is reached, idle runners rotate every 45 seconds so a runner with matching labels can come online; GitHub keeps jobs queued while no matching runner is available. Active jobs are left running. Keep NRS Workbench open or in the system tray for the queue to continue managing runners. Turning off the queue restores runners that the queue stopped during the current app session; runners already stopped manually are left stopped. After closing and reopening NRS Workbench, runners stopped in an earlier session may need to be started manually.
 
 ### NRS Workbench identity and migration
 
