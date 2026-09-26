@@ -16,7 +16,7 @@ The smoke-test executable uses temporary local repositories and a temporary bare
 dotnet run --project .\tests\NRS.Workbench.SmokeTests\NRS.Workbench.SmokeTests.csproj -c Release
 ```
 
-It also covers portable-settings privacy and round-trip checks plus unambiguous, ambiguous and invalid repository-path relocation. The queue smoke tests cover the connected-runner limit, active-job protection, idle rotation among eligible runners, exclusion of manually stopped runners, persistence of queue-owned stops, confirmation/decline after app restart and restoring only approved runners when disabling the queue. Catalan resource and portable-language round-trip checks are also included. Review/Cancel UI behavior and ZIP startup must still be checked manually.
+It also covers portable-settings privacy and round-trip checks plus unambiguous, ambiguous and invalid repository-path relocation. The queue smoke tests cover the connected-runner limit, active-job protection, idle rotation among eligible runners, exclusion of manually stopped runners, persistence of queue-owned stops, confirmation/decline after app restart, restoring only approved runners when disabling the queue, smart CPU/RAM holds, session pause and queue dashboard classification. Catalan resource and portable-language round-trip checks are also included. Review/Cancel UI behavior and ZIP startup must still be checked manually.
 
 It covers clean/dirty inspection, empty-message protection, partial commits, staged-file protection, unusual filenames, rename/delete handling, ahead/push, behind/fast-forward pull, divergence blocking and remote-credential redaction.
 
@@ -52,3 +52,13 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 4. With an active BUSY job, enabling the queue must never stop it. Test service-installed and interactive runners separately on a Windows PC.
 5. Select **Català** in Settings, save and restart. Verify main window, Settings, repositories, statistics, queue status and critical Git confirmation dialogs. Confirm Spanish and English remain selectable. The language setting must round-trip in portable JSON.
 6. Verify `%LOCALAPPDATA%\\NRSWorkbench\\runner-queue-state.json` is local-only and never appears in the portable JSON; do not publish paths or contents from a real machine.
+
+
+## v0.18.3 manual smart-queue checks
+
+1. Enable the queue with a limit of 1 and verify the dashboard distinguishes **running**, **next**, **waiting** and **manually stopped** runners.
+2. Pause the queue while a runner is BUSY. Verify the job continues and no READY/STOPPED runner is started, stopped or rotated until Resume is pressed.
+3. Enable the resource guard and temporarily set a low CPU threshold. While CPU is above it, verify the dashboard reports the hold and no waiting runner starts. Lower host load and verify scheduling resumes without manual intervention.
+4. Repeat with the RAM threshold. Existing BUSY jobs must continue in both cases.
+5. Disable the resource guard and verify CPU/RAM no longer block queue starts. Re-enable it and confirm thresholds persist after restarting the app.
+6. Export/import portable settings and confirm the resource-guard toggle plus CPU/RAM thresholds round-trip.
