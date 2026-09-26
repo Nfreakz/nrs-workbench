@@ -78,6 +78,8 @@ For a quick local test, run:
 RUN_ME_FIRST.cmd
 ```
 
+When run from a Git clone, the launcher now checks the current branch before compiling, refuses to overwrite local changes, runs `git fetch --prune` and updates that branch from its configured upstream with `git pull --ff-only`. It never switches branches, discards files, stashes changes, rebases, resets or creates a merge automatically. A detached HEAD, dirty working tree, missing upstream or failed fetch/pull stops the build with a clear message instead of silently launching an outdated checkout. If the source was downloaded without `.git`, the launcher simply builds the files that were extracted and explains that no automatic update is possible.
+
 The admin launch is useful when controlling runners installed as Windows services. Normal inspection should not require administrator rights.
 
 ## Windows tray and About
