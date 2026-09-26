@@ -11,6 +11,7 @@ namespace NRS.Workbench.App.Services;
 public sealed class RunnerQueueCoordinator
 {
     private static readonly TimeSpan IdleRotationDelay = TimeSpan.FromSeconds(45);
+    private const double ResourceReleaseMargin = 5d;
     private readonly IRunnerControlService _control;
     private readonly Dictionary<string, DateTimeOffset> _readySince = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DateTimeOffset> _pendingStarts = new(StringComparer.OrdinalIgnoreCase);
@@ -25,6 +26,8 @@ public sealed class RunnerQueueCoordinator
     private readonly SemaphoreSlim _gate = new(1, 1);
     private int _lastScheduledIndex = -1;
     private bool _queueWasEnabled;
+    private bool _cpuResourceHeld;
+    private bool _memoryResourceHeld;
 
     public bool IsPaused { get; private set; }
     public RunnerQueueSnapshot Snapshot { get; private set; } = RunnerQueueSnapshot.Disabled();
@@ -105,6 +108,8 @@ public sealed class RunnerQueueCoordinator
                 // Retain the marker until the stopped state is observed and restored.
                 _queueWasEnabled = false;
                 IsPaused = false;
+                _cpuResourceHeld = false;
+                _memoryResourceHeld = false;
                 var disabledStatus = outcomes.Any(success => !success)
                     ? UiLanguage.Choose("Cola desactivada · algunos runners gestionados no se pudieron iniciar.", "Queue disabled · some queue-managed runners could not be started.")
                     : UiLanguage.Choose("Cola desactivada · runners gestionados restaurados; los detenidos manualmente siguen detenidos.", "Queue disabled · queue-managed runners restored; manually stopped runners remain stopped.");
@@ -332,20 +337,35 @@ public sealed class RunnerQueueCoordinator
             status);
     }
 
-    private static RunnerQueueHoldReason DetermineResourceHold(RunnerSettings settings, SystemResourceSnapshot? resources)
+    private RunnerQueueHoldReason DetermineResourceHold(RunnerSettings settings, SystemResourceSnapshot? resources)
     {
         if (!settings.RunnerQueueResourceGuardEnabled || resources is null)
+        {
+            _cpuResourceHeld = false;
+            _memoryResourceHeld = false;
             return RunnerQueueHoldReason.None;
+        }
 
-        var cpuHigh = resources.CpuPercent is double cpu &&
-            cpu >= Math.Clamp(settings.RunnerQueueCpuStartThreshold, 50, 100);
+        var cpuThreshold = Math.Clamp(settings.RunnerQueueCpuStartThreshold, 50, 100);
+        if (resources.CpuPercent is double cpu)
+            _cpuResourceHeld = _cpuResourceHeld
+                ? cpu > Math.Max(0, cpuThreshold - ResourceReleaseMargin)
+                : cpu >= cpuThreshold;
+        else
+            _cpuResourceHeld = false;
+
+        var memoryThreshold = Math.Clamp(settings.RunnerQueueMemoryStartThreshold, 50, 100);
         var memoryPercent = MemoryPercent(resources);
-        var memoryHigh = memoryPercent is double memory &&
-            memory >= Math.Clamp(settings.RunnerQueueMemoryStartThreshold, 50, 100);
+        if (memoryPercent is double memory)
+            _memoryResourceHeld = _memoryResourceHeld
+                ? memory > Math.Max(0, memoryThreshold - ResourceReleaseMargin)
+                : memory >= memoryThreshold;
+        else
+            _memoryResourceHeld = false;
 
-        if (cpuHigh && memoryHigh) return RunnerQueueHoldReason.HighCpuAndMemory;
-        if (cpuHigh) return RunnerQueueHoldReason.HighCpu;
-        if (memoryHigh) return RunnerQueueHoldReason.HighMemory;
+        if (_cpuResourceHeld && _memoryResourceHeld) return RunnerQueueHoldReason.HighCpuAndMemory;
+        if (_cpuResourceHeld) return RunnerQueueHoldReason.HighCpu;
+        if (_memoryResourceHeld) return RunnerQueueHoldReason.HighMemory;
         return RunnerQueueHoldReason.None;
     }
 
