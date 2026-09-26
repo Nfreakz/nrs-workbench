@@ -128,6 +128,12 @@ public sealed class RunnerQueueCoordinator
                 // BUSY means a job was accepted and the stop did not complete.
                 if (runner.State == RunnerState.Busy && _stoppedByQueue.Remove(runner.FolderPath))
                     PersistOwnedStops();
+                // An eligible runner stopped outside the queue is now manually
+                // stopped. Never reclaim it until the user starts it again.
+                if (runner.State == RunnerState.Stopped &&
+                    !_stoppedByQueue.Contains(runner.FolderPath) &&
+                    !_pendingStarts.ContainsKey(runner.FolderPath))
+                    _eligiblePaths.Remove(runner.FolderPath);
             }
 
             var limit = Math.Clamp(settings.RunnerQueueLimit, 1, 2);
