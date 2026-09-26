@@ -81,8 +81,23 @@ jobs:
           }
 
           $tag = $env:GITHUB_REF_NAME
+          $version = $tag.TrimStart('v')
           $encodedTag = [System.Uri]::EscapeDataString($tag)
           $releaseByTagUri = "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/$encodedTag"
+
+          $changelog = Get-Content -LiteralPath '.\\CHANGELOG.md' -Raw
+          $escapedVersion = [regex]::Escape($version)
+          $notesMatch = [regex]::Match(
+            $changelog,
+            "(?ms)^## \\[$escapedVersion\\][^\\r\\n]*\\r?\\n(?<body>.*?)(?=^## \\[|\\z)"
+          )
+          if (-not $notesMatch.Success) {
+            throw "CHANGELOG.md does not contain release notes for $tag."
+          }
+          $releaseNotes = $notesMatch.Groups['body'].Value.Trim()
+          if ([string]::IsNullOrWhiteSpace($releaseNotes)) {
+            throw "Release notes for $tag are empty."
+          }
 
           try {
             $release = Invoke-RestMethod -Method Get -Uri $releaseByTagUri -Headers $headers -ErrorAction Stop
@@ -95,7 +110,8 @@ jobs:
             $body = @{
               tag_name = $tag
               name = "NRS Workbench $tag"
-              generate_release_notes = $true
+              body = $releaseNotes
+              generate_release_notes = $false
               prerelease = $true
             } | ConvertTo-Json
 
