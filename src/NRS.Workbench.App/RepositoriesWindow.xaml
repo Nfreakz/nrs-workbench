@@ -12,7 +12,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="245"/>
+            <RowDefinition Height="292"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -32,6 +32,7 @@
                 <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="CLEAN" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding CleanCount}" Foreground="#5AA878" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
                 <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='CAMBIOS'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding ChangesCount}" Foreground="#C59A4A" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
                 <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="AHEAD" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AheadCount}" Foreground="#6F91C4" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="BEHIND" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding BehindCount}" Foreground="#9BA3AE" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
                 <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AttentionCount}" Foreground="#D2636D" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
             </StackPanel>
         </Grid>
@@ -145,22 +146,78 @@
             </Border>
 
             <Border Grid.Column="1" Style="{StaticResource PanelCard}" Padding="17" Margin="7,0,0,0">
-                <StackPanel>
-                    <TextBlock Text="{local:Tr Source='Sincronización segura'}" Style="{StaticResource SectionTitle}"/>
-                    <TextBlock Text="{local:Tr Source='La aplicación usa el Git instalado en Windows. No implementa Git ni hace merges automáticos.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,8,0,14"/>
-                    <Border Background="#15181C" BorderBrush="#303640" BorderThickness="1" CornerRadius="9" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="{local:Tr Source='ACCIÓN SEGURA'}" Style="{StaticResource SectionTitle}"/>
+
+                    <Border Grid.Row="1" Background="#15181C" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,9,0,10">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BorderBrush" Value="#3B424C"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedSyncKind}" Value="Safe"><Setter Property="BorderBrush" Value="#56846A"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding SelectedSyncKind}" Value="Warning"><Setter Property="BorderBrush" Value="#8A723D"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding SelectedSyncKind}" Value="Blocked"><Setter Property="BorderBrush" Value="#B85B64"/></DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
                         <StackPanel>
-                            <TextBlock Text="COMMIT" Foreground="#7697C8" FontWeight="Bold"/>
-                            <TextBlock Text="{local:Tr Source='Selecciona archivos, revisa el diff y confirma el mensaje antes de modificar el índice de Git.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
-                            <TextBlock Text="FETCH" Foreground="#6F91C4" FontWeight="Bold"/>
-                            <TextBlock Text="{local:Tr Source='Seguro: actualiza referencias remotas sin modificar tu working tree.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
-                            <TextBlock Text="PULL" Foreground="#67AF87" FontWeight="Bold"/>
-                            <TextBlock Text="{local:Tr Source='Solo se permite como fast-forward y con working tree limpio. Si hay divergencia, se bloquea.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
-                            <TextBlock Text="PUSH" Foreground="#C59A4A" FontWeight="Bold"/>
-                            <TextBlock Text="{local:Tr Source='Se confirma antes de enviar commits. Si el remoto va por delante, se bloquea.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                            <TextBlock Text="{Binding SelectedSyncTitle}" FontSize="14" FontWeight="SemiBold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#AAB2BC"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedSyncKind}" Value="Safe"><Setter Property="Foreground" Value="#67AF87"/></DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedSyncKind}" Value="Warning"><Setter Property="Foreground" Value="#C59A4A"/></DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedSyncKind}" Value="Blocked"><Setter Property="Foreground" Value="#D56B75"/></DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock Text="{Binding SelectedSyncAdvice}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,5,0,0"/>
                         </StackPanel>
                     </Border>
-                </StackPanel>
+
+                    <Grid Grid.Row="2" Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="{local:Tr Source='ACTIVIDAD DE ESTA SESIÓN'}" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Grid.Column="1" Text="{local:Tr Source='Solo actividad iniciada desde NRS Workbench'}" FontSize="10.5" Foreground="#7F8893"/>
+                    </Grid>
+
+                    <ListBox Grid.Row="3" ItemsSource="{Binding ActionHistory}" Background="Transparent" BorderThickness="0" Padding="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="72"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="58"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding TimeText}" Foreground="#7F8893" FontFamily="Cascadia Mono, Consolas" FontSize="10.5"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Action}" Foreground="#7697C8" FontWeight="SemiBold" FontSize="10.5"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding RepositoryName}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Detail}" FontSize="10.5"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding ResultText}" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="10.5">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#67AF87"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Success}" Value="False"><Setter Property="Foreground" Value="#D56B75"/></DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
             </Border>
         </Grid>
 
