@@ -33,6 +33,16 @@
 - Default resource thresholds: CPU 85%, RAM 90%. Settings normalize configurable values to 50-100% and portable settings preserve them.
 - Smoke coverage must include CPU/RAM holds, recovery below threshold, pause semantics and dashboard classification.
 
+## v0.18.4 isolated candidate
+
+- Branch: `feat/v0.18.4-repository-guidance`, based on the validated v0.18.3 `main` state.
+- Version metadata on this branch is `0.18.4`; it is intentionally **not merged to main yet** so v0.18.3 can still be tested/published independently.
+- Repositories workspace adds selected-repository safe-action guidance and a session-only in-memory action history.
+- The top repository summary now displays the already-computed BEHIND count.
+- Pull and Push re-inspect the repository immediately before writing and block if the displayed branch or relevant working-tree/local-commit state became stale.
+- No automatic merge, rebase, reset, stash, remote creation or branch creation is introduced.
+- Do not merge this branch into `main` until the v0.18.3 release decision is complete.
+
 ## Verify before the next publication
 
 1. Confirm the current branch and version and compare candidate diff with the latest `main`.
