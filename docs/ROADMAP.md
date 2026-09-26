@@ -4,16 +4,14 @@ This roadmap is specific to the independent `Nfreakz/nrs-workbench` application.
 
 ## v0.18.3
 
-Current unreleased candidate on `main`.
+Published Public Preview.
 
 - Smart runner queue dashboard.
 - Pause/Resume.
 - CPU/RAM resource guard with 5-point recovery margin.
 - Professional visual refresh: graphite palette, restrained accent usage, larger metadata text and consistent component styling.
-- Version metadata on `main`: `0.18.3`.
-- Windows CI is green for `main` commit `721b23a08e78ce48c8973d6e2b061dbbf56e8379`.
-- The candidate CI validates portable packaging but intentionally does not upload a public artifact.
-- Publishing still requires explicit release approval.
+- Published release: `v0.18.3`.
+- Portable asset: `NRSWorkbench-v0.18.3-win-x64.zip`.
 
 ## v0.18.4
 
@@ -22,7 +20,7 @@ Repository Guidance candidate, rebuilt on top of the professional v0.18.3 UI bas
 Current implementation:
 - PR #18: `feat: v0.18.4 repository guidance on professional UI baseline`.
 - Branch: `feat/v0.18.4-repository-guidance-v2`.
-- Keep the PR separate from `main` until the v0.18.3 release decision is complete.
+- Rebuilt on top of the published v0.18.3 `main`.
 - PR #16 is obsolete, closed and not merged.
 
 Scope:

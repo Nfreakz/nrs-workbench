@@ -326,5 +326,8 @@
   "PARADOS MANUALMENTE": "ATURATS MANUALMENT",
   "Esperar si el PC está demasiado cargado": "Esperar si el PC està massa carregat",
   "No iniciar por encima de": "No iniciar per sobre de",
-  "Si se supera un límite, la cola no inicia ni rota runners nuevos. Los jobs BUSY siguen ejecutándose.": "Si se supera un límit, la cua no inicia ni rota runners nous. Els jobs BUSY continuen executant-se."
+  "Si se supera un límite, la cola no inicia ni rota runners nuevos. Los jobs BUSY siguen ejecutándose.": "Si se supera un límit, la cua no inicia ni rota runners nous. Els jobs BUSY continuen executant-se.",
+  "ACCIÓN SEGURA": "ACCIÓ SEGURA",
+  "ACTIVIDAD DE ESTA SESIÓN": "ACTIVITAT D'AQUESTA SESSIÓ",
+  "Solo actividad iniciada desde NRS Workbench": "Només activitat iniciada des de NRS Workbench"
 }

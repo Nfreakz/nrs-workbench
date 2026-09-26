@@ -206,5 +206,8 @@
   "PARADOS MANUALMENTE": "MANUALLY STOPPED",
   "Esperar si el PC está demasiado cargado": "Wait when the PC is under heavy load",
   "No iniciar por encima de": "Do not start above",
-  "Si se supera un límite, la cola no inicia ni rota runners nuevos. Los jobs BUSY siguen ejecutándose.": "If a threshold is exceeded, the queue does not start or rotate new runners. BUSY jobs keep running."
+  "Si se supera un límite, la cola no inicia ni rota runners nuevos. Los jobs BUSY siguen ejecutándose.": "If a threshold is exceeded, the queue does not start or rotate new runners. BUSY jobs keep running.",
+  "ACCIÓN SEGURA": "SAFE ACTION",
+  "ACTIVIDAD DE ESTA SESIÓN": "THIS SESSION",
+  "Solo actividad iniciada desde NRS Workbench": "Only activity started from NRS Workbench"
 }

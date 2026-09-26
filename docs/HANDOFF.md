@@ -7,111 +7,55 @@
 - Do not use this repository's paths, credentials, runner registrations, deployment decisions or release tags for any other Neo RS application.
 - Default branch: `main`. Review its live HEAD, PRs, CI and Releases before modifying anything.
 
-## Current verified state · 2026-09-26
-
-### main
-
-- HEAD: `721b23a08e78ce48c8973d6e2b061dbbf56e8379`
-- Commit: `style: professionalize NRS Workbench visual system before v0.18.3`
-- Version metadata:
-  - `Version 0.18.3`
-  - `AssemblyVersion 0.18.3.0`
-  - `FileVersion 0.18.3.0`
-- v0.18.3 is integrated on `main` but is not yet a public GitHub Release.
-
-### CI
-
-Verified main workflow run: `36261738887`
-
-Result: **SUCCESS**
-
-Passed:
-- Restore
-- Build
-- Git safety smoke tests
-- Public source audit
-- Portable distribution smoke
-
-The portable distribution step intentionally validates packaging without uploading an artifact.
+## Current verified state · 2026-09-27
 
 ### Published baseline
 
-- Latest verified public release: `v0.18.2 Public Preview`.
-- Verified asset: `NRSWorkbench-v0.18.2-win-x64.zip`.
-- Existing published release tags/assets are immutable; never move or replace them.
+- Latest published release: `v0.18.3 Public Preview`.
+- Release commit: `f830eb57a515e5c16755514ae35b8b0f0f5dfbc4`.
+- Verified asset: `NRSWorkbench-v0.18.3-win-x64.zip`.
+- Release workflow completed successfully.
+- GitHub Release notes use curated CHANGELOG sections instead of an automatic list of every PR.
+- `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
 
-## v0.18.3 candidate
+### main
 
-Integrated on `main`.
-
-- Visible smart-queue dashboard with BUSY runners, next runner, queue-owned waiting runners and manually stopped runners.
-- Session-only Pause/Resume control. Pause freezes queue scheduling only; it does not stop active jobs.
-- Resource guard enabled by default.
-- Default thresholds: CPU 85%, RAM 90%.
-- New starts and idle rotations wait while CPU/RAM exceed the configured limits.
-- Existing BUSY jobs are never interrupted by the guard.
-- A 5-point recovery margin prevents rapid threshold flapping.
-- Portable settings preserve the guard and thresholds.
-- Professional graphite UI baseline is integrated and visually approved.
-- `docs/VISUAL_SYSTEM.md` is the source of truth for future UI work.
+- Current base for v0.18.4: `bf66a4cba535cffd156f5760b88d9c8ac89a9e70`.
+- Professional graphite UI is the approved visual baseline.
+- `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
 
 ## v0.18.4 candidate
 
-Current implementation is isolated in PR #18.
+Active work is isolated in PR #18.
 
-- PR: `#18`
-- Title: `feat: v0.18.4 repository guidance on professional UI baseline`
-- Branch: `feat/v0.18.4-repository-guidance-v2`
-- Head: `ab9af31f5b6ee44703c4eba5f540cd33aef87091`
-- Base: `main` @ `721b23a08e78ce48c8973d6e2b061dbbf56e8379`
-- State: open, draft, mergeable, not merged.
-- CI run `36263398048`: **SUCCESS**
-- PR #16 is obsolete, closed and not merged.
+- Branch: `feat/v0.18.4-repository-guidance-v2`.
+- Version metadata: `0.18.4`.
+- Rebuilt on top of the current post-v0.18.3 `main`.
+- Do not tag or publish until manual Windows validation and CI are complete.
 
 Scope:
 - contextual safe-action guidance for the selected repository;
 - session-only in-memory history for Fetch, Pull, Push, Commit and local branch switches;
-- BEHIND visibility in repository summary;
-- dirty repositories counted even when their primary state is AHEAD/BEHIND;
+- visible BEHIND summary and correct dirty-repository counting;
 - repository state re-inspected immediately before Pull/Push;
-- stale branch, working-tree or local-commit state blocks the write action;
-- no automatic merge/rebase/reset/stash/remote creation/branch creation.
+- stale branch, working-tree or local-commit state blocks write actions;
+- no automatic merge, rebase, reset, stash, remote creation or branch creation.
 
-Do not merge PR #18 until the v0.18.3 release decision is complete.
+## Validation for v0.18.4
 
-## Release gate for v0.18.3
-
-Before publishing:
-
-1. Confirm `main` still points to the intended v0.18.3 commit and version metadata.
-2. Confirm trusted Windows CI remains green.
-3. Manually check on Windows:
-   - startup recovery prompt;
-   - disabling the queue after restart;
-   - BUSY-job protection;
-   - language selection;
-   - Smart Queue resource hold/recovery behavior;
-   - the approved graphite UI at normal Windows scaling.
-4. Ensure README/CHANGELOG/Wiki still distinguish the published v0.18.2 binary from unreleased v0.18.3 features.
-5. Obtain explicit user approval before creating any v0.18.3 tag or GitHub Release.
-6. After release, verify the actual Windows x64 ZIP and the release workflow before claiming the version is downloadable.
+1. Build and smoke tests must pass on the trusted Windows runner.
+2. Manually check CLEAN, CHANGES, AHEAD, BEHIND, DIVERGED/CONFLICT and no-remote guidance.
+3. Verify Fetch, Pull, Push, Commit and branch-switch history is session-only.
+4. Verify Pull is blocked if the working tree changes after the displayed snapshot.
+5. Verify Push is blocked if the branch changes after the displayed snapshot.
+6. Check Repositories layout at normal Windows scaling before merge.
 
 ## Next sequence
 
-If v0.18.3 is explicitly approved for release:
-
-1. re-verify `main` and CI;
-2. prepare release notes;
-3. create/tag/publish `v0.18.3`;
-4. verify `NRSWorkbench-v0.18.3-win-x64.zip`;
-5. then reconcile and merge PR #18;
-6. only after that proceed to v0.18.5.
-
-If release approval is not given yet:
-
-- keep PR #18 separate;
-- continue v0.18.3 validation only;
-- do not tag or publish.
+1. Let CI validate the rebuilt PR #18 candidate.
+2. Test the v0.18.4 branch on Windows.
+3. Merge only after UI and Git-safety behavior are confirmed.
+4. Publish only after explicit approval.
 
 ## Future roadmap
 
@@ -119,4 +63,3 @@ If release approval is not given yet:
 - v0.19.0: GitHub Actions Control.
 - Product website/SEO remains a separate web project or explicitly approved repository.
 - GitLab support only if real demand appears.
-- Measure startup time, process RAM, idle CPU and refresh impact before making public lightweight-performance claims.
