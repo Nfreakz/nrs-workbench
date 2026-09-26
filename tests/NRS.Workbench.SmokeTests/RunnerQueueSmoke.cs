@@ -16,6 +16,7 @@ internal static class RunnerQueueSmoke
         IdleSlotsRotateToReachOtherRunnerTargets();
         DisablingQueuePreservesManuallyStoppedRunners();
         DisablingQueueRestoresOnlyRunnersStoppedByQueue();
+        StaleReadySnapshotDoesNotLoseQueueStopOwnership();
     }
 
     private static void StartLimitQueuesExtraRunners()
@@ -112,6 +113,26 @@ internal static class RunnerQueueSmoke
 
         Assert(control.Stopped.SequenceEqual(["queued"]) && control.Started.SequenceEqual(["queued"]),
             "disabling the queue restores only runners that the queue stopped");
+    }
+
+    private static void StaleReadySnapshotDoesNotLoseQueueStopOwnership()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 1 };
+        var first = Runner("first", RunnerState.Ready);
+        var second = Runner("second", RunnerState.Ready);
+        var now = DateTimeOffset.UnixEpoch;
+
+        queue.ReconcileAsync([first, second], settings, now).GetAwaiter().GetResult();
+        // The next scan can return the old READY state while stopping completes.
+        queue.ReconcileAsync([first, second], settings, now.AddSeconds(1)).GetAwaiter().GetResult();
+        settings.RunnerQueueEnabled = false;
+        queue.ReconcileAsync([first, Runner("second", RunnerState.Stopped)],
+            settings, now.AddSeconds(2)).GetAwaiter().GetResult();
+
+        Assert(control.Started.SequenceEqual(["second"]),
+            "a stale READY snapshot after an asynchronous stop does not lose queue stop ownership");
     }
 
     private static RunnerInfo Runner(string name, RunnerState state) => new()
