@@ -19,6 +19,14 @@ public sealed class RunnerQueueCoordinator
     // intentionally left other runners stopped before enabling the queue.
     private readonly HashSet<string> _stoppedByQueue = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _eligiblePaths = new(StringComparer.OrdinalIgnoreCase);
+    // Tracks runners that have actually been online during the current queue session.
+    // When the queue is enabled with every runner stopped, those stopped runners are
+    // admitted as bootstrap candidates but are not treated as manually stopped until
+    // they have first come online.
+    private readonly HashSet<string> _seenOnlinePaths = new(StringComparer.OrdinalIgnoreCase);
+    // A declined recovery is an explicit "keep stopped" decision for this app
+    // session and must not be overridden by the all-stopped bootstrap fallback.
+    private readonly HashSet<string> _bootstrapExcludedPaths = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DateTimeOffset> _stopRequestedAt = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _recoveryPending = new(StringComparer.OrdinalIgnoreCase);
     private readonly IRunnerQueueStateStore? _stateStore;
@@ -52,12 +60,14 @@ public sealed class RunnerQueueCoordinator
 
     public void ApproveRecoveredQueueStops()
     {
+        _bootstrapExcludedPaths.ExceptWith(_recoveryPending);
         _stoppedByQueue.UnionWith(_recoveryPending);
         _recoveryPending.Clear();
     }
 
     public void DiscardRecoveredQueueStops()
     {
+        _bootstrapExcludedPaths.UnionWith(_recoveryPending);
         _recoveryPending.Clear();
         _stateStore?.Save([]);
     }
@@ -86,6 +96,7 @@ public sealed class RunnerQueueCoordinator
                 _stopRequestedAt.Clear();
                 _eligibleInitialized = false;
                 _eligiblePaths.Clear();
+                _seenOnlinePaths.Clear();
                 var runnersToRestore = runners.Where(runner =>
                     runner.State == RunnerState.Stopped && _stoppedByQueue.Contains(runner.FolderPath)).ToList();
                 var outcomes = new List<bool>();
@@ -123,15 +134,36 @@ public sealed class RunnerQueueCoordinator
             var knownPaths = ordered.Select(runner => runner.FolderPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
             if (!_eligibleInitialized)
             {
-                // Online at enable-time or explicitly approved from the journal:
-                // an already-stopped runner is not an implicit queue candidate.
-                _eligiblePaths.UnionWith(ordered.Where(IsOnline).Select(runner => runner.FolderPath));
+                var onlineAtEnable = ordered.Where(IsOnline).ToList();
+
+                // Normal case: runners already online when the queue is enabled become
+                // participants. Queue-owned stops restored from the journal stay eligible.
+                _eligiblePaths.UnionWith(onlineAtEnable.Select(runner => runner.FolderPath));
+                _seenOnlinePaths.UnionWith(onlineAtEnable.Select(runner => runner.FolderPath));
                 _eligiblePaths.UnionWith(_stoppedByQueue);
+
+                // Bootstrap case: if the user enables the queue while every usable runner
+                // is stopped, the queue must be able to start work by itself. These runners
+                // are candidates until they first come online; after that, a later manual
+                // stop is respected and removes them from the queue again.
+                if (_eligiblePaths.Count == 0)
+                    _eligiblePaths.UnionWith(ordered
+                        .Where(runner => runner.State == RunnerState.Stopped &&
+                                         !_bootstrapExcludedPaths.Contains(runner.FolderPath))
+                        .Select(runner => runner.FolderPath));
+
                 _eligibleInitialized = true;
             }
+
             // A runner started outside the queue is an explicit new participant.
-            _eligiblePaths.UnionWith(ordered.Where(IsOnline).Select(runner => runner.FolderPath));
+            var onlineNow = ordered.Where(IsOnline).ToList();
+            var onlinePaths = onlineNow.Select(runner => runner.FolderPath).ToList();
+            _bootstrapExcludedPaths.ExceptWith(onlinePaths);
+            _eligiblePaths.UnionWith(onlinePaths);
+            _seenOnlinePaths.UnionWith(onlinePaths);
             _eligiblePaths.RemoveWhere(path => !knownPaths.Contains(path));
+            _seenOnlinePaths.RemoveWhere(path => !knownPaths.Contains(path));
+            _bootstrapExcludedPaths.RemoveWhere(path => !knownPaths.Contains(path));
             foreach (var stale in _stopRequestedAt.Keys.Where(path => !knownPaths.Contains(path)).ToList())
                 _stopRequestedAt.Remove(stale);
             foreach (var stale in _readySince.Keys.Where(path => !knownPaths.Contains(path)).ToList())
@@ -171,12 +203,18 @@ public sealed class RunnerQueueCoordinator
                     _stopRequestedAt.Remove(runner.FolderPath);
                     PersistOwnedStops();
                 }
-                // An eligible runner stopped outside the queue is now manually
-                // stopped. Never reclaim it until the user starts it again.
+                // Once a participant has actually been online, a later stop that was not
+                // requested by the queue is a manual stop. Respect it and do not reclaim
+                // the runner until the user starts it again. Bootstrap candidates that
+                // have never been online remain eligible so an all-stopped queue can start.
                 if (runner.State == RunnerState.Stopped &&
+                    _seenOnlinePaths.Contains(runner.FolderPath) &&
                     !_stoppedByQueue.Contains(runner.FolderPath) &&
                     !_pendingStarts.ContainsKey(runner.FolderPath))
+                {
                     _eligiblePaths.Remove(runner.FolderPath);
+                    _seenOnlinePaths.Remove(runner.FolderPath);
+                }
             }
 
             var limit = Math.Clamp(settings.RunnerQueueLimit, 1, 2);

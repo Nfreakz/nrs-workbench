@@ -10,7 +10,7 @@ internal static class RunnerQueueSmoke
     [ModuleInitializer]
     internal static void Run()
     {
-        ManuallyStoppedRunnersAreNotStartedAutomatically();
+        AllStoppedQueueBootstrapsAndLaterManualStopsAreRespected();
         QueueRotatesOnlyRunnersItStopped();
         RecoveryRequiresExplicitApproval();
         DeclinedRecoveryPreservesStoppedRunners();
@@ -29,18 +29,32 @@ internal static class RunnerQueueSmoke
         QueueSnapshotDistinguishesWaitingAndManualStops();
     }
 
-    private static void ManuallyStoppedRunnersAreNotStartedAutomatically()
+    private static void AllStoppedQueueBootstrapsAndLaterManualStopsAreRespected()
     {
         var control = new FakeRunnerControl();
         var queue = new RunnerQueueCoordinator(control);
-        var settings = new RunnerSettings { RunnerQueueEnabled = true, RunnerQueueLimit = 2 };
-        var runners = new[] { Runner("a", RunnerState.Stopped), Runner("b", RunnerState.Stopped), Runner("c", RunnerState.Stopped) };
+        var settings = new RunnerSettings
+        {
+            RunnerQueueEnabled = true,
+            RunnerQueueLimit = 1,
+            RunnerQueueResourceGuardEnabled = false
+        };
+        var a = Runner("a", RunnerState.Stopped);
+        var b = Runner("b", RunnerState.Stopped);
+        var c = Runner("c", RunnerState.Stopped);
+        var now = DateTimeOffset.UnixEpoch;
 
-        queue.ReconcileAsync(runners, settings, DateTimeOffset.UnixEpoch).GetAwaiter().GetResult();
-        queue.ReconcileAsync(runners, settings, DateTimeOffset.UnixEpoch.AddSeconds(46)).GetAwaiter().GetResult();
+        queue.ReconcileAsync([a, b, c], settings, now).GetAwaiter().GetResult();
+        Assert(control.Started.SequenceEqual(["a"]),
+            "an all-stopped queue bootstraps its first runner without requiring the optimizer to be disabled");
 
-        Assert(control.Started.Count == 0 && control.Stopped.Count == 0,
-            "runners stopped before the queue was enabled remain stopped");
+        queue.ReconcileAsync([Runner("a", RunnerState.Ready), b, c], settings,
+            now.AddSeconds(1)).GetAwaiter().GetResult();
+        queue.ReconcileAsync([a, b, c], settings,
+            now.AddSeconds(2)).GetAwaiter().GetResult();
+
+        Assert(control.Started.SequenceEqual(["a", "b"]),
+            "after a bootstrapped runner has been online, a later manual stop is respected and the next candidate starts");
     }
 
     private static void QueueRotatesOnlyRunnersItStopped()

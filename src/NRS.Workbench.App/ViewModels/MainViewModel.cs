@@ -447,7 +447,10 @@ public sealed class MainViewModel : ObservableObject
         return _dialogs.Confirm(UiLanguage.Choose($"El runner '{runner.Alias}' está ejecutando un job.\n\nLa operación puede interrumpirlo y marcarlo como fallido.\n\n¿Continuar?", $"Runner '{runner.Alias}' is running a job.\n\nThis action may interrupt it and mark it as failed.\n\nContinue?", $"El runner '{runner.Alias}' està executant un job.\n\nL\u0027operació pot interrompre\u0027l i marcar-lo com a fallit.\n\nVols continuar?"), "Runner BUSY");
     }
 
-    private bool CanStartSelected() => !_settingsService.Load().RunnerQueueEnabled && SelectedRunner?.State == RunnerState.Stopped;
+    // Starting one stopped runner is an explicit opt-in even while the queue is active.
+    // The coordinator will discover it as online on the next refresh and continue
+    // enforcing the configured queue limit. Bulk/stop/restart controls remain guarded.
+    private bool CanStartSelected() => SelectedRunner?.State == RunnerState.Stopped;
     private bool CanStopSelected() => !_settingsService.Load().RunnerQueueEnabled && SelectedRunner is not null && CanStop(SelectedRunner);
     private bool CanRestartSelected() => !_settingsService.Load().RunnerQueueEnabled && (SelectedRunner?.State is RunnerState.Ready or RunnerState.Busy);
     private static bool CanStop(RunnerInfo runner) => runner.State is RunnerState.Ready or RunnerState.Busy or RunnerState.Starting;
