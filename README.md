@@ -10,7 +10,7 @@
 
 **New in v0.18.2:** Catalan interface, safer runner-queue recovery across app restarts, stronger protection for manually stopped runners, and guarded repository updating from `RUN_ME_FIRST.cmd`.
 
-**In development: v0.18.3.** The next queue iteration adds an at-a-glance queue dashboard, session Pause/Resume, and configurable CPU/RAM guards that delay new starts instead of overloading the host. The published v0.18.2 ZIP does not include these changes yet.
+**In development: v0.18.3.** The next queue iteration adds an at-a-glance queue dashboard, session Pause/Resume, configurable CPU/RAM guards that delay new starts instead of overloading the host, and an all-stopped bootstrap so enabling the queue can start initial candidates without first disabling the optimizer. A single stopped runner can also be started manually as an explicit queue opt-in; later manual stops remain respected. The published v0.18.2 ZIP does not include these changes yet.
 
 NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.2 Public Preview**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The published v0.18.2 interface is available in Spanish, English and Catalan.
 
