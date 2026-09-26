@@ -22,7 +22,7 @@
                     <TextBlock Text="&#xE7C3;" FontFamily="Segoe MDL2 Assets" FontSize="23" Foreground="#7697C8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="{local:Tr Source='Preparar commit'}" FontSize="27" FontWeight="Bold"/>
+                    <TextBlock Text="{local:Tr Source='Preparar commit'}" FontSize="25" FontWeight="Bold"/>
                     <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
                         <TextBlock Text="{Binding RepositoryTitle}" Foreground="#7894B8" FontWeight="SemiBold"/>
                         <TextBlock Text="  ·  " Foreground="{StaticResource MutedBrush}"/>
@@ -77,7 +77,7 @@
                                         </CheckBox.Style>
                                     </CheckBox>
                                     <Border Grid.Column="1" Padding="7,3" CornerRadius="8" BorderBrush="#3B424C" BorderThickness="1" Background="#20252B" HorizontalAlignment="Left">
-                                        <TextBlock Text="{Binding StatusLabel, Converter={StaticResource LocalizedText}}" FontSize="9.5" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding StatusLabel, Converter={StaticResource LocalizedText}}" FontSize="10.5" FontWeight="Bold"/>
                                     </Border>
                                     <TextBlock Grid.Column="2" Text="{Binding DisplayPath}" Margin="10,0,8,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding DisplayPath}"/>
                                     <TextBlock Grid.Column="3" Text="{Binding StatusCode}" Foreground="{StaticResource MutedBrush}" FontFamily="Cascadia Mono, Consolas" VerticalAlignment="Center" HorizontalAlignment="Right"/>
@@ -130,7 +130,7 @@
                 <Ellipse Width="9" Height="9" Fill="#5AA878" Margin="0,1,8,0"/>
                 <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}"/>
             </StackPanel>
-            <TextBlock Grid.Column="1" Text="Neo RS" FontFamily="Segoe UI" FontSize="12" Foreground="#6F8DB5" Opacity="0.76"/>
+            <TextBlock Grid.Column="1" Text="Neo RS" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource MutedBrush}" Opacity="0.70"/>
         </Grid>
     </Grid>
 </Window>
