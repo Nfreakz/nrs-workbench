@@ -259,10 +259,19 @@ internal static class RunnerQueueSmoke
 
         queue.ReconcileAsync(
             [Runner("first", RunnerState.Stopped), Runner("second", RunnerState.Stopped)],
-            settings, now.AddSeconds(10), Resources(cpu: 25, memoryPercent: 40)).GetAwaiter().GetResult();
+            settings, now.AddSeconds(10), Resources(cpu: 78, memoryPercent: 40)).GetAwaiter().GetResult();
+
+        Assert(control.Started.Count == 0 &&
+               queue.Snapshot.HoldReason == RunnerQueueHoldReason.HighCpu &&
+               queue.Snapshot.CpuReleaseThreshold == 75,
+            "smart queue keeps the CPU hold inside the 5-point recovery margin");
+
+        queue.ReconcileAsync(
+            [Runner("first", RunnerState.Stopped), Runner("second", RunnerState.Stopped)],
+            settings, now.AddSeconds(15), Resources(cpu: 74, memoryPercent: 40)).GetAwaiter().GetResult();
 
         Assert(control.Started.SequenceEqual(["second"]),
-            "smart queue starts the same queued runner after CPU returns below the threshold");
+            "smart queue starts the same queued runner only after CPU clears the recovery margin");
     }
 
     private static void ResourceGuardBlocksStartsUntilMemoryRecovers()
@@ -292,10 +301,19 @@ internal static class RunnerQueueSmoke
 
         queue.ReconcileAsync(
             [Runner("first", RunnerState.Stopped), Runner("second", RunnerState.Stopped)],
-            settings, now.AddSeconds(10), Resources(cpu: 20, memoryPercent: 50)).GetAwaiter().GetResult();
+            settings, now.AddSeconds(10), Resources(cpu: 20, memoryPercent: 72)).GetAwaiter().GetResult();
+
+        Assert(control.Started.Count == 0 &&
+               queue.Snapshot.HoldReason == RunnerQueueHoldReason.HighMemory &&
+               queue.Snapshot.MemoryReleaseThreshold == 70,
+            "smart queue keeps the RAM hold inside the 5-point recovery margin");
+
+        queue.ReconcileAsync(
+            [Runner("first", RunnerState.Stopped), Runner("second", RunnerState.Stopped)],
+            settings, now.AddSeconds(15), Resources(cpu: 20, memoryPercent: 69)).GetAwaiter().GetResult();
 
         Assert(control.Started.SequenceEqual(["second"]),
-            "smart queue resumes starts after RAM returns below the threshold");
+            "smart queue resumes starts only after RAM clears the recovery margin");
     }
 
     private static void QueuePauseFreezesRotationWithoutTouchingBusyJobs()
