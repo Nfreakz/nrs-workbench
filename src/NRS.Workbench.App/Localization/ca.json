@@ -200,7 +200,7 @@
   "☕ Apoyar desarrollo": "☕ Donar suport al desenvolupament",
   "Hay runners pendientes de revisión tras reiniciar NRS Workbench.": "Hi ha runners pendents de revisió després de reiniciar NRS Workbench.",
   "Revisar runners tras reiniciar": "Revisar els runners després de reiniciar",
-  "La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. Los runners que ya estaban detenidos manualmente no se iniciarán por la cola. Los jobs activos no se detienen. NRS Workbench debe permanecer abierto o en la bandeja.": "L'aplicació manté com a màxim aquest nombre de runners connectats i rota els que estan lliures cada 45 segons. La cua no iniciarà runners que ja estiguessin aturats manualment. Els jobs actius no s'interrompen. NRS Workbench ha de continuar obert o a la safata del sistema.",
+  "La app mantiene como máximo ese número de runners conectados y rota los libres cada 45 s. Si activas la cola con todos los runners detenidos, iniciará candidatos hasta alcanzar el límite. Después respetará los runners que detengas manualmente. Los jobs activos no se detienen. NRS Workbench debe permanecer abierto o en la bandeja.": "L'aplicació manté com a màxim aquest nombre de runners connectats i rota els que estan lliures cada 45 segons. Si actives la cua amb tots els runners aturats, iniciarà candidats fins a assolir el límit. Després respectarà els runners que aturis manualment. Els jobs actius no s'interrompen. NRS Workbench ha de continuar obert o a la safata del sistema.",
   "Versión ": "Versió ",
   "desconocida": "desconeguda",
   "No se pudo abrir la página de apoyo.": "No s'ha pogut obrir la pàgina de suport.",
