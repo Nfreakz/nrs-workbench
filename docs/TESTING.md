@@ -16,7 +16,9 @@ The smoke-test executable uses temporary local repositories and a temporary bare
 dotnet run --project .\tests\NRS.Workbench.SmokeTests\NRS.Workbench.SmokeTests.csproj -c Release
 ```
 
-It also covers portable-settings privacy and round-trip checks plus unambiguous, ambiguous and invalid repository-path relocation. The queue smoke tests cover the connected-runner limit, active-job protection, idle rotation, and preservation of manually stopped runners when the queue is disabled. Review/Cancel UI behavior and ZIP startup must still be checked manually.\n\nIt covers clean/dirty inspection, empty-message protection, partial commits, staged-file protection, unusual filenames, rename/delete handling, ahead/push, behind/fast-forward pull, divergence blocking and remote-credential redaction.
+It also covers portable-settings privacy and round-trip checks plus unambiguous, ambiguous and invalid repository-path relocation. The queue smoke tests cover the connected-runner limit, active-job protection, idle rotation, and preservation of manually stopped runners when the queue is disabled. Review/Cancel UI behavior and ZIP startup must still be checked manually.
+
+It covers clean/dirty inspection, empty-message protection, partial commits, staged-file protection, unusual filenames, rename/delete handling, ahead/push, behind/fast-forward pull, divergence blocking and remote-credential redaction.
 
 ## Public-source audit
 
