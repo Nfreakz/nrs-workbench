@@ -8,6 +8,7 @@
 - Adds an optional host-resource guard, enabled by default, that blocks new queue starts and idle rotations while CPU or physical RAM are above configurable thresholds. Existing BUSY jobs are never interrupted by the guard. A 5-point recovery margin prevents rapid on/off flapping when host load hovers near a threshold.
 - Adds portable settings for the resource guard and its CPU/RAM thresholds, with validation and smoke coverage.
 - Adds smoke coverage for CPU/RAM holds, pause behavior and queue dashboard classification.
+- Reworks the dark UI from a blue-heavy dashboard palette to a restrained graphite system, reduces decorative status chrome, removes script branding, increases microtext legibility and documents the shared visual rules.
 
 
 ## [0.18.2] - 2026-09-26

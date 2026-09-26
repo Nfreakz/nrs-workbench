@@ -18,13 +18,13 @@
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
-                <Border Width="54" Height="54" CornerRadius="14" Background="#143A63" BorderBrush="#2F6FAF" BorderThickness="1">
-                    <TextBlock Text="&#xE7C3;" FontFamily="Segoe MDL2 Assets" FontSize="23" Foreground="#7DBBFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Border Width="54" Height="54" CornerRadius="14" Background="#242C36" BorderBrush="#4E6685" BorderThickness="1">
+                    <TextBlock Text="&#xE7C3;" FontFamily="Segoe MDL2 Assets" FontSize="23" Foreground="#7697C8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="{local:Tr Source='Preparar commit'}" FontSize="27" FontWeight="Bold"/>
+                    <TextBlock Text="{local:Tr Source='Preparar commit'}" FontSize="25" FontWeight="Bold"/>
                     <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                        <TextBlock Text="{Binding RepositoryTitle}" Foreground="#6FADE8" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding RepositoryTitle}" Foreground="#7894B8" FontWeight="SemiBold"/>
                         <TextBlock Text="  ·  " Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Text="{Binding BranchText}" Foreground="{StaticResource MutedBrush}"/>
                     </StackPanel>
@@ -42,7 +42,7 @@
             <Border Grid.Column="0" Style="{StaticResource PanelCard}" Margin="0,0,7,0">
                 <Grid>
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <Border Grid.Row="0" Background="#122238" BorderBrush="#223A56" BorderThickness="0,0,0,1" Padding="13,10">
+                    <Border Grid.Row="0" Background="#1D2128" BorderBrush="#303640" BorderThickness="0,0,0,1" Padding="13,10">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <TextBlock Text="{local:Tr Source='Archivos del commit'}" FontWeight="SemiBold"/>
@@ -50,7 +50,7 @@
                         </Grid>
                     </Border>
                     <ListBox Grid.Row="1" ItemsSource="{Binding Changes}" SelectedItem="{Binding SelectedChange, Mode=TwoWay}"
-                             SelectionChanged="Changes_SelectionChanged" Background="#0B1624" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                             SelectionChanged="Changes_SelectionChanged" Background="#14171B" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -59,8 +59,8 @@
                                 <Setter Property="Background" Value="Transparent"/>
                                 <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
                                 <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#122A43"/></Trigger>
-                                    <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="#163754"/></Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#22272E"/></Trigger>
+                                    <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="#28313C"/></Trigger>
                                 </Style.Triggers>
                             </Style>
                         </ListBox.ItemContainerStyle>
@@ -76,8 +76,8 @@
                                             </Style>
                                         </CheckBox.Style>
                                     </CheckBox>
-                                    <Border Grid.Column="1" Padding="7,3" CornerRadius="8" BorderBrush="#34516D" BorderThickness="1" Background="#13283C" HorizontalAlignment="Left">
-                                        <TextBlock Text="{Binding StatusLabel, Converter={StaticResource LocalizedText}}" FontSize="9.5" FontWeight="Bold"/>
+                                    <Border Grid.Column="1" Padding="7,3" CornerRadius="8" BorderBrush="#3B424C" BorderThickness="1" Background="#20252B" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding StatusLabel, Converter={StaticResource LocalizedText}}" FontSize="10.5" FontWeight="Bold"/>
                                     </Border>
                                     <TextBlock Grid.Column="2" Text="{Binding DisplayPath}" Margin="10,0,8,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding DisplayPath}"/>
                                     <TextBlock Grid.Column="3" Text="{Binding StatusCode}" Foreground="{StaticResource MutedBrush}" FontFamily="Cascadia Mono, Consolas" VerticalAlignment="Center" HorizontalAlignment="Right"/>
@@ -91,7 +91,7 @@
             <Border Grid.Column="1" Style="{StaticResource PanelCard}" Margin="7,0,0,0">
                 <Grid>
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <Border Grid.Row="0" Background="#122238" BorderBrush="#223A56" BorderThickness="0,0,0,1" Padding="13,10">
+                    <Border Grid.Row="0" Background="#1D2128" BorderBrush="#303640" BorderThickness="0,0,0,1" Padding="13,10">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <TextBlock Text="Diff" FontWeight="SemiBold"/>
@@ -99,7 +99,7 @@
                         </Grid>
                     </Border>
                     <TextBox Grid.Row="1" Text="{Binding DiffText, Mode=OneWay}" IsReadOnly="True" BorderThickness="0"
-                             Background="#071321" Foreground="#DCEBFA" FontFamily="Cascadia Mono, Consolas" FontSize="11.5"
+                             Background="#111419" Foreground="#E2E5E9" FontFamily="Cascadia Mono, Consolas" FontSize="11.5"
                              Padding="13" AcceptsReturn="True" AcceptsTab="True" TextWrapping="NoWrap"
                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
                 </Grid>
@@ -127,10 +127,10 @@
         <Grid Grid.Row="3" Margin="2,10,2,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
-                <Ellipse Width="9" Height="9" Fill="#3DDC84" Margin="0,1,8,0"/>
+                <Ellipse Width="9" Height="9" Fill="#5AA878" Margin="0,1,8,0"/>
                 <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}"/>
             </StackPanel>
-            <TextBlock Grid.Column="1" Text="Neo RS" FontFamily="Segoe Script" FontSize="12" Foreground="#5EA7E8" Opacity="0.76"/>
+            <TextBlock Grid.Column="1" Text="Neo RS" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource MutedBrush}" Opacity="0.70"/>
         </Grid>
     </Grid>
 </Window>

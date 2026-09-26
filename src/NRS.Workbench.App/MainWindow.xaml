@@ -10,8 +10,8 @@
     <Window.Resources>
         <!-- Fully templated ComboBox so Windows' light native chrome never leaks through. -->
         <Style x:Key="RunnerSortComboItem" TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="#EAF3FD"/>
-            <Setter Property="Background" Value="#0F1D2D"/>
+            <Setter Property="Foreground" Value="#E7E9EC"/>
+            <Setter Property="Background" Value="#1B1F24"/>
             <Setter Property="Padding" Value="11,7"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="Template">
@@ -24,10 +24,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ItemChrome" Property="Background" Value="#163451"/>
+                                <Setter TargetName="ItemChrome" Property="Background" Value="#252B33"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="ItemChrome" Property="Background" Value="#1B4B76"/>
+                                <Setter TargetName="ItemChrome" Property="Background" Value="#2D3A4D"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
@@ -40,9 +40,9 @@
         </Style>
 
         <Style x:Key="RunnerSortCombo" TargetType="ComboBox">
-            <Setter Property="Foreground" Value="#EAF3FD"/>
-            <Setter Property="Background" Value="#11243A"/>
-            <Setter Property="BorderBrush" Value="#2B4767"/>
+            <Setter Property="Foreground" Value="#E7E9EC"/>
+            <Setter Property="Background" Value="#1D2128"/>
+            <Setter Property="BorderBrush" Value="#353B45"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="MinWidth" Value="150"/>
             <Setter Property="MinHeight" Value="38"/>
@@ -68,14 +68,14 @@
                                                 CornerRadius="8">
                                             <Grid>
                                                 <TextBlock Text="{Binding SelectedItem.Label, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"
-                                                           Foreground="#EAF3FD"
+                                                           Foreground="#E7E9EC"
                                                            Margin="11,0,34,0"
                                                            VerticalAlignment="Center"
                                                            TextTrimming="CharacterEllipsis"
                                                            IsHitTestVisible="False"/>
-                                                <Border Width="30" HorizontalAlignment="Right" Background="#0D1C2D" CornerRadius="0,7,7,0"
+                                                <Border Width="30" HorizontalAlignment="Right" Background="#1A1E23" CornerRadius="0,7,7,0"
                                                         IsHitTestVisible="False">
-                                                    <TextBlock Text="⌄" Foreground="#8FB3D8" FontSize="18"
+                                                    <TextBlock Text="⌄" Foreground="#9CA5B0" FontSize="18"
                                                                HorizontalAlignment="Center" VerticalAlignment="Center"
                                                                Margin="0,-4,0,0"/>
                                                 </Border>
@@ -83,11 +83,11 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="ComboChrome" Property="Background" Value="#163451"/>
-                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4B79A6"/>
+                                                <Setter TargetName="ComboChrome" Property="Background" Value="#252B33"/>
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#505B69"/>
                                             </Trigger>
                                             <Trigger Property="IsChecked" Value="True">
-                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4F91CB"/>
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#5B718F"/>
                                             </Trigger>
                                             <Trigger Property="IsEnabled" Value="False">
                                                 <Setter TargetName="ComboChrome" Property="Opacity" Value="0.45"/>
@@ -103,8 +103,8 @@
                                    Focusable="False"
                                    IsOpen="{TemplateBinding IsDropDownOpen}"
                                    PopupAnimation="Fade">
-                                <Border Background="#0F1D2D"
-                                        BorderBrush="#31577D"
+                                <Border Background="#1B1F24"
+                                        BorderBrush="#424A55"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         Margin="0,4,0,0"
@@ -147,14 +147,14 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="60" Height="60" CornerRadius="16" Background="#071725" BorderBrush="#2F6FAF" BorderThickness="1" ClipToBounds="True">
+                <Border Width="60" Height="60" CornerRadius="10" Background="#111419" BorderBrush="#4E6685" BorderThickness="1" ClipToBounds="True">
                     <Image Source="/Assets/NRSWorkbench.png" Stretch="Uniform" Margin="3"/>
                 </Border>
                 <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="NRS Workbench" FontSize="31" FontWeight="Bold"/>
-                        <Border Background="#173A61" BorderBrush="#38618A" BorderThickness="1" CornerRadius="7" Padding="7,2" Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding AppVersionText}" FontSize="11" Foreground="#C9E4FF" FontWeight="SemiBold"/>
+                        <TextBlock Text="NRS Workbench" FontSize="27" FontWeight="Bold"/>
+                        <Border Background="#28364B" BorderBrush="#4B5A6D" BorderThickness="1" CornerRadius="7" Padding="7,2" Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding AppVersionText}" FontSize="11" Foreground="#D9DEE5" FontWeight="SemiBold"/>
                         </Border>
                     </StackPanel>
                     <TextBlock Text="{local:Tr Source='Runners y repositorios locales desde un solo sitio'}" FontSize="14" Foreground="{StaticResource MutedBrush}" Margin="1,4,0,0"/>
@@ -165,31 +165,31 @@
                 <Border Style="{StaticResource StatCard}">
                     <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <Border Width="26" Height="26" CornerRadius="7" Background="#173B61" VerticalAlignment="Center">
-                            <TextBlock Text="&#xECA5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#67B3FF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Border Width="26" Height="26" CornerRadius="7" Background="#2A3A52" VerticalAlignment="Center">
+                            <TextBlock Text="&#xECA5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#6F91C4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                            <TextBlock Text="RUNNERS" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Text="RUNNERS" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                             <TextBlock Text="{Binding TotalCount}" FontSize="21" FontWeight="Bold"/>
                         </StackPanel>
                     </Grid>
                 </Border>
                 <Border Style="{StaticResource StatCard}">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse Width="12" Height="12" Fill="#3DDC84" Margin="0,1,11,0"/>
-                        <StackPanel><TextBlock Text="READY" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding ReadyCount}" FontSize="21" FontWeight="Bold"/></StackPanel>
+                        <Ellipse Width="12" Height="12" Fill="#5AA878" Margin="0,1,11,0"/>
+                        <StackPanel><TextBlock Text="READY" FontSize="11" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding ReadyCount}" FontSize="21" FontWeight="Bold"/></StackPanel>
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource StatCard}">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse Width="12" Height="12" Fill="#F5C451" Margin="0,1,11,0"/>
-                        <StackPanel><TextBlock Text="BUSY" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding BusyCount}" FontSize="21" FontWeight="Bold"/></StackPanel>
+                        <Ellipse Width="12" Height="12" Fill="#C59A4A" Margin="0,1,11,0"/>
+                        <StackPanel><TextBlock Text="BUSY" FontSize="11" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding BusyCount}" FontSize="21" FontWeight="Bold"/></StackPanel>
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource StatCard}">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse Width="12" Height="12" Fill="#FF6470" Margin="0,1,11,0"/>
-                        <StackPanel><TextBlock Text="STOPPED" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding StoppedCount}" FontSize="21" FontWeight="Bold"/></StackPanel>
+                        <Ellipse Width="12" Height="12" Fill="#D2636D" Margin="0,1,11,0"/>
+                        <StackPanel><TextBlock Text="STOPPED" FontSize="11" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding StoppedCount}" FontSize="21" FontWeight="Bold"/></StackPanel>
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource StatCard}">
@@ -197,25 +197,25 @@
                         <Ellipse Width="12" Height="12" Margin="0,1,11,0">
                             <Ellipse.Style>
                                 <Style TargetType="Ellipse">
-                                    <Setter Property="Fill" Value="#3DDC84"/>
+                                    <Setter Property="Fill" Value="#5AA878"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HealthKind}" Value="Warning"><Setter Property="Fill" Value="#F5C451"/></DataTrigger>
-                                        <DataTrigger Binding="{Binding HealthKind}" Value="Alert"><Setter Property="Fill" Value="#FF6470"/></DataTrigger>
-                                        <DataTrigger Binding="{Binding HealthKind}" Value="Unknown"><Setter Property="Fill" Value="#6F879F"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthKind}" Value="Warning"><Setter Property="Fill" Value="#C59A4A"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthKind}" Value="Alert"><Setter Property="Fill" Value="#D2636D"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthKind}" Value="Unknown"><Setter Property="Fill" Value="#8F97A1"/></DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Ellipse.Style>
                         </Ellipse>
                         <StackPanel>
-                            <TextBlock Text="{local:Tr Source='SALUD'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Text="{local:Tr Source='SALUD'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                             <TextBlock Text="{Binding HealthLabel}" FontSize="16" FontWeight="Bold">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="#72E6A5"/>
+                                        <Setter Property="Foreground" Value="#67AF87"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding HealthKind}" Value="Warning"><Setter Property="Foreground" Value="#F5C451"/></DataTrigger>
-                                            <DataTrigger Binding="{Binding HealthKind}" Value="Alert"><Setter Property="Foreground" Value="#FF7C86"/></DataTrigger>
-                                            <DataTrigger Binding="{Binding HealthKind}" Value="Unknown"><Setter Property="Foreground" Value="#8EA2B7"/></DataTrigger>
+                                            <DataTrigger Binding="{Binding HealthKind}" Value="Warning"><Setter Property="Foreground" Value="#C59A4A"/></DataTrigger>
+                                            <DataTrigger Binding="{Binding HealthKind}" Value="Alert"><Setter Property="Foreground" Value="#D56B75"/></DataTrigger>
+                                            <DataTrigger Binding="{Binding HealthKind}" Value="Unknown"><Setter Property="Foreground" Value="#9BA3AE"/></DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </TextBlock.Style>
@@ -239,7 +239,7 @@
                 <Button Style="{StaticResource ToolbarButton}" Command="{Binding RestartCommand}">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE72C;"/><TextBlock Text="{local:Tr Source='Reiniciar'}"/></StackPanel>
                 </Button>
-                <Border Width="1" Height="24" Background="#2A405B" Margin="4,7,13,0"/>
+                <Border Width="1" Height="24" Background="#343A43" Margin="4,7,13,0"/>
                 <Button Style="{StaticResource ToolbarButton}" Command="{Binding StartAllCommand}">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE768;"/><TextBlock Text="{local:Tr Source='Iniciar todos'}"/></StackPanel>
                 </Button>
@@ -286,15 +286,15 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Center">
-                    <TextBlock Text="{local:Tr Source='COLA INTELIGENTE'}" FontSize="9" FontWeight="Bold" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='COLA INTELIGENTE'}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding QueueStateText}" FontSize="16" FontWeight="Bold" Margin="0,2,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="#6F879F"/>
+                                <Setter Property="Foreground" Value="#8F97A1"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Active"><Setter Property="Foreground" Value="#72E6A5"/></DataTrigger>
-                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Paused"><Setter Property="Foreground" Value="#F5C451"/></DataTrigger>
-                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Blocked"><Setter Property="Foreground" Value="#FFB56B"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Active"><Setter Property="Foreground" Value="#67AF87"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Paused"><Setter Property="Foreground" Value="#C59A4A"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Blocked"><Setter Property="Foreground" Value="#C78D58"/></DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
@@ -302,19 +302,19 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Margin="12,0,14,0">
-                    <TextBlock Text="{local:Tr Source='EJECUTANDO'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='EJECUTANDO'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding QueueRunningText}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueRunningText}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2" Margin="12,0,14,0">
-                    <TextBlock Text="{local:Tr Source='SIGUIENTE'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='SIGUIENTE'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding QueueNextText}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueNextText}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="3" Margin="12,0,14,0">
-                    <TextBlock Text="{local:Tr Source='EN ESPERA'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='EN ESPERA'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding QueueWaitingText}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueWaitingText}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="4" Margin="12,0,14,0">
-                    <TextBlock Text="{local:Tr Source='PARADOS MANUALMENTE'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/>
+                    <TextBlock Text="{local:Tr Source='PARADOS MANUALMENTE'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                     <TextBlock Text="{Binding QueueManualText}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueManualText}"/>
                 </StackPanel>
 
@@ -323,7 +323,7 @@
                         Click="QueuePause_Click"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Text="{Binding QueueReasonText}"
-                           FontSize="10" Foreground="{StaticResource MutedBrush}" Margin="12,6,14,0"
+                           FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="12,6,14,0"
                            TextTrimming="CharacterEllipsis" ToolTip="{Binding QueueReasonText}"/>
             </Grid>
         </Border>
@@ -355,7 +355,7 @@
                                         HorizontalAlignment="Left" VerticalAlignment="Center" MinWidth="90">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <Ellipse Width="8" Height="8" Fill="{Binding State, Converter={StaticResource StateAccentBrush}}" Margin="0,1,7,0"/>
-                                        <TextBlock Text="{Binding State, Converter={StaticResource StateLabel}}" Foreground="#F7FBFF" FontWeight="Bold" FontSize="10"/>
+                                        <TextBlock Text="{Binding State, Converter={StaticResource StateLabel}}" Foreground="#F1F3F5" FontWeight="Bold" FontSize="11"/>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -365,7 +365,7 @@
                     <DataGridTemplateColumn Header="RUNNER" Width="128">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Alias}" FontWeight="SemiBold" Foreground="#F7FAFE" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Alias}" FontWeight="SemiBold" Foreground="#F1F3F5" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -383,10 +383,10 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Width="22" Height="22" CornerRadius="11" Background="#18283B" BorderBrush="#304865" BorderThickness="1" Margin="0,0,9,0">
-                                        <TextBlock Text="GH" FontSize="7" FontWeight="Bold" Foreground="#DCE8F5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Border Width="22" Height="22" CornerRadius="11" Background="#20252B" BorderBrush="#3B424C" BorderThickness="1" Margin="0,0,9,0">
+                                        <TextBlock Text="GH" FontSize="11" FontWeight="Bold" Foreground="#D6DBE1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
-                                    <TextBlock Text="{Binding GitHubTarget}" Foreground="#D9E6F4" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding GitHubTarget}" Foreground="#D6DBE1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -397,15 +397,15 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <TextBlock x:Name="IdleProgress" Text="—" Foreground="#60758D" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="IdleProgress" Text="—" Foreground="#7F8893" VerticalAlignment="Center"/>
                                     <StackPanel x:Name="BusyProgress" Visibility="Collapsed" VerticalAlignment="Center" ToolTip="{Binding Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}">
                                         <Grid Margin="0,0,0,3">
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding Progress.PhaseDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#E7F0FA" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" FontSize="10" FontWeight="Bold" Foreground="#F5C451" Margin="8,0,0,0"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold" Foreground="#C59A4A" Margin="8,0,0,0"/>
                                         </Grid>
                                         <ProgressBar Height="6" Minimum="0" Maximum="100" Value="{Binding Progress.Percent, Mode=OneWay}"
-                                                     Foreground="#F5C451" Background="#1A2A3E" BorderThickness="0">
+                                                     Foreground="#C59A4A" Background="#242931" BorderThickness="0">
                                             <ProgressBar.Style>
                                                 <Style TargetType="ProgressBar">
                                                     <Setter Property="IsIndeterminate" Value="True"/>
@@ -417,7 +417,7 @@
                                                 </Style>
                                             </ProgressBar.Style>
                                         </ProgressBar>
-                                        <TextBlock Text="{Binding Progress.CompactMetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="9" Foreground="#7F95AC" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Progress.CompactMetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8F97A1" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Grid>
                                 <DataTemplate.Triggers>
@@ -434,7 +434,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" Foreground="#72B7FF" FontSize="13" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" Foreground="#6F91C4" FontSize="13" Margin="0,0,7,0" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding ModeDisplay, Converter={StaticResource LocalizedText}}"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -474,8 +474,8 @@
                     <Grid Grid.Row="0" Margin="0,0,0,13">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal">
-                            <Border Width="28" Height="28" CornerRadius="8" Background="#173A61" Margin="0,0,9,0">
-                                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#71B7FF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Width="28" Height="28" CornerRadius="8" Background="#28364B" Margin="0,0,9,0">
+                                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#6F91C4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <TextBlock Text="{local:Tr Source='Detalle del runner'}" Style="{StaticResource SectionTitle}" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -484,17 +484,17 @@
                                 CornerRadius="12" Padding="9,4" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
                                 <Ellipse Width="8" Height="8" Fill="{Binding SelectedRunner.State, Converter={StaticResource StateAccentBrush}}" Margin="0,1,7,0"/>
-                                <TextBlock Text="{Binding SelectedRunner.State, Converter={StaticResource StateLabel}}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="10"/>
+                                <TextBlock Text="{Binding SelectedRunner.State, Converter={StaticResource StateLabel}}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11"/>
                             </StackPanel>
                         </Border>
                     </Grid>
 
                     <StackPanel Grid.Row="1" Margin="0,0,0,14">
                         <TextBlock Text="{Binding SelectedRunner.Alias, TargetNullValue=Selecciona un runner}" FontSize="23" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding SelectedRunner.GitHubTarget}" Foreground="#78B9FF" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding SelectedRunner.GitHubTarget}" Foreground="#6F91C4" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
 
-                    <Border Grid.Row="2" x:Name="SelectedProgressCard" Background="#111E2E" BorderBrush="#5B4A1C" BorderThickness="1" CornerRadius="9" Padding="11" Margin="0,0,0,12">
+                    <Border Grid.Row="2" x:Name="SelectedProgressCard" Background="#191C21" BorderBrush="#5A4D32" BorderThickness="1" CornerRadius="9" Padding="11" Margin="0,0,0,12">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -509,14 +509,14 @@
                             <Grid Margin="0,0,0,7">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Text="{local:Tr Source='Trabajo en curso'}" FontSize="10" Foreground="#A89355" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding SelectedRunner.Progress.JobDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8FB6DE" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                                    <TextBlock Text="{local:Tr Source='Trabajo en curso'}" FontSize="11" Foreground="#A08B5A" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding SelectedRunner.Progress.JobDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8FA0B3" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
                                     <TextBlock Text="{Binding SelectedRunner.Progress.PhaseDisplay, Converter={StaticResource LocalizedText}}" FontSize="13" FontWeight="SemiBold" Foreground="#F6F8FB" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
                                 </StackPanel>
-                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" Foreground="#F5C451" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" Foreground="#C59A4A" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
                             </Grid>
                             <ProgressBar Height="8" Minimum="0" Maximum="100" Value="{Binding SelectedRunner.Progress.Percent, Mode=OneWay}"
-                                         Foreground="#F5C451" Background="#213044" BorderThickness="0">
+                                         Foreground="#C59A4A" Background="#242931" BorderThickness="0">
                                 <ProgressBar.Style>
                                     <Style TargetType="ProgressBar">
                                         <Setter Property="IsIndeterminate" Value="True"/>
@@ -530,8 +530,8 @@
                             </ProgressBar>
                             <Grid Margin="0,7,0,0">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding SelectedRunner.Progress.MetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="10.5" Foreground="#AFC0D2"/>
-                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}" FontSize="9.5" Foreground="#6F879F" Margin="10,0,0,0"/>
+                                <TextBlock Text="{Binding SelectedRunner.Progress.MetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#A7AEB7"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8F97A1" Margin="10,0,0,0"/>
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -568,16 +568,16 @@
                     <Grid Grid.Row="0" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal">
-                            <Border Width="28" Height="28" CornerRadius="8" Background="#173A61" Margin="0,0,9,0">
-                                <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#71B7FF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Width="28" Height="28" CornerRadius="8" Background="#28364B" Margin="0,0,9,0">
+                                <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#6F91C4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{local:Tr Source='Último log'}" Style="{StaticResource SectionTitle}"/>
-                                    <Border Margin="9,1,0,0" Padding="6,2" CornerRadius="7" Background="#103524" BorderBrush="#217A4B" BorderThickness="1">
+                                    <Border Margin="9,1,0,0" Padding="6,2" CornerRadius="7" Background="#223229" BorderBrush="#3D6F53" BorderThickness="1">
                                         <StackPanel Orientation="Horizontal">
-                                            <Ellipse Width="6" Height="6" Fill="#3DDC84" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                                            <TextBlock Text="LIVE" FontSize="9" FontWeight="Bold" Foreground="#72E6A5"/>
+                                            <Ellipse Width="6" Height="6" Fill="#5AA878" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="LIVE" FontSize="11" FontWeight="Bold" Foreground="#67AF87"/>
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
@@ -588,7 +588,7 @@
                             <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE74D;"/><TextBlock Text="{local:Tr Source='Limpiar vista'}"/></StackPanel>
                         </Button>
                     </Grid>
-                    <Border Grid.Row="1" Background="#07111D" BorderBrush="#263F5C" BorderThickness="1" CornerRadius="8" Padding="1">
+                    <Border Grid.Row="1" Background="#111419" BorderBrush="#303640" BorderThickness="1" CornerRadius="8" Padding="1">
                         <TextBox Text="{Binding LogText, Mode=OneWay}" IsReadOnly="True" TextWrapping="NoWrap"
                                  FontFamily="Cascadia Mono, Consolas" FontSize="11.5" Padding="12" AcceptsReturn="True"
                                  Background="Transparent" BorderThickness="0"
@@ -608,32 +608,32 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="{local:Tr Source='RECURSOS DEL EQUIPO'}" FontSize="10" FontWeight="Bold" Foreground="#C9E4FF"/>
-                    <TextBlock Text="{local:Tr Source='Uso total del PC'}" FontSize="10" Foreground="{StaticResource MutedBrush}" Margin="0,3,0,0"/>
+                    <TextBlock Text="{local:Tr Source='RECURSOS DEL EQUIPO'}" FontSize="11" FontWeight="Bold" Foreground="#D9DEE5"/>
+                    <TextBlock Text="{local:Tr Source='Uso total del PC'}" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,3,0,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Margin="12,0,18,0">
                     <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <TextBlock Text="CPU" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Text="CPU" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Grid.Column="1" Text="{Binding CpuUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding CpuPercent, Mode=OneWay}" Foreground="#67B3FF" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
-                    <TextBlock Text="{Binding CpuCapacityText}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding CpuPercent, Mode=OneWay}" Foreground="#6F91C4" Background="#242931" BorderThickness="0" Margin="0,5,0,3"/>
+                    <TextBlock Text="{Binding CpuCapacityText}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2" Margin="12,0,18,0">
                     <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <TextBlock Text="RAM" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Text="RAM" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Grid.Column="1" Text="{Binding MemoryUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding MemoryPercent, Mode=OneWay}" Foreground="#72E6A5" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
-                    <TextBlock Text="{local:Tr Source='Memoria usada / total'}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding MemoryPercent, Mode=OneWay}" Foreground="#67AF87" Background="#242931" BorderThickness="0" Margin="0,5,0,3"/>
+                    <TextBlock Text="{local:Tr Source='Memoria usada / total'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="3" Margin="12,0,0,0">
                     <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <TextBlock Text="{local:Tr Source='DISCO DEL SISTEMA'}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                        <TextBlock Text="{local:Tr Source='DISCO DEL SISTEMA'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                         <TextBlock Grid.Column="1" Text="{Binding DiskUseText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
-                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding DiskPercent, Mode=OneWay}" Foreground="#F5C451" Background="#1A2A3E" BorderThickness="0" Margin="0,5,0,3"/>
-                    <TextBlock Text="{local:Tr Source='Espacio usado / total'}" FontSize="10" Foreground="{StaticResource MutedBrush}"/>
+                    <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding DiskPercent, Mode=OneWay}" Foreground="#C59A4A" Background="#242931" BorderThickness="0" Margin="0,5,0,3"/>
+                    <TextBlock Text="{local:Tr Source='Espacio usado / total'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -642,15 +642,15 @@
         <Grid Grid.Row="7" Margin="2,12,2,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
-                <Ellipse Width="9" Height="9" Fill="#3DDC84" Margin="0,1,8,0"/>
+                <Ellipse Width="9" Height="9" Fill="#5AA878" Margin="0,1,8,0"/>
                 <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}"/>
                 <TextBlock Text="{Binding QueueStatusText}" Foreground="{StaticResource AccentBrush}" Margin="8,0,0,0"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="{Binding LastUpdatedText}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"/>
-                <TextBlock Text="  ·  " Foreground="#3D5873" VerticalAlignment="Center"/>
-                <TextBlock FontFamily="Segoe Script" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="{local:Tr Source='Acerca de · Neo RS'}">
-                    <Hyperlink Click="About_Click" Foreground="#5EA7E8" TextDecorations="{x:Null}">Neo RS</Hyperlink>
+                <TextBlock Text="  ·  " Foreground="#4A515B" VerticalAlignment="Center"/>
+                <TextBlock FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Opacity="0.78" VerticalAlignment="Center" ToolTip="{local:Tr Source='Acerca de · Neo RS'}">
+                    <Hyperlink Click="About_Click" Foreground="{StaticResource MutedBrush}" TextDecorations="{x:Null}">Neo RS</Hyperlink>
                 </TextBlock>
             </StackPanel>
         </Grid>

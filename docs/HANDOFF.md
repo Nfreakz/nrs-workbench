@@ -32,6 +32,7 @@
 - Adds a resource guard enabled by default. New starts and idle rotations wait when host CPU reaches the configured CPU threshold or physical RAM reaches the configured RAM threshold. Existing BUSY jobs are never interrupted. Once a resource hold starts, it clears only after load drops 5 percentage points below the configured threshold to avoid rapid flapping.
 - Default resource thresholds: CPU 85%, RAM 90%. Settings normalize configurable values to 50-100% and portable settings preserve them.
 - Smoke coverage must include CPU/RAM holds, recovery below threshold, pause semantics and dashboard classification.
+- A professional UI pass is being validated on `style/v0.18.3-professional-ui`: graphite surfaces, restrained blue accent, larger metadata text, reduced corner radii, neutral KPI borders and no script font branding. `docs/VISUAL_SYSTEM.md` is the source of truth for future visual changes.
 
 ## Verify before the next publication
 

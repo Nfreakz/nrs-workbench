@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="0,0,0,18">
-            <TextBlock Text="{local:Tr Source='Configuración'}" FontSize="26" FontWeight="Bold"/>
+            <TextBlock Text="{local:Tr Source='Configuración'}" FontSize="24" FontWeight="Bold"/>
             <TextBlock Text="{local:Tr Source='Configura runners, notificaciones y comportamiento del NRS Workbench.'}" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
         </StackPanel>
 
@@ -54,11 +54,11 @@
                     </StackPanel>
                 </Grid>
 
-                <Border Grid.Row="3" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12">
+                <Border Grid.Row="3" Background="#15181C" BorderBrush="#303640" BorderThickness="1" CornerRadius="8" Padding="12">
                     <StackPanel>
                         <CheckBox x:Name="ConfirmBusyCheck" Content="{local:Tr Source='Confirmar antes de parar un runner BUSY'}" Foreground="{StaticResource TextBrush}"/>
                         <CheckBox x:Name="KeepInTrayCheck" Content="{local:Tr Source='Mantener NRS Workbench en la bandeja al cerrar o minimizar'}" Foreground="{StaticResource TextBrush}" Margin="0,10,0,0"/>
-                        <Border BorderBrush="#263D5A" BorderThickness="0,1,0,0" Margin="0,12,0,10"/>
+                        <Border BorderBrush="#303640" BorderThickness="0,1,0,0" Margin="0,12,0,10"/>
                         <CheckBox x:Name="RunnerQueueEnabledCheck" Content="{local:Tr Source='Activar cola automática de runners'}" Foreground="{StaticResource TextBrush}"/>
                         <StackPanel Orientation="Horizontal" Margin="22,8,0,0">
                             <TextBlock Text="{local:Tr Source='Máximo de runners conectados'}" Style="{StaticResource MutedLabel}" VerticalAlignment="Center" Margin="0,0,12,0"/>
@@ -85,7 +85,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="4" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
+                <Border Grid.Row="4" Background="#15181C" BorderBrush="#303640" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
                     <StackPanel>
                         <TextBlock Text="{local:Tr Source='Notificaciones'}" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,0,0,8"/>
                         <CheckBox x:Name="NotificationsEnabledCheck" Content="{local:Tr Source='Activar notificaciones de escritorio'}" Foreground="{StaticResource TextBrush}"/>
@@ -108,7 +108,7 @@
                     <TextBlock Text="{local:Tr Source='Se aplica al reiniciar la aplicación.'}" Style="{StaticResource MutedLabel}" VerticalAlignment="Center" Margin="14,0,0,0"/>
                 </StackPanel>
 
-                <Border Grid.Row="6" Background="#0A1725" BorderBrush="#213A56" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
+                <Border Grid.Row="6" Background="#15181C" BorderBrush="#303640" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>

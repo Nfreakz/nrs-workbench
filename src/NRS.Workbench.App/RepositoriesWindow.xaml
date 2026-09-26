@@ -19,20 +19,20 @@
         <Grid Grid.Row="0" Margin="0,0,0,17">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="58" Height="58" CornerRadius="15" Background="#143A63" BorderBrush="#2F6FAF" BorderThickness="1">
-                    <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="#7DBBFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Border Width="58" Height="58" CornerRadius="10" Background="#242C36" BorderBrush="#4E6685" BorderThickness="1">
+                    <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="#7697C8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel Margin="15,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="{local:Tr Source='Repositorios'}" FontSize="29" FontWeight="Bold"/>
+                    <TextBlock Text="{local:Tr Source='Repositorios'}" FontSize="26" FontWeight="Bold"/>
                     <TextBlock Text="{local:Tr Source='Estado Git, sincronización segura y acceso rápido a tus proyectos locales'}" FontSize="13.5" Foreground="{StaticResource MutedBrush}" Margin="1,3,0,0"/>
                 </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="REPOS" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding TotalCount}" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="CLEAN" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding CleanCount}" Foreground="#3DDC84" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='CAMBIOS'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding ChangesCount}" Foreground="#F5C451" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="AHEAD" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AheadCount}" Foreground="#67B3FF" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
-                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" FontSize="9" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AttentionCount}" Foreground="#FF6470" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="REPOS" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding TotalCount}" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="CLEAN" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding CleanCount}" Foreground="#5AA878" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='CAMBIOS'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding ChangesCount}" Foreground="#C59A4A" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="AHEAD" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AheadCount}" Foreground="#6F91C4" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
+                <Border Style="{StaticResource StatCard}"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding AttentionCount}" Foreground="#D2636D" FontSize="20" FontWeight="Bold"/></StackPanel></Border>
             </StackPanel>
         </Grid>
 
@@ -48,7 +48,7 @@
                 <Button Style="{StaticResource ToolbarButton}" Command="{Binding RemoveCommand}">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE74D;"/><TextBlock Text="{local:Tr Source='Quitar'}"/></StackPanel>
                 </Button>
-                <Border Width="1" Height="24" Background="#2A405B" Margin="4,7,13,0"/>
+                <Border Width="1" Height="24" Background="#343A43" Margin="4,7,13,0"/>
                 <Button Style="{StaticResource PrimaryToolbarButton}" Click="Commit_Click" IsEnabled="{Binding SelectedRepository.CanCommit}">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE73E;"/><TextBlock Text="Commit..."/></StackPanel>
                 </Button>
@@ -80,19 +80,19 @@
                                 <Border Padding="9,4" CornerRadius="10" BorderThickness="1" HorizontalAlignment="Left">
                                     <Border.Style>
                                         <Style TargetType="Border">
-                                            <Setter Property="Background" Value="#13283C"/><Setter Property="BorderBrush" Value="#35536D"/>
+                                            <Setter Property="Background" Value="#20252B"/><Setter Property="BorderBrush" Value="#3B424C"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding State}" Value="Clean"><Setter Property="Background" Value="#0D3B28"/><Setter Property="BorderBrush" Value="#1E9A59"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Changes"><Setter Property="Background" Value="#4A3810"/><Setter Property="BorderBrush" Value="#A47B18"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Ahead"><Setter Property="Background" Value="#123B62"/><Setter Property="BorderBrush" Value="#367FBE"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Behind"><Setter Property="Background" Value="#26365A"/><Setter Property="BorderBrush" Value="#5B78B5"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Diverged"><Setter Property="Background" Value="#4A2810"/><Setter Property="BorderBrush" Value="#D07A20"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Conflict"><Setter Property="Background" Value="#511922"/><Setter Property="BorderBrush" Value="#D34D5C"/></DataTrigger>
-                                                <DataTrigger Binding="{Binding State}" Value="Error"><Setter Property="Background" Value="#511922"/><Setter Property="BorderBrush" Value="#D34D5C"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Clean"><Setter Property="Background" Value="#24362C"/><Setter Property="BorderBrush" Value="#56846A"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Changes"><Setter Property="Background" Value="#3A3323"/><Setter Property="BorderBrush" Value="#8A723D"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Ahead"><Setter Property="Background" Value="#263445"/><Setter Property="BorderBrush" Value="#5B718F"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Behind"><Setter Property="Background" Value="#2C3340"/><Setter Property="BorderBrush" Value="#68768D"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Diverged"><Setter Property="Background" Value="#382B22"/><Setter Property="BorderBrush" Value="#A5703E"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Conflict"><Setter Property="Background" Value="#3A2025"/><Setter Property="BorderBrush" Value="#B85B64"/></DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="Error"><Setter Property="Background" Value="#3A2025"/><Setter Property="BorderBrush" Value="#B85B64"/></DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
-                                    <TextBlock Text="{Binding StateLabel, Converter={StaticResource LocalizedText}}" FontSize="10" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding StateLabel, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold"/>
                                 </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -118,11 +118,11 @@
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <StackPanel>
                             <TextBlock Text="{Binding SelectedRepository.Name, TargetNullValue='Selecciona un repositorio'}" FontSize="22" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding SelectedRepository.Path}" Foreground="#6FADE8" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding SelectedRepository.Path}" Foreground="#7894B8" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
-                        <TextBlock Grid.Column="1" Text="{Binding SelectedRepository.StateLabel, Converter={StaticResource LocalizedText}}" Foreground="#F5C451" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding SelectedRepository.StateLabel, Converter={StaticResource LocalizedText}}" Foreground="#C59A4A" FontWeight="Bold" VerticalAlignment="Center"/>
                     </Grid>
-                    <Separator Grid.Row="1" Margin="0,13" Background="#263D5A"/>
+                    <Separator Grid.Row="1" Margin="0,13" Background="#303640"/>
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="130"/><ColumnDefinition Width="*"/><ColumnDefinition Width="130"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                         <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
@@ -148,15 +148,15 @@
                 <StackPanel>
                     <TextBlock Text="{local:Tr Source='Sincronización segura'}" Style="{StaticResource SectionTitle}"/>
                     <TextBlock Text="{local:Tr Source='La aplicación usa el Git instalado en Windows. No implementa Git ni hace merges automáticos.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,8,0,14"/>
-                    <Border Background="#0B1B2C" BorderBrush="#29425F" BorderThickness="1" CornerRadius="9" Padding="12">
+                    <Border Background="#15181C" BorderBrush="#303640" BorderThickness="1" CornerRadius="9" Padding="12">
                         <StackPanel>
-                            <TextBlock Text="COMMIT" Foreground="#7DBBFF" FontWeight="Bold"/>
+                            <TextBlock Text="COMMIT" Foreground="#7697C8" FontWeight="Bold"/>
                             <TextBlock Text="{local:Tr Source='Selecciona archivos, revisa el diff y confirma el mensaje antes de modificar el índice de Git.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
-                            <TextBlock Text="FETCH" Foreground="#67B3FF" FontWeight="Bold"/>
+                            <TextBlock Text="FETCH" Foreground="#6F91C4" FontWeight="Bold"/>
                             <TextBlock Text="{local:Tr Source='Seguro: actualiza referencias remotas sin modificar tu working tree.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
-                            <TextBlock Text="PULL" Foreground="#72E6A5" FontWeight="Bold"/>
+                            <TextBlock Text="PULL" Foreground="#67AF87" FontWeight="Bold"/>
                             <TextBlock Text="{local:Tr Source='Solo se permite como fast-forward y con working tree limpio. Si hay divergencia, se bloquea.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
-                            <TextBlock Text="PUSH" Foreground="#F5C451" FontWeight="Bold"/>
+                            <TextBlock Text="PUSH" Foreground="#C59A4A" FontWeight="Bold"/>
                             <TextBlock Text="{local:Tr Source='Se confirma antes de enviar commits. Si el remoto va por delante, se bloquea.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
                         </StackPanel>
                     </Border>
@@ -167,12 +167,12 @@
         <Grid Grid.Row="4" Margin="2,11,2,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
-                <Ellipse Width="9" Height="9" Fill="#3DDC84" Margin="0,1,8,0"/>
+                <Ellipse Width="9" Height="9" Fill="#5AA878" Margin="0,1,8,0"/>
                 <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <TextBlock Text="{Binding LastUpdatedText}" Foreground="{StaticResource MutedBrush}"/>
-                <TextBlock Text="  ·  Neo RS" FontFamily="Segoe Script" FontSize="12" Foreground="#5EA7E8" Opacity="0.76"/>
+                <TextBlock Text="  ·  Neo RS" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource MutedBrush}" Opacity="0.70"/>
             </StackPanel>
         </Grid>
     </Grid>
