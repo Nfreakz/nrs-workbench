@@ -273,7 +273,7 @@ public sealed class RunnerQueueCoordinator
             return UiLanguage.Choose("Cola activa · dejando terminar los jobs activos antes de liberar puestos.", "Queue active · waiting for active jobs to finish before freeing slots.");
         if (changing)
             return UiLanguage.Choose($"Cola activa · preparando {limit} runners a la vez", $"Queue active · preparing {limit} runners at a time", $"Cua activa · preparant {limit} runners alhora");
-        return UiLanguage.Choose($"Cola activa · {busy}/{limit} jobs · {waiting} runners waiting", $"Queue active · {busy}/{limit} jobs · {waiting} runners waiting", $"Cua activa · {busy}/{limit} jobs · {waiting} runners en espera");
+        return UiLanguage.Choose($"Cola activa · {busy}/{limit} jobs · {waiting} runners en espera", $"Queue active · {busy}/{limit} jobs · {waiting} runners waiting", $"Cua activa · {busy}/{limit} jobs · {waiting} runners en espera");
     }
 
     private sealed record StopResult(bool Success, bool BecameBusy);
