@@ -17,6 +17,7 @@ public partial class SettingsWindow : Window
         _settingsService = settingsService;
         _workingSettings = _settingsService.Load();
         ApplySettingsToForm(_workingSettings);
+        ContentRendered += (_, _) => SettingsScrollViewer.ScrollToTop();
     }
 
     private void ApplySettingsToForm(RunnerSettings settings)
