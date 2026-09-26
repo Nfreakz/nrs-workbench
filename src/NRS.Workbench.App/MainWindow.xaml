@@ -41,8 +41,8 @@
 
         <Style x:Key="RunnerSortCombo" TargetType="ComboBox">
             <Setter Property="Foreground" Value="#E7E9EC"/>
-            <Setter Property="Background" Value="#11243A"/>
-            <Setter Property="BorderBrush" Value="#2B4767"/>
+            <Setter Property="Background" Value="#1D2128"/>
+            <Setter Property="BorderBrush" Value="#353B45"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="MinWidth" Value="150"/>
             <Setter Property="MinHeight" Value="38"/>
@@ -73,9 +73,9 @@
                                                            VerticalAlignment="Center"
                                                            TextTrimming="CharacterEllipsis"
                                                            IsHitTestVisible="False"/>
-                                                <Border Width="30" HorizontalAlignment="Right" Background="#0D1C2D" CornerRadius="0,7,7,0"
+                                                <Border Width="30" HorizontalAlignment="Right" Background="#1A1E23" CornerRadius="0,7,7,0"
                                                         IsHitTestVisible="False">
-                                                    <TextBlock Text="⌄" Foreground="#8FB3D8" FontSize="18"
+                                                    <TextBlock Text="⌄" Foreground="#9CA5B0" FontSize="18"
                                                                HorizontalAlignment="Center" VerticalAlignment="Center"
                                                                Margin="0,-4,0,0"/>
                                                 </Border>
@@ -84,10 +84,10 @@
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
                                                 <Setter TargetName="ComboChrome" Property="Background" Value="#252B33"/>
-                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4B79A6"/>
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#505B69"/>
                                             </Trigger>
                                             <Trigger Property="IsChecked" Value="True">
-                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4F91CB"/>
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#5B718F"/>
                                             </Trigger>
                                             <Trigger Property="IsEnabled" Value="False">
                                                 <Setter TargetName="ComboChrome" Property="Opacity" Value="0.45"/>
@@ -104,7 +104,7 @@
                                    IsOpen="{TemplateBinding IsDropDownOpen}"
                                    PopupAnimation="Fade">
                                 <Border Background="#1B1F24"
-                                        BorderBrush="#31577D"
+                                        BorderBrush="#424A55"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         Margin="0,4,0,0"
@@ -153,7 +153,7 @@
                 <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="NRS Workbench" FontSize="31" FontWeight="Bold"/>
-                        <Border Background="#173A61" BorderBrush="#38618A" BorderThickness="1" CornerRadius="7" Padding="7,2" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <Border Background="#28364B" BorderBrush="#4B5A6D" BorderThickness="1" CornerRadius="7" Padding="7,2" Margin="12,0,0,0" VerticalAlignment="Center">
                             <TextBlock Text="{Binding AppVersionText}" FontSize="11" Foreground="#D9DEE5" FontWeight="SemiBold"/>
                         </Border>
                     </StackPanel>
@@ -165,7 +165,7 @@
                 <Border Style="{StaticResource StatCard}">
                     <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <Border Width="26" Height="26" CornerRadius="7" Background="#173B61" VerticalAlignment="Center">
+                        <Border Width="26" Height="26" CornerRadius="7" Background="#2A3A52" VerticalAlignment="Center">
                             <TextBlock Text="&#xECA5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#6F91C4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
@@ -214,8 +214,8 @@
                                         <Setter Property="Foreground" Value="#67AF87"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding HealthKind}" Value="Warning"><Setter Property="Foreground" Value="#C59A4A"/></DataTrigger>
-                                            <DataTrigger Binding="{Binding HealthKind}" Value="Alert"><Setter Property="Foreground" Value="#FF7C86"/></DataTrigger>
-                                            <DataTrigger Binding="{Binding HealthKind}" Value="Unknown"><Setter Property="Foreground" Value="#8EA2B7"/></DataTrigger>
+                                            <DataTrigger Binding="{Binding HealthKind}" Value="Alert"><Setter Property="Foreground" Value="#D56B75"/></DataTrigger>
+                                            <DataTrigger Binding="{Binding HealthKind}" Value="Unknown"><Setter Property="Foreground" Value="#9BA3AE"/></DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </TextBlock.Style>
@@ -294,7 +294,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding QueueStateKind}" Value="Active"><Setter Property="Foreground" Value="#67AF87"/></DataTrigger>
                                     <DataTrigger Binding="{Binding QueueStateKind}" Value="Paused"><Setter Property="Foreground" Value="#C59A4A"/></DataTrigger>
-                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Blocked"><Setter Property="Foreground" Value="#FFB56B"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding QueueStateKind}" Value="Blocked"><Setter Property="Foreground" Value="#C78D58"/></DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
@@ -355,7 +355,7 @@
                                         HorizontalAlignment="Left" VerticalAlignment="Center" MinWidth="90">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <Ellipse Width="8" Height="8" Fill="{Binding State, Converter={StaticResource StateAccentBrush}}" Margin="0,1,7,0"/>
-                                        <TextBlock Text="{Binding State, Converter={StaticResource StateLabel}}" Foreground="#F7FBFF" FontWeight="Bold" FontSize="11"/>
+                                        <TextBlock Text="{Binding State, Converter={StaticResource StateLabel}}" Foreground="#F1F3F5" FontWeight="Bold" FontSize="11"/>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -365,7 +365,7 @@
                     <DataGridTemplateColumn Header="RUNNER" Width="128">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Alias}" FontWeight="SemiBold" Foreground="#F7FAFE" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Alias}" FontWeight="SemiBold" Foreground="#F1F3F5" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -383,10 +383,10 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Width="22" Height="22" CornerRadius="11" Background="#18283B" BorderBrush="#304865" BorderThickness="1" Margin="0,0,9,0">
-                                        <TextBlock Text="GH" FontSize="11" FontWeight="Bold" Foreground="#DCE8F5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Border Width="22" Height="22" CornerRadius="11" Background="#20252B" BorderBrush="#3B424C" BorderThickness="1" Margin="0,0,9,0">
+                                        <TextBlock Text="GH" FontSize="11" FontWeight="Bold" Foreground="#D6DBE1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
-                                    <TextBlock Text="{Binding GitHubTarget}" Foreground="#D9E6F4" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding GitHubTarget}" Foreground="#D6DBE1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -474,8 +474,8 @@
                     <Grid Grid.Row="0" Margin="0,0,0,13">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal">
-                            <Border Width="28" Height="28" CornerRadius="8" Background="#173A61" Margin="0,0,9,0">
-                                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#71B7FF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Width="28" Height="28" CornerRadius="8" Background="#28364B" Margin="0,0,9,0">
+                                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#6F91C4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <TextBlock Text="{local:Tr Source='Detalle del runner'}" Style="{StaticResource SectionTitle}" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -568,8 +568,8 @@
                     <Grid Grid.Row="0" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal">
-                            <Border Width="28" Height="28" CornerRadius="8" Background="#173A61" Margin="0,0,9,0">
-                                <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#71B7FF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Width="28" Height="28" CornerRadius="8" Background="#28364B" Margin="0,0,9,0">
+                                <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#6F91C4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
