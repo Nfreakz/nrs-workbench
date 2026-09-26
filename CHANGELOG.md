@@ -2,14 +2,18 @@
 
 ## [Unreleased]
 
-### Planned for v0.18.2 (candidate, not published)
-- Adds Catalan (`ca`) to the language selector with translations for all XAML text resources, common dialogs and runner progress; the selection is retained in local and portable settings and applies after restarting the app.
-- Limits automatic queue rotation to runners that were online when it was enabled or subsequently joined it. Runners that were manually stopped before or during queue operation are not started without their own user action.
-- Records queue-managed stops in a local journal outside portable configuration. On relaunch, previously managed runners remain stopped until the user explicitly confirms their recovery; declining clears the journal.
-- Adds queue and localization smoke scenarios for manual stops, recovery consent and persistent state. Actual Windows build, smoke tests and release packaging must pass before publication.
-- Updates README download links to the already published v0.18.1 ZIP.
-- Updates `RUN_ME_FIRST.cmd` / `build-and-run.ps1` so Git clones fetch and fast-forward their current tracked branch before compiling, while refusing to discard local changes, switch branches or perform merge/rebase/reset operations automatically.
+## [0.18.2] - 2026-09-26
 
+### Added
+- Adds Catalan (`ca`) to the language selector with translations for all XAML text resources, common dialogs, repository/commit workflows and runner progress; the selection is retained in local and portable settings and applies after restarting the app.
+- Adds a local-only runner-queue ownership journal so queue-managed stops can be reviewed after reopening NRS Workbench.
+
+### Improved
+- Restricts automatic queue rotation to runners that are actually participating in the queue. Runners stopped manually before or during queue operation are not restarted automatically.
+- Requires explicit confirmation before recovering runners recorded by a previous app session; declining keeps them stopped and clears the journal.
+- Treats stale READY snapshots after a stop request as a draining slot, preventing duplicate stop actions or unnecessary stopping of another runner.
+- Updates `RUN_ME_FIRST.cmd` / `build-and-run.ps1` so Git clones fetch and fast-forward their current tracked branch before compiling while refusing to discard local changes, switch branches or perform automatic merge/rebase/reset/stash operations.
+- Adds PowerShell launcher syntax validation to CI and expands smoke coverage for queue ownership, restart recovery and Catalan settings/resources.
 
 ## [0.18.1] - 2026-09-26
 
