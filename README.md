@@ -28,6 +28,16 @@ NRS Workbench brings your local runners and Git working trees into one desktop a
 
 Screenshot from Windows. Computer, runner and repository names, paths and log content have been redacted.
 
+## Who is NRS Workbench for?
+
+- **Developers maintaining self-hosted GitHub Actions runners:** monitor runner state, current work and locally retained execution history from one Windows desktop.
+- **People managing several local Git repositories:** inspect working-tree state and use guarded Fetch, Pull, Push, Commit and local branch switching without jumping between folders.
+- **Small homelab and development setups:** keep host CPU, memory and disk usage visible next to runner activity, with an optional one- or two-runner queue to limit simultaneous listeners.
+
+The current **v0.18.2 Public Preview** adds Catalan, safer queue recovery across app restarts and guarded repository updating from `RUN_ME_FIRST.cmd`.
+
+**Try it:** [Download the latest Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/latest) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
+
 ## Public preview readiness
 
 The public-preview gate combines a dependency-free Git smoke-test executable, source audit, Windows CI, tag-driven release automation, community templates, privacy/testing/architecture documentation and repository hardening.
