@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using Microsoft.Win32;
 using NRS.Workbench.App.Services;
@@ -82,6 +83,27 @@ public partial class SettingsWindow : Window
         _workingSettings.NotifyOnlyWhenHidden = NotifyOnlyWhenHiddenCheck.IsChecked == true;
         _workingSettings.Language = LanguageChoice.SelectedValue as string ?? "es";
         return true;
+    }
+
+    private void Support_Click(object sender, RoutedEventArgs e)
+    {
+        const string supportUrl = "https://buymeacoffee.com/neors";
+        try
+        {
+            Process.Start(new ProcessStartInfo(supportUrl) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Could not open support page", ex);
+            MessageBox.Show(
+                UiLanguage.Choose(
+                    "No se pudo abrir la página de apoyo.",
+                    "Could not open the support page.",
+                    "No s'ha pogut obrir la pàgina de suport."),
+                "NRS Workbench",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
     }
 
     private void Detect_Click(object sender, RoutedEventArgs e)
