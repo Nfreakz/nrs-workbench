@@ -16,7 +16,7 @@ The smoke-test executable uses temporary local repositories and a temporary bare
 dotnet run --project .\tests\NRS.Workbench.SmokeTests\NRS.Workbench.SmokeTests.csproj -c Release
 ```
 
-It also covers portable-settings privacy and round-trip checks plus unambiguous, ambiguous and invalid repository-path relocation. The queue smoke tests cover the connected-runner limit, active-job protection, idle rotation, and preservation of manually stopped runners when the queue is disabled. Review/Cancel UI behavior and ZIP startup must still be checked manually.
+It also covers portable-settings privacy and round-trip checks plus unambiguous, ambiguous and invalid repository-path relocation. The queue smoke tests cover the connected-runner limit, active-job protection, idle rotation among eligible runners, exclusion of manually stopped runners, persistence of queue-owned stops, confirmation/decline after app restart and restoring only approved runners when disabling the queue. Catalan resource and portable-language round-trip checks are also included. Review/Cancel UI behavior and ZIP startup must still be checked manually.
 
 It covers clean/dirty inspection, empty-message protection, partial commits, staged-file protection, unusual filenames, rename/delete handling, ahead/push, behind/fast-forward pull, divergence blocking and remote-credential redaction.
 
@@ -43,3 +43,12 @@ RUN_PUBLIC_READINESS.cmd
 ```
 
 This performs the Release build, Git smoke tests and public-source audit in sequence.
+
+## v0.18.2 manual safety checks
+
+1. With one READY and one manually STOPPED runner, enable the queue; verify the stopped runner stays stopped while the queue operates.
+2. With two READY runners, enable the one-runner queue, let it stop one, and exit NRS Workbench explicitly. Restart; the confirmation dialog must list previously queue-managed folders. Selecting **No** must not start them.
+3. Repeat and select **Yes**; verify only the approved queue-managed runner can restart. If the queue is disabled before restarting, the confirmation must still be required before any restoration.
+4. With an active BUSY job, enabling the queue must never stop it. Test service-installed and interactive runners separately on a Windows PC.
+5. Select **Català** in Settings, save and restart. Verify main window, Settings, repositories, statistics, queue status and critical Git confirmation dialogs. Confirm Spanish and English remain selectable. The language setting must round-trip in portable JSON.
+6. Verify `%LOCALAPPDATA%\\NRSWorkbench\\runner-queue-state.json` is local-only and never appears in the portable JSON; do not publish paths or contents from a real machine.
