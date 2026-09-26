@@ -29,7 +29,7 @@
 - Version metadata is `0.18.3`; no v0.18.3 tag or public ZIP exists until the release gate passes.
 - Adds a visible smart-queue dashboard with BUSY runners, next runner, queue-owned waiting runners and manually stopped runners.
 - Adds a session-only Pause/Resume control. Pause freezes queue scheduling only; it does not stop READY/BUSY runners and is not persisted across app restarts.
-- Adds a resource guard enabled by default. New starts and idle rotations wait when host CPU reaches the configured CPU threshold or physical RAM reaches the configured RAM threshold. Existing BUSY jobs are never interrupted.
+- Adds a resource guard enabled by default. New starts and idle rotations wait when host CPU reaches the configured CPU threshold or physical RAM reaches the configured RAM threshold. Existing BUSY jobs are never interrupted. Once a resource hold starts, it clears only after load drops 5 percentage points below the configured threshold to avoid rapid flapping.
 - Default resource thresholds: CPU 85%, RAM 90%. Settings normalize configurable values to 50-100% and portable settings preserve them.
 - Smoke coverage must include CPU/RAM holds, recovery below threshold, pause semantics and dashboard classification.
 

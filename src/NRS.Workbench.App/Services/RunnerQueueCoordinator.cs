@@ -11,6 +11,7 @@ namespace NRS.Workbench.App.Services;
 public sealed class RunnerQueueCoordinator
 {
     private static readonly TimeSpan IdleRotationDelay = TimeSpan.FromSeconds(45);
+    private const double ResourceReleaseMargin = 5d;
     private readonly IRunnerControlService _control;
     private readonly Dictionary<string, DateTimeOffset> _readySince = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DateTimeOffset> _pendingStarts = new(StringComparer.OrdinalIgnoreCase);
@@ -25,6 +26,8 @@ public sealed class RunnerQueueCoordinator
     private readonly SemaphoreSlim _gate = new(1, 1);
     private int _lastScheduledIndex = -1;
     private bool _queueWasEnabled;
+    private bool _cpuResourceHeld;
+    private bool _memoryResourceHeld;
 
     public bool IsPaused { get; private set; }
     public RunnerQueueSnapshot Snapshot { get; private set; } = RunnerQueueSnapshot.Disabled();
@@ -105,6 +108,8 @@ public sealed class RunnerQueueCoordinator
                 // Retain the marker until the stopped state is observed and restored.
                 _queueWasEnabled = false;
                 IsPaused = false;
+                _cpuResourceHeld = false;
+                _memoryResourceHeld = false;
                 var disabledStatus = outcomes.Any(success => !success)
                     ? UiLanguage.Choose("Cola desactivada · algunos runners gestionados no se pudieron iniciar.", "Queue disabled · some queue-managed runners could not be started.")
                     : UiLanguage.Choose("Cola desactivada · runners gestionados restaurados; los detenidos manualmente siguen detenidos.", "Queue disabled · queue-managed runners restored; manually stopped runners remain stopped.");
@@ -328,24 +333,41 @@ public sealed class RunnerQueueCoordinator
             MemoryPercent(resources),
             Math.Clamp(settings.RunnerQueueCpuStartThreshold, 50, 100),
             Math.Clamp(settings.RunnerQueueMemoryStartThreshold, 50, 100),
+            Math.Max(0, Math.Clamp(settings.RunnerQueueCpuStartThreshold, 50, 100) - (int)ResourceReleaseMargin),
+            Math.Max(0, Math.Clamp(settings.RunnerQueueMemoryStartThreshold, 50, 100) - (int)ResourceReleaseMargin),
             settings.RunnerQueueResourceGuardEnabled,
             status);
     }
 
-    private static RunnerQueueHoldReason DetermineResourceHold(RunnerSettings settings, SystemResourceSnapshot? resources)
+    private RunnerQueueHoldReason DetermineResourceHold(RunnerSettings settings, SystemResourceSnapshot? resources)
     {
         if (!settings.RunnerQueueResourceGuardEnabled || resources is null)
+        {
+            _cpuResourceHeld = false;
+            _memoryResourceHeld = false;
             return RunnerQueueHoldReason.None;
+        }
 
-        var cpuHigh = resources.CpuPercent is double cpu &&
-            cpu >= Math.Clamp(settings.RunnerQueueCpuStartThreshold, 50, 100);
+        var cpuThreshold = Math.Clamp(settings.RunnerQueueCpuStartThreshold, 50, 100);
+        if (resources.CpuPercent is double cpu)
+            _cpuResourceHeld = _cpuResourceHeld
+                ? cpu > Math.Max(0, cpuThreshold - ResourceReleaseMargin)
+                : cpu >= cpuThreshold;
+        else
+            _cpuResourceHeld = false;
+
+        var memoryThreshold = Math.Clamp(settings.RunnerQueueMemoryStartThreshold, 50, 100);
         var memoryPercent = MemoryPercent(resources);
-        var memoryHigh = memoryPercent is double memory &&
-            memory >= Math.Clamp(settings.RunnerQueueMemoryStartThreshold, 50, 100);
+        if (memoryPercent is double memory)
+            _memoryResourceHeld = _memoryResourceHeld
+                ? memory > Math.Max(0, memoryThreshold - ResourceReleaseMargin)
+                : memory >= memoryThreshold;
+        else
+            _memoryResourceHeld = false;
 
-        if (cpuHigh && memoryHigh) return RunnerQueueHoldReason.HighCpuAndMemory;
-        if (cpuHigh) return RunnerQueueHoldReason.HighCpu;
-        if (memoryHigh) return RunnerQueueHoldReason.HighMemory;
+        if (_cpuResourceHeld && _memoryResourceHeld) return RunnerQueueHoldReason.HighCpuAndMemory;
+        if (_cpuResourceHeld) return RunnerQueueHoldReason.HighCpu;
+        if (_memoryResourceHeld) return RunnerQueueHoldReason.HighMemory;
         return RunnerQueueHoldReason.None;
     }
 
@@ -365,17 +387,17 @@ public sealed class RunnerQueueCoordinator
         return reason switch
         {
             RunnerQueueHoldReason.HighCpu => UiLanguage.Choose(
-                $"Cola en espera · CPU {cpu} (límite {settings.RunnerQueueCpuStartThreshold}%).",
-                $"Queue waiting · CPU {cpu} (limit {settings.RunnerQueueCpuStartThreshold}%).",
-                $"Cua en espera · CPU {cpu} (límit {settings.RunnerQueueCpuStartThreshold}%)."),
+                $"Cola en espera · CPU {cpu}; reanuda por debajo de {Math.Max(0, settings.RunnerQueueCpuStartThreshold - (int)ResourceReleaseMargin)}% tras superar {settings.RunnerQueueCpuStartThreshold}%.",
+                $"Queue waiting · CPU {cpu}; resumes below {Math.Max(0, settings.RunnerQueueCpuStartThreshold - (int)ResourceReleaseMargin)}% after crossing {settings.RunnerQueueCpuStartThreshold}%.",
+                $"Cua en espera · CPU {cpu}; es reprèn per sota de {Math.Max(0, settings.RunnerQueueCpuStartThreshold - (int)ResourceReleaseMargin)}% després de superar {settings.RunnerQueueCpuStartThreshold}%."),
             RunnerQueueHoldReason.HighMemory => UiLanguage.Choose(
-                $"Cola en espera · RAM {memory} (límite {settings.RunnerQueueMemoryStartThreshold}%).",
-                $"Queue waiting · RAM {memory} (limit {settings.RunnerQueueMemoryStartThreshold}%).",
-                $"Cua en espera · RAM {memory} (límit {settings.RunnerQueueMemoryStartThreshold}%)."),
+                $"Cola en espera · RAM {memory}; reanuda por debajo de {Math.Max(0, settings.RunnerQueueMemoryStartThreshold - (int)ResourceReleaseMargin)}% tras superar {settings.RunnerQueueMemoryStartThreshold}%.",
+                $"Queue waiting · RAM {memory}; resumes below {Math.Max(0, settings.RunnerQueueMemoryStartThreshold - (int)ResourceReleaseMargin)}% after crossing {settings.RunnerQueueMemoryStartThreshold}%.",
+                $"Cua en espera · RAM {memory}; es reprèn per sota de {Math.Max(0, settings.RunnerQueueMemoryStartThreshold - (int)ResourceReleaseMargin)}% després de superar {settings.RunnerQueueMemoryStartThreshold}%."),
             _ => UiLanguage.Choose(
-                $"Cola en espera · CPU {cpu} / RAM {memory} por encima de los límites.",
-                $"Queue waiting · CPU {cpu} / RAM {memory} above limits.",
-                $"Cua en espera · CPU {cpu} / RAM {memory} per sobre dels límits.")
+                $"Cola en espera · CPU {cpu} / RAM {memory}; esperando margen de recuperación.",
+                $"Queue waiting · CPU {cpu} / RAM {memory}; waiting for recovery margin.",
+                $"Cua en espera · CPU {cpu} / RAM {memory}; esperant marge de recuperació.")
         };
     }
 

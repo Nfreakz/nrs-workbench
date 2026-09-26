@@ -172,17 +172,17 @@ public sealed class MainViewModel : ObservableObject
                 "Waiting for a BUSY job to finish and free capacity.",
                 "Esperant que acabi un job BUSY per alliberar capacitat."),
             RunnerQueueHoldReason.HighCpu => UiLanguage.Choose(
-                $"CPU {snapshot.CpuPercent:N0}% · no se iniciarán runners por encima de {snapshot.CpuThreshold}%.",
-                $"CPU {snapshot.CpuPercent:N0}% · runners will not start above {snapshot.CpuThreshold}%.",
-                $"CPU {snapshot.CpuPercent:N0}% · no s'iniciaran runners per sobre de {snapshot.CpuThreshold}%."),
+                $"CPU {snapshot.CpuPercent:N0}% · reanuda por debajo de {snapshot.CpuReleaseThreshold}%.",
+                $"CPU {snapshot.CpuPercent:N0}% · resumes below {snapshot.CpuReleaseThreshold}%.",
+                $"CPU {snapshot.CpuPercent:N0}% · es reprèn per sota de {snapshot.CpuReleaseThreshold}%."),
             RunnerQueueHoldReason.HighMemory => UiLanguage.Choose(
-                $"RAM {snapshot.MemoryPercent:N0}% · no se iniciarán runners por encima de {snapshot.MemoryThreshold}%.",
-                $"RAM {snapshot.MemoryPercent:N0}% · runners will not start above {snapshot.MemoryThreshold}%.",
-                $"RAM {snapshot.MemoryPercent:N0}% · no s'iniciaran runners per sobre de {snapshot.MemoryThreshold}%."),
+                $"RAM {snapshot.MemoryPercent:N0}% · reanuda por debajo de {snapshot.MemoryReleaseThreshold}%.",
+                $"RAM {snapshot.MemoryPercent:N0}% · resumes below {snapshot.MemoryReleaseThreshold}%.",
+                $"RAM {snapshot.MemoryPercent:N0}% · es reprèn per sota de {snapshot.MemoryReleaseThreshold}%."),
             RunnerQueueHoldReason.HighCpuAndMemory => UiLanguage.Choose(
-                $"CPU {snapshot.CpuPercent:N0}% / RAM {snapshot.MemoryPercent:N0}% · esperando recursos.",
-                $"CPU {snapshot.CpuPercent:N0}% / RAM {snapshot.MemoryPercent:N0}% · waiting for resources.",
-                $"CPU {snapshot.CpuPercent:N0}% / RAM {snapshot.MemoryPercent:N0}% · esperant recursos."),
+                $"CPU {snapshot.CpuPercent:N0}% / RAM {snapshot.MemoryPercent:N0}% · esperando bajar de {snapshot.CpuReleaseThreshold}% / {snapshot.MemoryReleaseThreshold}%.",
+                $"CPU {snapshot.CpuPercent:N0}% / RAM {snapshot.MemoryPercent:N0}% · waiting to drop below {snapshot.CpuReleaseThreshold}% / {snapshot.MemoryReleaseThreshold}%.",
+                $"CPU {snapshot.CpuPercent:N0}% / RAM {snapshot.MemoryPercent:N0}% · esperant baixar de {snapshot.CpuReleaseThreshold}% / {snapshot.MemoryReleaseThreshold}%."),
             _ when snapshot.ResourceGuardEnabled => UiLanguage.Choose(
                 $"Guard activo · CPU < {snapshot.CpuThreshold}% · RAM < {snapshot.MemoryThreshold}%.",
                 $"Guard active · CPU < {snapshot.CpuThreshold}% · RAM < {snapshot.MemoryThreshold}%.",

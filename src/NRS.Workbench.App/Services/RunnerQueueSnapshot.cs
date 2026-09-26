@@ -25,10 +25,12 @@ public sealed record RunnerQueueSnapshot(
     double? MemoryPercent,
     int CpuThreshold,
     int MemoryThreshold,
+    int CpuReleaseThreshold,
+    int MemoryReleaseThreshold,
     bool ResourceGuardEnabled,
     string StatusText)
 {
     public static RunnerQueueSnapshot Disabled(string status = "") => new(
         false, false, RunnerQueueHoldReason.Disabled,
-        [], string.Empty, [], [], 0, null, null, 0, 0, false, status);
+        [], string.Empty, [], [], 0, null, null, 0, 0, 0, 0, false, status);
 }
