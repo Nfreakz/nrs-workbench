@@ -9,6 +9,7 @@
 
 ### Improved
 - Vertically centers the runner table's text and mode indicators for consistent row alignment.
+- Disabling the queue restores only runners stopped by the queue in the current application session; it does not start runners that were already stopped manually. The queue's managed-stop list is in memory, so runners from an earlier app session may need to be started manually.
 
 ## [0.18.0] - 2026-09-23
 
