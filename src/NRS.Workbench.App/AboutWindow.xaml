@@ -14,7 +14,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-            <Border Width="64" Height="64" CornerRadius="17" Background="#071725" BorderBrush="#2F6FAF" BorderThickness="1" ClipToBounds="True">
+            <Border Width="64" Height="64" CornerRadius="17" Background="#111419" BorderBrush="#4E6685" BorderThickness="1" ClipToBounds="True">
                 <Image Source="/Assets/NRSWorkbench.png" Stretch="Uniform" Margin="3"/>
             </Border>
             <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
@@ -32,8 +32,8 @@
                                Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,7,20,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <TextBlock Text="Neo RS" FontFamily="Segoe Script" FontSize="22" FontWeight="SemiBold" Foreground="#5EA7E8" HorizontalAlignment="Right"/>
-                    <TextBlock Text="{local:Tr Source='creado por'}" Foreground="#6E879F" FontSize="10" HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                    <TextBlock Text="Neo RS" FontFamily="Segoe UI" FontSize="22" FontWeight="SemiBold" Foreground="#6F8DB5" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{local:Tr Source='creado por'}" Foreground="#8F97A1" FontSize="10" HorizontalAlignment="Right" Margin="0,2,0,0"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -50,12 +50,12 @@
                     <TextBlock Grid.Row="2" Text="{local:Tr Source='Sistema'}" Style="{StaticResource MutedLabel}"/><TextBlock x:Name="SystemText" Grid.Row="2" Grid.Column="1" TextTrimming="CharacterEllipsis"/>
                     <TextBlock Grid.Row="3" Text="{local:Tr Source='Datos locales'}" Style="{StaticResource MutedLabel}"/><TextBlock x:Name="DataPathText" Grid.Row="3" Grid.Column="1" TextTrimming="CharacterEllipsis"/>
                 </Grid>
-                <Separator Grid.Row="2" Margin="0,15" Background="#263D5A"/>
+                <Separator Grid.Row="2" Margin="0,15" Background="#303640"/>
                 <TextBlock Grid.Row="3" TextWrapping="Wrap" Foreground="{StaticResource MutedBrush}">
                     Este proyecto es independiente y no está afiliado ni respaldado por GitHub, Inc. GitHub y GitHub Actions son marcas de GitHub, Inc.
                 </TextBlock>
                 <TextBlock Grid.Row="4" Text="{local:Tr Source='Source-available · Uso no comercial. El uso comercial requiere una licencia separada de Neo RS. No almacena tokens de GitHub ni lee credenciales del runner.'}"
-                           Foreground="#6F879F" TextWrapping="Wrap" VerticalAlignment="Bottom" Margin="0,14,0,0"/>
+                           Foreground="#8F97A1" TextWrapping="Wrap" VerticalAlignment="Bottom" Margin="0,14,0,0"/>
             </Grid>
         </Border>
 
