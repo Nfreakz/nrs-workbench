@@ -161,11 +161,16 @@ public sealed class RunnerQueueCoordinator
             var active = ordered.Where(IsOnline).ToList();
             var pendingStartCount = _pendingStarts.Keys.Count(path => ordered.Any(runner =>
                 string.Equals(runner.FolderPath, path, StringComparison.OrdinalIgnoreCase) && runner.State == RunnerState.Stopped));
+            // A just-requested stop can still appear READY for one or more
+            // discovery snapshots. Count that slot as already draining so the
+            // queue never reacts to stale state by stopping another idle runner.
+            var pendingStopCount = _stopRequestedAt.Keys.Count(path => ordered.Any(runner =>
+                string.Equals(runner.FolderPath, path, StringComparison.OrdinalIgnoreCase) && IsOnline(runner)));
             var busyCount = active.Count(runner => runner.State == RunnerState.Busy);
             var stopped = ordered.Where(runner => runner.State == RunnerState.Stopped &&
                 _eligiblePaths.Contains(runner.FolderPath) &&
                 !_pendingStarts.ContainsKey(runner.FolderPath)).ToList();
-            var managedActiveCount = active.Count + pendingStartCount;
+            var managedActiveCount = Math.Max(0, active.Count - pendingStopCount) + pendingStartCount;
 
             // When enabling the queue with more listeners already online, drain
             // idle listeners first. Busy jobs are never stopped by the queue.
