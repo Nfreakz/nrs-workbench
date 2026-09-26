@@ -10,7 +10,7 @@
         UseLayoutRounding="True" SnapsToDevicePixels="True">
     <Window.Resources>
         <Style x:Key="StatsMetricCard" TargetType="Border">
-            <Setter Property="Background" Value="#0E1B2A"/>
+            <Setter Property="Background" Value="#171A1F"/>
             <Setter Property="BorderBrush" Value="#303640"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="10"/>
@@ -19,7 +19,7 @@
             <Setter Property="MinHeight" Value="68"/>
         </Style>
         <Style x:Key="RepoMetricCard" TargetType="Border">
-            <Setter Property="Background" Value="#0C1A29"/>
+            <Setter Property="Background" Value="#16191E"/>
             <Setter Property="BorderBrush" Value="#303640"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="9"/>
@@ -28,7 +28,7 @@
             <Setter Property="MinHeight" Value="54"/>
         </Style>
         <Style x:Key="MetricLabel" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontSize" Value="10.5"/>
             <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
@@ -76,8 +76,8 @@
 
         <Style x:Key="StatsCombo" TargetType="ComboBox">
             <Setter Property="Foreground" Value="#E7E9EC"/>
-            <Setter Property="Background" Value="#11243A"/>
-            <Setter Property="BorderBrush" Value="#2B4767"/>
+            <Setter Property="Background" Value="#1D2128"/>
+            <Setter Property="BorderBrush" Value="#353B45"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="MinWidth" Value="150"/>
             <Setter Property="MinHeight" Value="38"/>
@@ -108,9 +108,9 @@
                                                            VerticalAlignment="Center"
                                                            TextTrimming="CharacterEllipsis"
                                                            IsHitTestVisible="False"/>
-                                                <Border Width="30" HorizontalAlignment="Right" Background="#0D1C2D" CornerRadius="0,7,7,0"
+                                                <Border Width="30" HorizontalAlignment="Right" Background="#1A1E23" CornerRadius="0,7,7,0"
                                                         IsHitTestVisible="False">
-                                                    <TextBlock Text="⌄" Foreground="#8FB3D8" FontSize="18"
+                                                    <TextBlock Text="⌄" Foreground="#9CA5B0" FontSize="18"
                                                                HorizontalAlignment="Center" VerticalAlignment="Center"
                                                                Margin="0,-4,0,0"/>
                                                 </Border>
@@ -119,10 +119,10 @@
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
                                                 <Setter TargetName="ComboChrome" Property="Background" Value="#252B33"/>
-                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4B79A6"/>
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#505B69"/>
                                             </Trigger>
                                             <Trigger Property="IsChecked" Value="True">
-                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#4F91CB"/>
+                                                <Setter TargetName="ComboChrome" Property="BorderBrush" Value="#5B718F"/>
                                             </Trigger>
                                             <Trigger Property="IsEnabled" Value="False">
                                                 <Setter TargetName="ComboChrome" Property="Opacity" Value="0.45"/>
@@ -139,7 +139,7 @@
                                    IsOpen="{TemplateBinding IsDropDownOpen}"
                                    PopupAnimation="Fade">
                                 <Border Background="#1B1F24"
-                                        BorderBrush="#31577D"
+                                        BorderBrush="#424A55"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         Margin="0,4,0,0"
@@ -176,7 +176,7 @@
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <Border Width="48" Height="48" CornerRadius="13" Background="#242C36" BorderBrush="#4E6685" BorderThickness="1">
-                    <TextBlock Text="&#xE9D2;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="#79BBFF"
+                    <TextBlock Text="&#xE9D2;" FontFamily="Segoe MDL2 Assets" FontSize="20" Foreground="#7697C8"
                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel Margin="13,0,0,0" VerticalAlignment="Center">
@@ -200,11 +200,11 @@
         <!-- Runner KPI cards -->
         <UniformGrid Grid.Row="1" Columns="7" Margin="0,0,0,12">
             <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='JOBS LOCALES'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding TotalRuns}" Style="{StaticResource MetricValue}"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#217A4B"><StackPanel><TextBlock Text="OK" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SucceededRuns}" Style="{StaticResource MetricValue}" Foreground="#67AF87"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#8D3942"><StackPanel><TextBlock Text="{local:Tr Source='FALLOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding FailedRuns}" Style="{StaticResource MetricValue}" Foreground="#FF7A84"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#725B1A"><StackPanel><TextBlock Text="{local:Tr Source='CANCELADAS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding CancelledRuns}" Style="{StaticResource MetricValue}" Foreground="#C59A4A"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#3D6F53"><StackPanel><TextBlock Text="OK" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SucceededRuns}" Style="{StaticResource MetricValue}" Foreground="#67AF87"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#704047"><StackPanel><TextBlock Text="{local:Tr Source='FALLOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding FailedRuns}" Style="{StaticResource MetricValue}" Foreground="#D56B75"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#6B5932"><StackPanel><TextBlock Text="{local:Tr Source='CANCELADAS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding CancelledRuns}" Style="{StaticResource MetricValue}" Foreground="#C59A4A"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}"><StackPanel><TextBlock Text="{local:Tr Source='SIN CLASIFICAR'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding UnknownRuns}" Style="{StaticResource MetricValue}" Foreground="#A8B5C4"/></StackPanel></Border>
-            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#2E689D"><StackPanel><TextBlock Text="{local:Tr Source='EN CURSO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding ActiveRuns}" Style="{StaticResource MetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
+            <Border Style="{StaticResource StatsMetricCard}" BorderBrush="#4E6580"><StackPanel><TextBlock Text="{local:Tr Source='EN CURSO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding ActiveRuns}" Style="{StaticResource MetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
             <Border Style="{StaticResource StatsMetricCard}" Margin="0"><StackPanel><TextBlock Text="{local:Tr Source='TASA DE ÉXITO'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding SuccessRate}" Style="{StaticResource MetricValue}" Foreground="#67AF87"/></StackPanel></Border>
         </UniformGrid>
 
@@ -225,11 +225,11 @@
 
                 <UniformGrid Grid.Row="1" Columns="6" Margin="12,10,12,7">
                     <Border Style="{StaticResource RepoMetricCard}"><StackPanel><TextBlock Text="REPOS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryTotalCount}" Style="{StaticResource RepoMetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#217A4B"><StackPanel><TextBlock Text="CLEAN" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryCleanCount}" Style="{StaticResource RepoMetricValue}" Foreground="#67AF87"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#725B1A"><StackPanel><TextBlock Text="{local:Tr Source='CON CAMBIOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryChangesCount}" Style="{StaticResource RepoMetricValue}" Foreground="#C59A4A"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#2E689D"><StackPanel><TextBlock Text="AHEAD" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAheadCount}" Style="{StaticResource RepoMetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#3C5870"><StackPanel><TextBlock Text="BEHIND" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryBehindCount}" Style="{StaticResource RepoMetricValue}" Foreground="#A9C6E0"/></StackPanel></Border>
-                    <Border Style="{StaticResource RepoMetricCard}" Margin="0" BorderBrush="#8D3942"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAttentionCount}" Style="{StaticResource RepoMetricValue}" Foreground="#FF7A84"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#3D6F53"><StackPanel><TextBlock Text="CLEAN" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryCleanCount}" Style="{StaticResource RepoMetricValue}" Foreground="#67AF87"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#6B5932"><StackPanel><TextBlock Text="{local:Tr Source='CON CAMBIOS'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryChangesCount}" Style="{StaticResource RepoMetricValue}" Foreground="#C59A4A"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#4E6580"><StackPanel><TextBlock Text="AHEAD" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAheadCount}" Style="{StaticResource RepoMetricValue}" Foreground="#6F91C4"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" BorderBrush="#4B5663"><StackPanel><TextBlock Text="BEHIND" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryBehindCount}" Style="{StaticResource RepoMetricValue}" Foreground="#AAB2BC"/></StackPanel></Border>
+                    <Border Style="{StaticResource RepoMetricCard}" Margin="0" BorderBrush="#704047"><StackPanel><TextBlock Text="{local:Tr Source='ATENCIÓN'}" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RepositoryAttentionCount}" Style="{StaticResource RepoMetricValue}" Foreground="#D56B75"/></StackPanel></Border>
                 </UniformGrid>
 
                 <Grid Grid.Row="2" Margin="14,0,14,9">
@@ -249,7 +249,7 @@
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
                         <TextBlock Text="{local:Tr Source='Último commit: '}" Foreground="#848C96" FontSize="11"/>
-                        <TextBlock Text="{Binding RepositoryLastCommit}" Foreground="#AFC3D8" FontSize="11" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding RepositoryLastCommit}" Foreground="#B7BEC8" FontSize="11" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                     <StackPanel Grid.Column="3" Orientation="Horizontal">
                         <TextBlock Text="{local:Tr Source='Más cambios: '}" Foreground="#848C96" FontSize="11"/>
@@ -316,7 +316,7 @@
                                 <Grid Margin="3,0" ToolTip="{Binding Tooltip, Converter={StaticResource LocalizedText}}">
                                     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                                     <ProgressBar Grid.Row="0" Minimum="0" Maximum="100" Value="{Binding RelativeHeight, Mode=OneWay}" Orientation="Vertical"
-                                                 Width="18" HorizontalAlignment="Center" Foreground="#6F91C4" Background="#14283D" BorderThickness="0"/>
+                                                 Width="18" HorizontalAlignment="Center" Foreground="#6F91C4" Background="#20252B" BorderThickness="0"/>
                                     <TextBlock Grid.Row="1" Text="{Binding TotalRuns}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,3,0,0"/>
                                     <TextBlock Grid.Row="2" Text="{Binding DayLabel}" Foreground="#9098A2" FontSize="11" HorizontalAlignment="Center" Margin="0,1,0,0"/>
                                 </Grid>
@@ -420,7 +420,7 @@
                                 <DataTemplate>
                                     <TextBlock Text="{Binding ActiveDisplay}" FontWeight="SemiBold">
                                         <TextBlock.Style>
-                                            <Style TargetType="TextBlock"><Setter Property="Foreground" Value="#657B91"/><Style.Triggers><DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="Foreground" Value="#C59A4A"/></DataTrigger></Style.Triggers></Style>
+                                            <Style TargetType="TextBlock"><Setter Property="Foreground" Value="#7F8893"/><Style.Triggers><DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="Foreground" Value="#C59A4A"/></DataTrigger></Style.Triggers></Style>
                                         </TextBlock.Style>
                                     </TextBlock>
                                 </DataTemplate>
@@ -517,7 +517,7 @@
                     <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}"/>
                 </StackPanel>
                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding ScanProgress, Mode=OneWay}" Height="4" Width="380"
-                             HorizontalAlignment="Left" Margin="15,7,0,0" Foreground="#6F91C4" Background="#14283D"
+                             HorizontalAlignment="Left" Margin="15,7,0,0" Foreground="#6F91C4" Background="#20252B"
                              BorderThickness="0">
                     <ProgressBar.Style>
                         <Style TargetType="ProgressBar">
