@@ -51,6 +51,10 @@ function Update-RepositorySafely {
         throw "La rama '$branch' no tiene upstream configurado. No puedo garantizar que sea la ultima version sin elegir un remoto por ti."
     }
 
+    if ($branch -ne 'main') {
+        Write-Host "Nota: estas en '$branch'. Se actualizara contra '$upstream'; RUN_ME_FIRST no cambiara automaticamente a main." -ForegroundColor Yellow
+    }
+
     $before = [string](& git -C $root rev-parse --short HEAD)
     $before = $before.Trim()
     if ($LASTEXITCODE -ne 0) {
