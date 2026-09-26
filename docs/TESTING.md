@@ -62,3 +62,13 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 4. Repeat with the RAM threshold and its 5-point recovery margin. Existing BUSY jobs must continue in both cases.
 5. Disable the resource guard and verify CPU/RAM no longer block queue starts. Re-enable it and confirm thresholds persist after restarting the app.
 6. Export/import portable settings and confirm the resource-guard toggle plus CPU/RAM thresholds round-trip.
+
+
+## v0.18.4 manual repository-guidance checks
+
+1. Select CLEAN, CHANGES, AHEAD, BEHIND, DIVERGED/CONFLICT and no-remote repositories and verify the right-side guidance changes without modifying Git state.
+2. Run Fetch, Pull and Push from NRS Workbench and confirm each completed/failed operation appears in the session activity list with repository name and timestamp.
+3. Complete a selective Commit and a local branch switch; verify both are added to the same in-memory activity list.
+4. With a Pull-enabled repository selected, create a local edit outside NRS Workbench before pressing Pull. Pull must be blocked after the service re-inspects the working tree.
+5. With a Push-enabled repository selected, switch branch outside NRS Workbench before pressing Push. Push must be blocked and ask for a refresh.
+6. Close and reopen NRS Workbench and confirm repository action history is empty; it is intentionally session-only and not telemetry/persistent audit history.
