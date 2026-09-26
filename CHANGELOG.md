@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 ### Planned for v0.18.3
+- Fixes the all-stopped queue deadlock: when the queue is enabled with no runner online, stopped runners become initial queue candidates so work can start without disabling the optimizer first. Once a candidate has been online, a later manual stop is still respected.
+- Improves window layout at normal Windows scaling: the main runner table gets more vertical space, Statistics no longer clips the third history-scope row, Repositories shows the full safe-sync guidance, and Settings is resizable and opens at the top.
 - Adds a visible smart-queue dashboard showing BUSY runners, the next queued runner, queue-owned waiting runners, and runners that remain manually stopped.
 - Adds a session-only Pause/Resume control that freezes queue scheduling without stopping active jobs.
 - Adds an optional host-resource guard, enabled by default, that blocks new queue starts and idle rotations while CPU or physical RAM are above configurable thresholds. Existing BUSY jobs are never interrupted by the guard. A 5-point recovery margin prevents rapid on/off flapping when host load hovers near a threshold.
