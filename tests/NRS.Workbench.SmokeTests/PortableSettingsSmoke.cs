@@ -63,6 +63,15 @@ internal static class PortableSettingsSmoke
                 "portable settings preserves the automatic runner queue and its concurrency limit");
             UiLanguage.Select(imported.Language);
             Assert(UiLanguage.Text("Configuración") == "Settings", "English UI resources load from the packaged app");
+            UiLanguage.Select("ca");
+            Assert(UiLanguage.Text("Configuración") == "Configuració" &&
+                   UiLanguage.Text("Guardar") == "Desar" &&
+                   UiLanguage.Choose("Error al actualizar runners", "Could not refresh runners") == "Error en actualitzar els runners",
+                "Catalan resources include UI controls and operational messages");
+            var catalanPortablePath = Path.Combine(root, "portable-ca.json");
+            service.ExportPortableSettings(new RunnerSettings { Language = "ca" }, catalanPortablePath);
+            Assert(service.ReadPortableSettings(catalanPortablePath).Language == "ca",
+                "portable settings preserve the Catalan language selection");
             UiLanguage.Select("es");
             Assert(UiLanguage.Text("Configuración") == "Configuración", "Spanish remains the default UI text");
             Assert(imported.RefreshIntervalSeconds == 300 &&
