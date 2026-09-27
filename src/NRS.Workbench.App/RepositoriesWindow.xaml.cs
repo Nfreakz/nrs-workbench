@@ -29,7 +29,11 @@ public partial class RepositoriesWindow : Window
         var repository = _viewModel.SelectedRepository;
         if (repository is null || !repository.CanCommit) return;
         var window = new CommitWindow(_git, repository, _dialogs) { Owner = this };
-        if (window.ShowDialog() == true) await _viewModel.RefreshAsync();
+        if (window.ShowDialog() == true)
+        {
+            _viewModel.RecordAction(repository.Name, "COMMIT", true);
+            await _viewModel.RefreshAsync();
+        }
     }
 
     private async void SwitchBranch_Click(object sender, RoutedEventArgs e)
@@ -76,12 +80,14 @@ public partial class RepositoriesWindow : Window
 
             if (!_dialogs.Confirm(UiLanguage.Choose($"Repositorio: {repository.Name}\nRama actual: {repository.Branch}\nNueva rama local: {target}\n\nNo se descargará ni fusionará nada. ¿Cambiar de rama?", $"Repository: {repository.Name}\nCurrent branch: {repository.Branch}\nNew local branch: {target}\n\nNothing will be downloaded or merged. Switch branch?", $"Repositori: {repository.Name}\nBranca actual: {repository.Branch}\nNova branca local: {target}\n\nNo es descarregarà ni fusionarà res. Vols canviar de branca?"), UiLanguage.Choose("Confirmar cambio de rama", "Confirm branch switch"))) return;
             await _git.SwitchLocalBranchAsync(repository, target);
+            _viewModel.RecordAction(repository.Name, "SWITCH", true, $"{repository.Branch} → {target}");
             await _viewModel.RefreshAsync();
         }
         catch (Exception ex)
         {
             AppLogger.Error("Could not switch local branch", ex);
-            _dialogs.ShowError(ex.Message, UiLanguage.Choose("Cambiar rama", "Switch branch"));
+            _viewModel.RecordAction(repository?.Name ?? "—", "SWITCH", false, ex.Message);
+            _dialogs.ShowError(SensitiveDataRedactor.Redact(ex.Message), UiLanguage.Choose("Cambiar rama", "Switch branch", "Canviar de branca"));
             await _viewModel.RefreshAsync();
         }
     }

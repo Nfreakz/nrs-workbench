@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Planned for v0.18.4
+- Adds a Buy Me a Coffee support card in Settings with a short optional-support message.
+- Adds contextual guidance in Repositories so the selected project explains which Git action is safe next.
+- Adds a session-only history of repository actions started from NRS Workbench.
+- Improves AHEAD, BEHIND and local-change visibility in the repository summary.
+- Re-checks repository state immediately before Pull and Push to block stale or unsafe operations.
+
 ## [0.18.3] - 2026-09-27
 
 ### Added
