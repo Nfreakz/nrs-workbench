@@ -20,18 +20,20 @@
 
 ### main
 
-- Current base for v0.18.4: `bf66a4cba535cffd156f5760b88d9c8ac89a9e70`.
+- Current v0.18.4 integration commit on `main`: `77a4a633b4b90af1067f9155d823dda31304aa9e`.
+- Post-merge CI for that commit completed successfully.
 - Professional graphite UI is the approved visual baseline.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
 
 ## v0.18.4 candidate
 
-Active work is isolated in PR #18.
+The core v0.18.4 scope has been merged to `main`; final UI/documentation polish is isolated in `polish/v0.18.4-final`.
 
-- Branch: `feat/v0.18.4-repository-guidance-v2`.
+- PR #18 is merged.
 - Version metadata: `0.18.4`.
-- Rebuilt on top of the current post-v0.18.3 `main`.
-- Do not tag or publish until manual Windows validation and CI are complete.
+- Manual Windows validation of the core Repositories and Settings changes has passed.
+- Final polish adds clearer recommendation hierarchy and an empty state for session activity.
+- Do not tag or publish until the polish PR is validated and merged.
 
 Scope:
 - contextual safe-action guidance for the selected repository;
@@ -52,10 +54,11 @@ Scope:
 
 ## Next sequence
 
-1. Let CI validate the rebuilt PR #18 candidate.
-2. Test the v0.18.4 branch on Windows.
-3. Merge only after UI and Git-safety behavior are confirmed.
-4. Publish only after explicit approval.
+1. Validate the `polish/v0.18.4-final` branch in CI.
+2. Manually confirm the recommendation hierarchy and empty history state on Windows.
+3. Merge the polish PR if clean.
+4. Finalize CHANGELOG/README release wording.
+5. Publish only after explicit approval.
 
 ## Future roadmap
 
