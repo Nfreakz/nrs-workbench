@@ -22,6 +22,9 @@ public sealed class GitService : IGitService
 
     public async Task<GitRepositoryInfo> InspectAsync(string repositoryPath)
     {
+        using var inspectTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));
+        var cancellationToken = inspectTimeout.Token;
+
         var path = Path.GetFullPath(repositoryPath);
         var info = new GitRepositoryInfo { Path = path, Name = new DirectoryInfo(path).Name };
 
@@ -32,7 +35,7 @@ public sealed class GitService : IGitService
             return info;
         }
 
-        var top = await RunAsync(path, ["rev-parse", "--show-toplevel"], allowFailure: true);
+        var top = await RunAsync(path, ["rev-parse", "--show-toplevel"], allowFailure: true, cancellationToken);
         if (top.ExitCode != 0)
         {
             info.State = GitRepositoryState.Error;
@@ -47,10 +50,10 @@ public sealed class GitService : IGitService
             info.Name = new DirectoryInfo(info.Path).Name;
         }
 
-        var status = await RunAsync(info.Path, ["status", "--porcelain=v2", "--branch"], allowFailure: false);
+        var status = await RunAsync(info.Path, ["status", "--porcelain=v2", "--branch"], allowFailure: false, cancellationToken);
         ParseStatus(status.StdOut, info);
 
-        var remote = await RunAsync(info.Path, ["remote", "get-url", "origin"], allowFailure: true);
+        var remote = await RunAsync(info.Path, ["remote", "get-url", "origin"], allowFailure: true, cancellationToken);
         if (remote.ExitCode == 0)
         {
             var rawRemote = remote.StdOut.Trim();
@@ -58,7 +61,7 @@ public sealed class GitService : IGitService
             info.GitHubUrl = ToBrowserGitHubUrl(rawRemote);
         }
 
-        var commit = await RunAsync(info.Path, ["log", "-1", "--format=%h%x1f%s%x1f%cI"], allowFailure: true);
+        var commit = await RunAsync(info.Path, ["log", "-1", "--format=%h%x1f%s%x1f%cI"], allowFailure: true, cancellationToken);
         if (commit.ExitCode == 0 && !string.IsNullOrWhiteSpace(commit.StdOut))
         {
             var parts = commit.StdOut.Trim().Split('\u001f');
@@ -512,7 +515,7 @@ public sealed class GitService : IGitService
         return results.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
-    private static async Task<GitCommandResult> RunAsync(string workingDirectory, IReadOnlyList<string> arguments, bool allowFailure)
+    private static async Task<GitCommandResult> RunAsync(string workingDirectory, IReadOnlyList<string> arguments, bool allowFailure, CancellationToken cancellationToken = default)
     {
         var psi = new ProcessStartInfo
         {
@@ -533,7 +536,26 @@ public sealed class GitService : IGitService
             process.Start();
             var stdoutTask = process.StandardOutput.ReadToEndAsync();
             var stderrTask = process.StandardError.ReadToEndAsync();
-            await process.WaitForExitAsync();
+            try
+            {
+                await process.WaitForExitAsync(cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    if (!process.HasExited) process.Kill(entireProcessTree: true);
+                }
+                catch
+                {
+                    // Best effort: the process may already have exited.
+                }
+
+                throw new TimeoutException(UiLanguage.Choose(
+                    "Git ha tardado demasiado al inspeccionar este repositorio. Vuelve a intentarlo o revisa la carpeta manualmente.",
+                    "Git took too long while inspecting this repository. Try again or review the folder manually.",
+                    "Git ha trigat massa a inspeccionar aquest repositori. Torna-ho a provar o revisa la carpeta manualment."));
+            }
             var result = new GitCommandResult(process.ExitCode, await stdoutTask, await stderrTask);
             if (!allowFailure && result.ExitCode != 0)
             {
