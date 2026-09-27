@@ -15,19 +15,20 @@ Published Public Preview.
 
 ## v0.18.4
 
-Repository Guidance candidate, rebuilt on top of the professional v0.18.3 UI baseline.
+Repository Guidance candidate integrated into `main` and undergoing final polish.
 
 Current implementation:
-- PR #18: `feat: v0.18.4 repository guidance on professional UI baseline`.
-- Branch: `feat/v0.18.4-repository-guidance-v2`.
-- Rebuilt on top of the published v0.18.3 `main`.
-- PR #16 is obsolete, closed and not merged.
+- PR #18 merged into `main`.
+- Main integration commit: `77a4a633b4b90af1067f9155d823dda31304aa9e`.
+- Post-merge Windows CI completed successfully.
+- Final polish is isolated in `polish/v0.18.4-final`.
 
 Scope:
-- Contextual safe-action guidance.
-- Session-only repository action history.
+- Contextual safe-action guidance with a clearer recommendation hierarchy.
+- Session-only repository action history with an explicit empty state.
 - Clear AHEAD/BEHIND/dirty visibility.
 - Revalidation immediately before Pull/Push.
+- Optional Buy Me a Coffee card in Settings.
 
 ## v0.18.5
 

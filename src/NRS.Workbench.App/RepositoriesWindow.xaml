@@ -168,7 +168,8 @@
                             </Style>
                         </Border.Style>
                         <StackPanel>
-                            <TextBlock Text="{Binding SelectedSyncTitle}" FontSize="14" FontWeight="SemiBold">
+                            <TextBlock Text="{local:Tr Source='RECOMENDACIÓN'}" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding SelectedSyncTitle}" FontSize="15" FontWeight="SemiBold">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="#AAB2BC"/>
@@ -190,33 +191,52 @@
                         <TextBlock Grid.Column="1" Text="{local:Tr Source='Solo actividad iniciada desde NRS Workbench'}" FontSize="10.5" Foreground="#7F8893"/>
                     </Grid>
 
-                    <ListBox Grid.Row="3" ItemsSource="{Binding ActionHistory}" Background="Transparent" BorderThickness="0" Padding="0">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0,2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="72"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="58"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="{Binding TimeText}" Foreground="#7F8893" FontFamily="Cascadia Mono, Consolas" FontSize="10.5"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Action}" Foreground="#7697C8" FontWeight="SemiBold" FontSize="10.5"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding RepositoryName}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Detail}" FontSize="10.5"/>
-                                    <TextBlock Grid.Column="3" Text="{Binding ResultText}" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="10.5">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="#67AF87"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Success}" Value="False"><Setter Property="Foreground" Value="#D56B75"/></DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                    <Grid Grid.Row="3">
+                        <ListBox ItemsSource="{Binding ActionHistory}" Background="Transparent" BorderThickness="0" Padding="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="72"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="58"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding TimeText}" Foreground="#7F8893" FontFamily="Cascadia Mono, Consolas" FontSize="10.5"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Action}" Foreground="#7697C8" FontWeight="SemiBold" FontSize="10.5"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding RepositoryName}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Detail}" FontSize="10.5"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding ResultText}" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="10.5">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#67AF87"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Success}" Value="False"><Setter Property="Foreground" Value="#D56B75"/></DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Border Background="#12161B" BorderBrush="#303640" BorderThickness="1" CornerRadius="8" Padding="14" VerticalAlignment="Top">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ActionHistory.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel>
+                                <TextBlock Text="{local:Tr Source='Sin actividad todavía'}" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock Text="{local:Tr Source='Las acciones que inicies desde NRS Workbench aparecerán aquí durante esta sesión.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>
