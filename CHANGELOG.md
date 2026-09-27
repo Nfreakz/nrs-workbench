@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 ### Planned for v0.18.4
+- Prevents a stalled local Git inspection from leaving the Repositories view waiting indefinitely.
+- Keeps runner details accessible in compact layouts instead of clipping the lower fields and actions.
 - Adds contextual repository guidance with a clearer visual recommendation for the next safe action.
 - Adds a session-only repository action history with an explicit empty state before the first action.
 - Improves AHEAD, BEHIND and local-change visibility in the repository summary.
