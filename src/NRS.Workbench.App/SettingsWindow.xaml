@@ -12,16 +12,26 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,18">
-            <TextBlock Text="{local:Tr Source='Configuración'}" FontSize="24" FontWeight="Bold"/>
-            <TextBlock Text="{local:Tr Source='Configura runners, notificaciones y comportamiento del NRS Workbench.'}" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
-        </StackPanel>
+        <Grid Grid.Row="0" Margin="0,0,0,18">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="{local:Tr Source='Configuración'}" FontSize="24" FontWeight="Bold"/>
+                <TextBlock Text="{local:Tr Source='Configura runners, notificaciones y comportamiento del NRS Workbench.'}" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+            <Button Grid.Column="1" Click="Support_Click"
+                    Padding="14,8" Margin="18,0,0,0" VerticalAlignment="Center"
+                    Background="#FFDD00" Foreground="#111111" BorderBrush="#FFDD00" BorderThickness="1"
+                    FontWeight="SemiBold" Cursor="Hand" Content="☕ Buy me a coffee"
+                    ToolTip="{local:Tr Source='Abre la página de apoyo de Neo RS en Buy Me a Coffee.'}"/>
+        </Grid>
 
         <ScrollViewer x:Name="SettingsScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <Border Style="{StaticResource PanelCard}" Padding="18">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -130,24 +140,6 @@
                 </StackPanel>
 
                 <Border Grid.Row="6" Background="#15181C" BorderBrush="#303640" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Margin="0,0,18,0">
-                            <TextBlock Text="{local:Tr Source='Apoyar NRS Workbench'}" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
-                            <TextBlock Text="{local:Tr Source='Si NRS Workbench te resulta útil, puedes apoyar su desarrollo con un café. Es completamente opcional y no cambia la licencia ni las funciones de la aplicación.'}"
-                                       Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="0,4,0,0"/>
-                        </StackPanel>
-                        <Button Grid.Column="1" Click="Support_Click" Padding="15,9" Margin="0" VerticalAlignment="Center"
-                                Background="#FFDD00" Foreground="#111111" BorderBrush="#FFDD00" BorderThickness="1"
-                                FontWeight="SemiBold" Cursor="Hand" Content="☕ Buy me a coffee"
-                                ToolTip="{local:Tr Source='Abre la página de apoyo de Neo RS en Buy Me a Coffee.'}"/>
-                    </Grid>
-                </Border>
-
-                <Border Grid.Row="7" Background="#15181C" BorderBrush="#303640" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
