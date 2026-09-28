@@ -157,7 +157,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="7"/>
-            <RowDefinition x:Name="DetailPanelRow" Height="220" MinHeight="0"/>
+            <RowDefinition x:Name="DetailPanelRow" Height="195" MinHeight="0"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -568,113 +568,165 @@
             <Grid.ColumnDefinitions><ColumnDefinition Width="0.78*"/><ColumnDefinition Width="1.72*"/></Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Style="{StaticResource PanelCard}" Margin="0,0,7,0" Padding="0">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="14">
-                <Grid>
-                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Margin="0,0,0,13">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <StackPanel Orientation="Horizontal">
-                            <Border Width="28" Height="28" CornerRadius="8" Background="#28364B" Margin="0,0,9,0">
-                                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#6F91C4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <TextBlock Text="{local:Tr Source='Detalle del runner'}" Style="{StaticResource SectionTitle}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <Border Grid.Column="1" Background="{Binding SelectedRunner.State, Converter={StaticResource StateBrush}}"
-                                BorderBrush="{Binding SelectedRunner.State, Converter={StaticResource StateAccentBrush}}" BorderThickness="1"
-                                CornerRadius="12" Padding="9,4" VerticalAlignment="Center">
-                            <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="8" Height="8" Fill="{Binding SelectedRunner.State, Converter={StaticResource StateAccentBrush}}" Margin="0,1,7,0"/>
-                                <TextBlock Text="{Binding SelectedRunner.State, Converter={StaticResource StateLabel}}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="0,0,0,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel>
+                                <TextBlock Text="{Binding SelectedRunner.Alias, TargetNullValue=Selecciona un runner}"
+                                           FontSize="19" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding SelectedRunner.GitHubTarget}"
+                                           Foreground="#6F91C4" FontSize="11"
+                                           Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="10,0,0,0">
+                                <Border Background="{Binding SelectedRunner.State, Converter={StaticResource StateBrush}}"
+                                        BorderBrush="{Binding SelectedRunner.State, Converter={StaticResource StateAccentBrush}}"
+                                        BorderThickness="1" CornerRadius="10" Padding="8,2" Margin="0,0,7,0"
+                                        VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="7" Height="7"
+                                                 Fill="{Binding SelectedRunner.State, Converter={StaticResource StateAccentBrush}}"
+                                                 Margin="0,1,6,0"/>
+                                        <TextBlock Text="{Binding SelectedRunner.State, Converter={StaticResource StateLabel}}"
+                                                   Foreground="#FFFFFF" FontWeight="Bold" FontSize="10.5"/>
+                                    </StackPanel>
+                                </Border>
+                                <Button Style="{StaticResource MainToolbarButton}" Command="{Binding OpenFolderCommand}"
+                                        Width="31" Height="29" MinHeight="0" Padding="0" Margin="0,0,5,0"
+                                        ToolTip="{local:Tr Source='Abrir carpeta'}">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B7;" FontSize="13"/>
+                                </Button>
+                                <Button Style="{StaticResource MainToolbarButton}" Command="{Binding OpenGitHubCommand}"
+                                        Width="31" Height="29" MinHeight="0" Padding="0" Margin="0"
+                                        ToolTip="{local:Tr Source='Abrir en GitHub'}">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A7;" FontSize="13"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Grid.Row="1" x:Name="SelectedProgressCard"
+                                Background="#191C21" BorderBrush="#5A4D32" BorderThickness="1"
+                                CornerRadius="8" Padding="8" Margin="0,0,0,7">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedRunner.State}" Value="{x:Static models:RunnerState.Busy}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding SelectedRunner.Progress.JobDisplay, Converter={StaticResource LocalizedText}}"
+                                                   FontSize="10.5" Foreground="#8FA0B3" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding SelectedRunner.Progress.PhaseDisplay, Converter={StaticResource LocalizedText}}"
+                                                   FontSize="12" FontWeight="SemiBold" Foreground="#F6F8FB"
+                                                   TextTrimming="CharacterEllipsis" Margin="0,1,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedRunner.Progress.PercentDisplay, Converter={StaticResource LocalizedText}}"
+                                               Foreground="#C59A4A" FontSize="11" FontWeight="Bold"
+                                               VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                </Grid>
+                                <ProgressBar Height="6" Minimum="0" Maximum="100"
+                                             Value="{Binding SelectedRunner.Progress.Percent, Mode=OneWay}"
+                                             Foreground="#C59A4A" Background="#242931" BorderThickness="0"
+                                             Margin="0,5,0,0">
+                                    <ProgressBar.Style>
+                                        <Style TargetType="ProgressBar">
+                                            <Setter Property="IsIndeterminate" Value="True"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedRunner.Progress.HasEstimate}" Value="True">
+                                                    <Setter Property="IsIndeterminate" Value="False"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ProgressBar.Style>
+                                </ProgressBar>
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding SelectedRunner.Progress.MetaDisplay, Converter={StaticResource LocalizedText}}"
+                                               FontSize="10.5" Foreground="#A7AEB7" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedRunner.Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}"
+                                               FontSize="10.5" Foreground="#8F97A1" Margin="8,0,0,0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Grid>
                             </StackPanel>
                         </Border>
+
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="72"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="58"/>
+                                <ColumnDefinition Width="1.18*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Host / agent" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedRunner.AgentName}" FontSize="10.5" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Uptime" FontSize="10.5" Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0"/>
+                            <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding SelectedRunner.UptimeDisplay}" FontSize="10.5" TextTrimming="CharacterEllipsis"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{local:Tr Source='Modo'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedRunner.ModeDisplay, Converter={StaticResource LocalizedText}}" FontSize="10.5" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{local:Tr Source='Versión'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding SelectedRunner.Version}" FontSize="10.5" TextTrimming="CharacterEllipsis"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="PID" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedRunner.PidDisplay}" FontSize="10.5" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="2" Grid.Column="2" Text="{local:Tr Source='Servicio'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding SelectedRunner.ServiceName}" FontSize="10.5" TextTrimming="CharacterEllipsis"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="RAM" FontSize="10.5" Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedRunner.RamDisplay}" FontSize="10.5" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Row="3" Grid.Column="2" Text="{local:Tr Source='Carpeta'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0"/>
+                            <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding SelectedRunner.FolderPath}" FontSize="10.5" TextTrimming="CharacterEllipsis" ToolTip="{Binding SelectedRunner.FolderPath}"/>
+                        </Grid>
                     </Grid>
-
-                    <StackPanel Grid.Row="1" Margin="0,0,0,14">
-                        <TextBlock Text="{Binding SelectedRunner.Alias, TargetNullValue=Selecciona un runner}" FontSize="20" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding SelectedRunner.GitHubTarget}" Foreground="#6F91C4" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
-                    </StackPanel>
-
-                    <Border Grid.Row="2" x:Name="SelectedProgressCard" Background="#191C21" BorderBrush="#5A4D32" BorderThickness="1" CornerRadius="8" Padding="9" Margin="0,0,0,10">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedRunner.State}" Value="{x:Static models:RunnerState.Busy}">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <StackPanel>
-                            <Grid Margin="0,0,0,7">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="{local:Tr Source='Trabajo en curso'}" FontSize="11" Foreground="#A08B5A" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding SelectedRunner.Progress.JobDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8FA0B3" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
-                                    <TextBlock Text="{Binding SelectedRunner.Progress.PhaseDisplay, Converter={StaticResource LocalizedText}}" FontSize="13" FontWeight="SemiBold" Foreground="#F6F8FB" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" Foreground="#C59A4A" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
-                            </Grid>
-                            <ProgressBar Height="8" Minimum="0" Maximum="100" Value="{Binding SelectedRunner.Progress.Percent, Mode=OneWay}"
-                                         Foreground="#C59A4A" Background="#242931" BorderThickness="0">
-                                <ProgressBar.Style>
-                                    <Style TargetType="ProgressBar">
-                                        <Setter Property="IsIndeterminate" Value="True"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedRunner.Progress.HasEstimate}" Value="True">
-                                                <Setter Property="IsIndeterminate" Value="False"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ProgressBar.Style>
-                            </ProgressBar>
-                            <Grid Margin="0,7,0,0">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding SelectedRunner.Progress.MetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#A7AEB7"/>
-                                <TextBlock Grid.Column="1" Text="{Binding SelectedRunner.Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8F97A1" Margin="10,0,0,0"/>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <Grid Grid.Row="3">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="116"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Text="Host / agent" Style="{StaticResource MutedLabel}"/><TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedRunner.AgentName}"/>
-                        <TextBlock Grid.Row="1" Text="{local:Tr Source='Modo'}" Style="{StaticResource MutedLabel}"/><TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedRunner.ModeDisplay, Converter={StaticResource LocalizedText}}"/>
-                        <TextBlock Grid.Row="2" Text="PID" Style="{StaticResource MutedLabel}"/><TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedRunner.PidDisplay}"/>
-                        <TextBlock Grid.Row="3" Text="RAM" Style="{StaticResource MutedLabel}"/><TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedRunner.RamDisplay}"/>
-                        <TextBlock Grid.Row="4" Text="Uptime" Style="{StaticResource MutedLabel}"/><TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedRunner.UptimeDisplay}"/>
-                        <TextBlock Grid.Row="5" Text="{local:Tr Source='Versión'}" Style="{StaticResource MutedLabel}"/><TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedRunner.Version}"/>
-                        <TextBlock Grid.Row="6" Text="{local:Tr Source='Servicio'}" Style="{StaticResource MutedLabel}"/><TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding SelectedRunner.ServiceName}" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Grid.Row="7" Text="{local:Tr Source='Carpeta'}" Style="{StaticResource MutedLabel}"/><TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding SelectedRunner.FolderPath}" TextTrimming="CharacterEllipsis"/>
-                    </Grid>
-
-                    <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,14,0,0">
-                        <Button Style="{StaticResource MainToolbarButton}" Command="{Binding OpenFolderCommand}">
-                            <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource MainIconGlyph}" Text="&#xE8B7;"/><TextBlock Text="{local:Tr Source='Abrir carpeta'}"/></StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource MainToolbarButton}" Command="{Binding OpenGitHubCommand}" Margin="0">
-                            <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource MainIconGlyph}" Text="&#xE8A7;"/><TextBlock Text="{local:Tr Source='Abrir en GitHub'}"/></StackPanel>
-                        </Button>
-                    </StackPanel>
-                </Grid>
                 </ScrollViewer>
             </Border>
 
-            <Border Grid.Column="1" Style="{StaticResource PanelCard}" Margin="7,0,0,0" Padding="12">
+            <Border Grid.Column="1" Style="{StaticResource PanelCard}" Margin="7,0,0,0" Padding="10">
                 <Grid>
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid Grid.Row="0" Margin="0,0,0,6">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal">
-                            <Border Width="28" Height="28" CornerRadius="8" Background="#28364B" Margin="0,0,9,0">
+                            <Border Width="24" Height="24" CornerRadius="7" Background="#28364B" Margin="0,0,8,0">
                                 <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="#6F91C4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{local:Tr Source='Último log'}" Style="{StaticResource SectionTitle}"/>
+                                    <TextBlock Text="{local:Tr Source='Último log'}" FontSize="14" FontWeight="SemiBold"/>
                                     <Border Margin="9,1,0,0" Padding="6,2" CornerRadius="7" Background="#223229" BorderBrush="#3D6F53" BorderThickness="1">
                                         <StackPanel Orientation="Horizontal">
                                             <Ellipse Width="6" Height="6" Fill="#5AA878" Margin="0,0,5,0" VerticalAlignment="Center"/>
@@ -682,7 +734,7 @@
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
-                                <TextBlock Text="{local:Tr Source='Salida reciente del runner seleccionado'}" Style="{StaticResource MutedLabel}" Margin="0,1,0,0"/>
+                                <TextBlock Text="{local:Tr Source='Salida reciente del runner seleccionado'}" FontSize="10.5" Foreground="{StaticResource MutedBrush}" Margin="0,1,0,0"/>
                             </StackPanel>
                         </StackPanel>
                         <Button Grid.Column="1" Style="{StaticResource MainToolbarButton}" Command="{Binding ClearLogCommand}" Margin="0" Padding="10,6">
@@ -691,7 +743,7 @@
                     </Grid>
                     <Border Grid.Row="1" Background="#111419" BorderBrush="#303640" BorderThickness="1" CornerRadius="8" Padding="1">
                         <TextBox Text="{Binding LogText, Mode=OneWay}" IsReadOnly="True" TextWrapping="NoWrap"
-                                 FontFamily="Cascadia Mono, Consolas" FontSize="11.5" Padding="12" AcceptsReturn="True"
+                                 FontFamily="Cascadia Mono, Consolas" FontSize="11" Padding="9" AcceptsReturn="True"
                                  Background="Transparent" BorderThickness="0"
                                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
                     </Border>
