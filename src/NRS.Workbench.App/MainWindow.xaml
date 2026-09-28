@@ -344,7 +344,7 @@
 
         <!-- Runner table -->
         <Border Grid.Row="4" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,14">
-            <DataGrid ItemsSource="{Binding Runners}" SelectedItem="{Binding SelectedRunner, Mode=TwoWay}" AlternationCount="2" CanUserSortColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <DataGrid ItemsSource="{Binding Runners}" SelectedItem="{Binding SelectedRunner, Mode=TwoWay}" AlternationCount="2" CanUserSortColumns="False" RowHeight="42" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="{local:Tr Source='ESTADO'}" Width="112">
                         <DataGridTemplateColumn.CellTemplate>
@@ -399,12 +399,17 @@
                                 <Grid>
                                     <TextBlock x:Name="IdleProgress" Text="—" Foreground="#7F8893" VerticalAlignment="Center"/>
                                     <StackPanel x:Name="BusyProgress" Visibility="Collapsed" VerticalAlignment="Center" ToolTip="{Binding Progress.EstimateSourceDisplay, Converter={StaticResource LocalizedText}}">
-                                        <Grid Margin="0,0,0,3">
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <Grid Margin="0,0,0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding Progress.PhaseDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#E7F0FA" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold" Foreground="#C59A4A" Margin="8,0,0,0"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Progress.CompactMetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="10.5" Foreground="#8F97A1" Margin="8,0,8,0" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold" Foreground="#C59A4A"/>
                                         </Grid>
-                                        <ProgressBar Height="6" Minimum="0" Maximum="100" Value="{Binding Progress.Percent, Mode=OneWay}"
+                                        <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding Progress.Percent, Mode=OneWay}"
                                                      Foreground="#C59A4A" Background="#242931" BorderThickness="0">
                                             <ProgressBar.Style>
                                                 <Style TargetType="ProgressBar">
@@ -417,7 +422,6 @@
                                                 </Style>
                                             </ProgressBar.Style>
                                         </ProgressBar>
-                                        <TextBlock Text="{Binding Progress.CompactMetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" Foreground="#8F97A1" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Grid>
                                 <DataTemplate.Triggers>
