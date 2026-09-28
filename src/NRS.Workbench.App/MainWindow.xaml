@@ -146,6 +146,7 @@
         <conv:RunnerStateBrushConverter x:Key="StateBrush"/>
         <conv:RunnerStateAccentBrushConverter x:Key="StateAccentBrush"/>
         <conv:RunnerStateLabelConverter x:Key="StateLabel"/>
+        <conv:VersionAccentConverter x:Key="VersionAccent"/>
     </Window.Resources>
 
     <Grid Background="{StaticResource BgBrush}" Margin="18">
@@ -531,8 +532,15 @@
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="Foreground" Value="#9BA3AE"/>
                                 <Setter Property="FontSize" Value="11"/>
+                                <Setter Property="Foreground">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{StaticResource VersionAccent}">
+                                            <Binding Path="Version"/>
+                                            <Binding Path="DataContext.DominantRunnerVersion" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
                                 <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
