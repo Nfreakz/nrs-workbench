@@ -75,3 +75,14 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 4. With a Pull-enabled repository selected, create a local edit outside NRS Workbench before pressing Pull. Pull must be blocked after the service re-inspects the working tree.
 5. With a Push-enabled repository selected, switch branch outside NRS Workbench before pressing Push. Push must be blocked and ask for a refresh.
 6. Close and reopen NRS Workbench and confirm repository action history is empty; it is intentionally session-only and not telemetry/persistent audit history.
+
+
+## v0.18.5 runner discovery and queue-pool checks
+
+1. Create a valid runner installation under a configured root with a folder name that does not start with `actions-runner`; verify NRS Workbench detects it.
+2. Create an empty folder whose name starts with `actions-runner`; verify it is ignored.
+3. In Settings, disable **Use all detected runners**, select only a subset, save, and verify only those runners appear as Smart Queue participants.
+4. Keep an excluded runner READY while the queue limit is 1; verify the queue does not stop it or count it against the selected pool.
+5. Select a stopped runner while an excluded runner is already online; verify Smart Queue may start the selected runner without touching the excluded one.
+6. Change the selected pool while NRS Workbench remains open and verify newly selected runners become eligible without automatically controlling runners removed from the pool.
+7. Export/import portable settings and verify the queue selection mode and selected runner paths round-trip without credentials.
