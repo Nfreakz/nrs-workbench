@@ -8,7 +8,9 @@
 
 ### Improved
 - Hides the Smart Queue dashboard when the queue is disabled so the runner table gets that vertical space back.
-- Makes the main runner table denser and better balanced: step/time metadata shares the action line, row/header height is reduced, and compact status/metadata columns leave more room for GitHub target and progress.
+- Makes the lower Details/Log area vertically resizable; double-clicking its splitter collapses or restores it.
+- Compacts the header, action bar, runner controls and host-resource strip to keep more runner rows visible at once.
+- Makes the main runner table denser and better balanced: step/time metadata shares the action line, rows/headers are shorter, selection uses a quieter graphite highlight, and compact metadata columns leave more room for GitHub target and progress.
 - Detects GitHub Actions runner installations from their actual runner files instead of requiring an `actions-runner*` folder name.
 - Keeps runner discovery shallow while allowing configured runner folders and common parent folders to be found without a naming convention.
 
