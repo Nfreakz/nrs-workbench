@@ -11,29 +11,29 @@
 
 ### Published baseline
 
-- Latest published release: `v0.18.3 Public Preview`.
-- Release commit: `f830eb57a515e5c16755514ae35b8b0f0f5dfbc4`.
-- Verified asset: `NRSWorkbench-v0.18.3-win-x64.zip`.
-- Release workflow completed successfully.
+- Latest published release before the current release preparation: `v0.18.3 Public Preview`.
+- v0.18.4 release candidate is on `main` at `8ea7f8d1eb471f5360c09e341ec1205fe50c02c3`.
+- Post-merge CI for the v0.18.4 candidate completed successfully.
+- Manual Windows validation of Repositories, Settings and compact runner details passed.
 - GitHub Release notes use curated CHANGELOG sections instead of an automatic list of every PR.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
 
 ### main
 
-- Current v0.18.4 integration commit on `main`: `77a4a633b4b90af1067f9155d823dda31304aa9e`.
-- Post-merge CI for that commit completed successfully.
+- Current v0.18.4 release candidate on `main`: `8ea7f8d1eb471f5360c09e341ec1205fe50c02c3`.
+- Release-prep changes are isolated in `release/v0.18.4`.
 - Professional graphite UI is the approved visual baseline.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
 
-## v0.18.4 candidate
+## v0.18.4 release candidate
 
-The core v0.18.4 scope has been merged to `main`; final UI/documentation polish is isolated in `polish/v0.18.4-final`.
+The implementation and final polish are merged to `main`.
 
-- PR #18 is merged.
+- PR #18 and PR #22 are merged.
 - Version metadata: `0.18.4`.
-- Manual Windows validation of the core Repositories and Settings changes has passed.
-- Final polish adds clearer recommendation hierarchy and an empty state for session activity.
-- Do not tag or publish until the polish PR is validated and merged.
+- Manual Windows validation passed.
+- CI on the final implementation commit passed.
+- Release preparation finalizes CHANGELOG/README wording before tagging `v0.18.4`.
 
 Scope:
 - contextual safe-action guidance for the selected repository;
@@ -54,11 +54,10 @@ Scope:
 
 ## Next sequence
 
-1. Validate the `polish/v0.18.4-final` branch in CI.
-2. Manually confirm the recommendation hierarchy and empty history state on Windows.
-3. Merge the polish PR if clean.
-4. Finalize CHANGELOG/README release wording.
-5. Publish only after explicit approval.
+1. Validate and merge `release/v0.18.4`.
+2. Tag the final release-prep commit as `v0.18.4`.
+3. Verify the release workflow creates the GitHub Release and Windows x64 ZIP.
+4. Verify release notes and asset checksum before calling the release complete.
 
 ## Future roadmap
 

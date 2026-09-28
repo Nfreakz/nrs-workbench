@@ -6,19 +6,19 @@
 
 **A local Windows dashboard for Git repositories and GitHub Actions self-hosted runners.**
 
-**Latest published release: [v0.18.3 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.3)** · [Download Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.3/NRSWorkbench-v0.18.3-win-x64.zip) · [What's new](CHANGELOG.md)
+**Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4)** · [Download Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.4/NRSWorkbench-v0.18.4-win-x64.zip) · [What's new](CHANGELOG.md)
 
-**New in v0.18.3:** Smart Queue dashboard, Pause/Resume scheduling, configurable CPU/RAM limits, reliable startup when all runners are stopped, and a cleaner graphite interface with layout fixes.
+**New in v0.18.4:** contextual repository guidance, session-only Git action history, clearer AHEAD/BEHIND visibility, safer Pull/Push revalidation, compact-layout fixes, and optional Buy Me a Coffee support in Settings.
 
-NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.3 Public Preview**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
+NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.4 Public Preview**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
 
 **New in v0.18.1:** The optional automatic runner queue can keep one or two runners connected and rotate idle runners while GitHub holds jobs for stopped runners. Active jobs are not intentionally interrupted. This feature is absent from the v0.18.0 ZIP. See [Automatic runner queue](#automatic-runner-queue) for operational limits.
 
 **Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-**En español:** La v0.18.3 ya está publicada con mejoras en Smart Queue, control de carga del equipo y una interfaz más limpia.
+**En español:** La v0.18.4 mejora la gestión de repositorios con recomendaciones contextuales, historial de acciones y comprobaciones más seguras antes de Pull y Push.
 
-**En català:** La v0.18.3 ja està publicada amb millores a Smart Queue, control de càrrega de l'equip i una interfície més neta.
+**En català:** La v0.18.4 millora la gestió de repositoris amb recomanacions contextuals, historial d'accions i comprovacions més segures abans de Pull i Push.
 
 ### Main window
 
@@ -32,7 +32,7 @@ Screenshot from Windows. Computer, runner and repository names, paths and log co
 - **People managing several local Git repositories:** inspect working-tree state and use guarded Fetch, Pull, Push, Commit and local branch switching without jumping between folders.
 - **Small homelab and development setups:** keep host CPU, memory and disk usage visible next to runner activity, with an optional one- or two-runner queue to limit simultaneous listeners.
 
-The current **v0.18.3 Public Preview** adds smarter queue control, host resource limits and the refreshed graphite interface.
+The current **v0.18.4 Public Preview** adds safer repository guidance, clearer synchronization state and the final polish on the graphite interface.
 
 **Try it:** [Download the latest Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/latest) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
 
