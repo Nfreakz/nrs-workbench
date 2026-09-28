@@ -36,9 +36,9 @@ Archived v0.18.0 screenshot. The project preview above shows the later interface
 - **People managing several local Git repositories:** inspect working-tree state and use guarded Fetch, Pull, Push, Commit and local branch switching without jumping between folders.
 - **Small homelab and development setups:** keep host CPU, memory and disk usage visible next to runner activity, with an optional one- or two-runner queue to limit simultaneous listeners.
 
-The **v0.18.4 release candidate** adds safer repository guidance, clearer synchronization state and the final polish on the graphite interface.
+The **v0.18.4 tagged source** adds repository guidance, synchronization status and Pull/Push revalidation. These changes are not in the downloadable v0.18.3 ZIP.
 
-**Try it:** [Download the latest Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/latest) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
+**Try it:** [Download the published v0.18.3 Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.3/NRSWorkbench-v0.18.3-win-x64.zip) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
 
 ## Public preview readiness
 
