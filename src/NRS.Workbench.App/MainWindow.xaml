@@ -134,7 +134,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="270"/>
+            <RowDefinition Height="245"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -270,7 +270,7 @@
         </Grid>
 
         <!-- Smart runner queue -->
-        <Border Grid.Row="2" Style="{StaticResource PanelCard}" Padding="13,10" Margin="0,0,0,12">
+        <Border Grid.Row="2" Style="{StaticResource PanelCard}" Padding="12,8" Margin="0,0,0,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
@@ -329,12 +329,12 @@
         </Border>
 
         <!-- Runner list controls -->
-        <Grid Grid.Row="3" Margin="2,0,2,10">
+        <Grid Grid.Row="3" Margin="2,0,2,8">
             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <TextBlock Text="{local:Tr Source='Buscar runner'}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,9,0"/>
-            <TextBox Grid.Column="1" Width="235" Height="30" VerticalAlignment="Center" VerticalContentAlignment="Center" Text="{Binding RunnerSearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="{local:Tr Source='Busca por nombre, destino, etiqueta o ruta'}"/>
+            <TextBox Grid.Column="1" Width="225" Height="30" VerticalAlignment="Center" VerticalContentAlignment="Center" Text="{Binding RunnerSearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="{local:Tr Source='Busca por nombre, destino, etiqueta o ruta'}"/>
             <Button Grid.Column="2" Style="{StaticResource ToolbarButton}" Command="{Binding ClearRunnerSearchCommand}" Content="✕" Padding="9,5" Margin="5,0,18,0" ToolTip="{local:Tr Source='Limpiar búsqueda'}"/>
-            <ComboBox Grid.Column="3" Style="{StaticResource RunnerSortCombo}" Width="205" Height="38" VerticalAlignment="Center" ItemsSource="{Binding SortOptions}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding SelectedSortMode, Mode=TwoWay}" ToolTip="{local:Tr Source='Orden de runners'}"/>
+            <ComboBox Grid.Column="3" Style="{StaticResource RunnerSortCombo}" Width="190" Height="34" VerticalAlignment="Center" ItemsSource="{Binding SortOptions}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding SelectedSortMode, Mode=TwoWay}" ToolTip="{local:Tr Source='Orden de runners'}"/>
             <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="7,0,0,0">
                 <Button Style="{StaticResource ToolbarButton}" Command="{Binding MoveRunnerUpCommand}" Content="↑" Padding="10,5" Margin="0,0,4,0" ToolTip="{local:Tr Source='Subir runner seleccionado en el orden manual'}"/>
                 <Button Style="{StaticResource ToolbarButton}" Command="{Binding MoveRunnerDownCommand}" Content="↓" Padding="10,5" Margin="0" ToolTip="{local:Tr Source='Bajar runner seleccionado en el orden manual'}"/>
@@ -349,63 +349,44 @@
                       SelectedItem="{Binding SelectedRunner, Mode=TwoWay}"
                       AlternationCount="2"
                       CanUserSortColumns="False"
-                      RowHeight="42"
+                      RowHeight="40"
+                      ColumnHeaderHeight="36"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       PreviewMouseRightButtonDown="RunnerGrid_PreviewMouseRightButtonDown">
                 <DataGrid.ContextMenu>
-                    <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"
-                                 Background="#171A1F" Foreground="#F1F3F5"
-                                 BorderBrush="#303640" BorderThickness="1" Padding="4">
-                        <ContextMenu.Resources>
-                            <Style TargetType="{x:Type MenuItem}">
-                                <Setter Property="Foreground" Value="#F1F3F5"/>
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="Padding" Value="11,7"/>
-                                <Setter Property="Cursor" Value="Hand"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type MenuItem}">
-                                            <Border x:Name="MenuItemChrome"
-                                                    Background="{TemplateBinding Background}"
-                                                    CornerRadius="4"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter ContentSource="Header"
-                                                                  RecognizesAccessKey="True"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsHighlighted" Value="True">
-                                                    <Setter TargetName="MenuItemChrome" Property="Background" Value="#252B33"/>
-                                                </Trigger>
-                                                <Trigger Property="IsEnabled" Value="False">
-                                                    <Setter Property="Opacity" Value="0.38"/>
-                                                    <Setter Property="Cursor" Value="Arrow"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ContextMenu.Resources>
-                        <MenuItem Header="{local:Tr Source='Iniciar'}" Command="{Binding StartCommand}"/>
-                        <MenuItem Header="{local:Tr Source='Parar'}" Command="{Binding StopCommand}"/>
-                        <MenuItem Header="{local:Tr Source='Reiniciar'}" Command="{Binding RestartCommand}"/>
-                        <Separator Margin="5,3" Background="#303640"/>
-                        <MenuItem Header="{local:Tr Source='Abrir carpeta'}" Command="{Binding OpenFolderCommand}"/>
-                        <MenuItem Header="{local:Tr Source='Abrir diagnóstico'}" Command="{Binding OpenDiagCommand}"/>
-                        <MenuItem Header="{local:Tr Source='Abrir en GitHub'}" Command="{Binding OpenGitHubCommand}"/>
+                    <ContextMenu Style="{StaticResource DarkContextMenu}"
+                                 DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                        <MenuItem Style="{StaticResource DarkMenuItem}" Header="{local:Tr Source='Iniciar'}" Command="{Binding StartCommand}">
+                            <MenuItem.Icon><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE768;" Foreground="#AEB7C3" FontSize="13"/></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Style="{StaticResource DarkMenuItem}" Header="{local:Tr Source='Parar'}" Command="{Binding StopCommand}">
+                            <MenuItem.Icon><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE71A;" Foreground="#AEB7C3" FontSize="13"/></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Style="{StaticResource DarkMenuItem}" Header="{local:Tr Source='Reiniciar'}" Command="{Binding RestartCommand}">
+                            <MenuItem.Icon><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72C;" Foreground="#AEB7C3" FontSize="13"/></MenuItem.Icon>
+                        </MenuItem>
+                        <Separator Style="{StaticResource DarkMenuSeparator}"/>
+                        <MenuItem Style="{StaticResource DarkMenuItem}" Header="{local:Tr Source='Abrir carpeta'}" Command="{Binding OpenFolderCommand}">
+                            <MenuItem.Icon><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B7;" Foreground="#AEB7C3" FontSize="13"/></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Style="{StaticResource DarkMenuItem}" Header="{local:Tr Source='Abrir diagnóstico'}" Command="{Binding OpenDiagCommand}">
+                            <MenuItem.Icon><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" Foreground="#AEB7C3" FontSize="13"/></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Style="{StaticResource DarkMenuItem}" Header="{local:Tr Source='Abrir en GitHub'}" Command="{Binding OpenGitHubCommand}">
+                            <MenuItem.Icon><TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A7;" Foreground="#AEB7C3" FontSize="13"/></MenuItem.Icon>
+                        </MenuItem>
                     </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="{local:Tr Source='ESTADO'}" Width="112">
+                    <DataGridTemplateColumn Header="{local:Tr Source='ESTADO'}" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Border Background="{Binding State, Converter={StaticResource StateBrush}}"
                                         BorderBrush="{Binding State, Converter={StaticResource StateAccentBrush}}"
-                                        BorderThickness="1" CornerRadius="13" Padding="9,4"
-                                        HorizontalAlignment="Left" VerticalAlignment="Center" MinWidth="90">
+                                        BorderThickness="1" CornerRadius="11" Padding="8,2"
+                                        HorizontalAlignment="Left" VerticalAlignment="Center" MinWidth="80">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <Ellipse Width="8" Height="8" Fill="{Binding State, Converter={StaticResource StateAccentBrush}}" Margin="0,1,7,0"/>
+                                        <Ellipse Width="7" Height="7" Fill="{Binding State, Converter={StaticResource StateAccentBrush}}" Margin="0,1,6,0"/>
                                         <TextBlock Text="{Binding State, Converter={StaticResource StateLabel}}" Foreground="#F1F3F5" FontWeight="Bold" FontSize="11"/>
                                     </StackPanel>
                                 </Border>
@@ -413,7 +394,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Header="RUNNER" Width="128">
+                    <DataGridTemplateColumn Header="RUNNER" Width="118">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Alias}" FontWeight="SemiBold" Foreground="#F1F3F5" VerticalAlignment="Center"/>
@@ -421,7 +402,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="HOST / AGENT" Binding="{Binding AgentName}" Width="135">
+                    <DataGridTextColumn Header="HOST / AGENT" Binding="{Binding AgentName}" Width="126">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Center"/>
@@ -430,11 +411,11 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTemplateColumn Header="{local:Tr Source='DESTINO GITHUB'}" Width="1.15*" MinWidth="210">
+                    <DataGridTemplateColumn Header="{local:Tr Source='DESTINO GITHUB'}" Width="0.95*" MinWidth="205">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Width="22" Height="22" CornerRadius="11" Background="#20252B" BorderBrush="#3B424C" BorderThickness="1" Margin="0,0,9,0">
+                                    <Border Width="20" Height="20" CornerRadius="10" Background="#20252B" BorderBrush="#3B424C" BorderThickness="1" Margin="0,0,7,0">
                                         <TextBlock Text="GH" FontSize="11" FontWeight="Bold" Foreground="#D6DBE1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
                                     <TextBlock Text="{Binding GitHubTarget}" Foreground="#D6DBE1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
@@ -444,7 +425,7 @@
                     </DataGridTemplateColumn>
 
 
-                    <DataGridTemplateColumn Header="{local:Tr Source='PROGRESO'}" Width="1.15*" MinWidth="220">
+                    <DataGridTemplateColumn Header="{local:Tr Source='PROGRESO'}" Width="1.25*" MinWidth="260">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -460,7 +441,7 @@
                                             <TextBlock Grid.Column="1" Text="{Binding Progress.CompactMetaDisplay, Converter={StaticResource LocalizedText}}" FontSize="10.5" Foreground="#8F97A1" Margin="8,0,8,0" TextTrimming="CharacterEllipsis"/>
                                             <TextBlock Grid.Column="2" Text="{Binding Progress.PercentDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold" Foreground="#C59A4A"/>
                                         </Grid>
-                                        <ProgressBar Height="5" Minimum="0" Maximum="100" Value="{Binding Progress.Percent, Mode=OneWay}"
+                                        <ProgressBar Height="4" Minimum="0" Maximum="100" Value="{Binding Progress.Percent, Mode=OneWay}"
                                                      Foreground="#C59A4A" Background="#242931" BorderThickness="0">
                                             <ProgressBar.Style>
                                                 <Style TargetType="ProgressBar">
@@ -485,7 +466,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Header="{local:Tr Source='MODO'}" Width="100">
+                    <DataGridTemplateColumn Header="{local:Tr Source='MODO'}" Width="92">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -495,22 +476,22 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="PID" Binding="{Binding PidDisplay}" Width="62">
+                    <DataGridTextColumn Header="PID" Binding="{Binding PidDisplay}" Width="56">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="RAM" Binding="{Binding RamDisplay}" Width="72">
+                    <DataGridTextColumn Header="RAM" Binding="{Binding RamDisplay}" Width="66">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="UPTIME" Binding="{Binding UptimeDisplay}" Width="82">
+                    <DataGridTextColumn Header="UPTIME" Binding="{Binding UptimeDisplay}" Width="74">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="{local:Tr Source='VERSIÓN'}" Binding="{Binding Version}" Width="78">
+                    <DataGridTextColumn Header="{local:Tr Source='VERSIÓN'}" Binding="{Binding Version}" Width="72">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
                         </DataGridTextColumn.ElementStyle>
