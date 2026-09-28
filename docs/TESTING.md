@@ -100,3 +100,6 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 14. With runners on two different runner versions, verify the most common version stays muted while the uncommon version is highlighted in amber. With a single version across all runners, all version values should remain muted.
 
 15. In the lower runner pane, verify there is no redundant "Runner details" heading. Status plus folder/GitHub quick actions must sit beside the runner name, metadata must use two compact columns, and both Details and Log must share the same shorter default height without clipping BUSY progress information.
+
+16. Open Settings and verify the Buy Me a Coffee button is visible in the fixed top header without scrolling. The old support card must not remain lower in the settings list.
+17. With one or more BUSY runners, verify the progress percentage and the Mode column have a clear visual gap at 100% scaling and do not read as one combined value.
