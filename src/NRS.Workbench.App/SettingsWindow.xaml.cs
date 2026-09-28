@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
 using Microsoft.Win32;
 using NRS.Workbench.App.Services;
 using NRS.Workbench.Core.Models;
@@ -9,6 +10,7 @@ namespace NRS.Workbench.App;
 public partial class SettingsWindow : Window
 {
     private readonly SettingsService _settingsService;
+    private readonly List<CheckBox> _runnerQueueChecks = [];
     private RunnerSettings _workingSettings;
 
     public SettingsWindow(SettingsService settingsService)
@@ -24,11 +26,11 @@ public partial class SettingsWindow : Window
     private void ApplySettingsToForm(RunnerSettings settings)
     {
         RootsText.Text = string.Join(Environment.NewLine, settings.RunnerRoots);
-        PatternText.Text = settings.FolderPattern;
         RefreshText.Text = settings.RefreshIntervalSeconds.ToString();
         ConfirmBusyCheck.IsChecked = settings.ConfirmStopBusy;
         KeepInTrayCheck.IsChecked = settings.KeepInTray;
         RunnerQueueEnabledCheck.IsChecked = settings.RunnerQueueEnabled;
+        RunnerQueueUseAllCheck.IsChecked = settings.RunnerQueueUseAllRunners;
         RunnerQueueLimitChoice.SelectedValue = settings.RunnerQueueLimit.ToString();
         RunnerQueueResourceGuardCheck.IsChecked = settings.RunnerQueueResourceGuardEnabled;
         RunnerQueueCpuThresholdText.Text = settings.RunnerQueueCpuStartThreshold.ToString();
@@ -39,7 +41,66 @@ public partial class SettingsWindow : Window
         NotifyRunnerIssuesCheck.IsChecked = settings.NotifyRunnerIssues;
         NotifyOnlyWhenHiddenCheck.IsChecked = settings.NotifyOnlyWhenHidden;
         LanguageChoice.SelectedValue = settings.Language;
+        RefreshQueueRunnerChoices(settings);
     }
+
+    private IReadOnlyList<string> RootsFromForm() => RootsText.Text
+        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+        .Select(path => path.Trim())
+        .Where(path => path.Length > 0)
+        .ToList();
+
+    private void RefreshQueueRunnerChoices(RunnerSettings settings)
+    {
+        var folders = _settingsService.DetectRunnerFolders(RootsFromForm());
+        var selected = settings.RunnerQueueIncludedPaths.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var useAll = RunnerQueueUseAllCheck.IsChecked == true;
+
+        RunnerQueueSelectionPanel.Children.Clear();
+        _runnerQueueChecks.Clear();
+
+        foreach (var folder in folders)
+        {
+            var check = new CheckBox
+            {
+                Content = Path.GetFileName(folder.TrimEnd(Path.DirectorySeparatorChar)),
+                Tag = folder,
+                ToolTip = folder,
+                IsChecked = useAll || selected.Contains(folder),
+                IsEnabled = !useAll,
+                Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
+                Margin = new Thickness(0, 0, 0, 6)
+            };
+            _runnerQueueChecks.Add(check);
+            RunnerQueueSelectionPanel.Children.Add(check);
+        }
+
+        if (_runnerQueueChecks.Count == 0)
+        {
+            RunnerQueueSelectionPanel.Children.Add(new TextBlock
+            {
+                Text = UiLanguage.Choose(
+                    "No hay runners válidos en las raíces configuradas.",
+                    "No valid runners were found in the configured roots.",
+                    "No hi ha runners vàlids a les arrels configurades."),
+                Foreground = (System.Windows.Media.Brush)FindResource("MutedBrush"),
+                TextWrapping = TextWrapping.Wrap
+            });
+        }
+    }
+
+    private void RunnerQueueUseAllCheck_Changed(object sender, RoutedEventArgs e)
+    {
+        var useAll = RunnerQueueUseAllCheck.IsChecked == true;
+        foreach (var check in _runnerQueueChecks)
+        {
+            check.IsEnabled = !useAll;
+            if (useAll) check.IsChecked = true;
+        }
+    }
+
+    private void RefreshQueueRunners_Click(object sender, RoutedEventArgs e) =>
+        RefreshQueueRunnerChoices(_workingSettings);
 
     private bool TryApplyFormToWorkingSettings()
     {
@@ -49,16 +110,31 @@ public partial class SettingsWindow : Window
             return false;
         }
 
-        _workingSettings.RunnerRoots = RootsText.Text
-            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => x.Trim())
-            .Where(x => x.Length > 0)
-            .ToList();
-        _workingSettings.FolderPattern = string.IsNullOrWhiteSpace(PatternText.Text) ? "actions-runner*" : PatternText.Text.Trim();
+        _workingSettings.RunnerRoots = RootsFromForm();
         _workingSettings.RefreshIntervalSeconds = refresh;
         _workingSettings.ConfirmStopBusy = ConfirmBusyCheck.IsChecked == true;
         _workingSettings.KeepInTray = KeepInTrayCheck.IsChecked == true;
         _workingSettings.RunnerQueueEnabled = RunnerQueueEnabledCheck.IsChecked == true;
+        _workingSettings.RunnerQueueUseAllRunners = RunnerQueueUseAllCheck.IsChecked == true;
+        _workingSettings.RunnerQueueIncludedPaths = _runnerQueueChecks
+            .Where(check => check.IsChecked == true && check.Tag is string)
+            .Select(check => (string)check.Tag)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (_workingSettings.RunnerQueueEnabled &&
+            !_workingSettings.RunnerQueueUseAllRunners &&
+            _workingSettings.RunnerQueueIncludedPaths.Count == 0)
+        {
+            MessageBox.Show(
+                UiLanguage.Choose(
+                    "Selecciona al menos un runner para la cola o activa «Usar todos los runners detectados».",
+                    "Select at least one runner for the queue or enable “Use all detected runners”.",
+                    "Selecciona com a mínim un runner per a la cua o activa «Utilitza tots els runners detectats»."),
+                UiLanguage.Text("Configuración"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return false;
+        }
         _workingSettings.RunnerQueueLimit = int.TryParse(RunnerQueueLimitChoice.SelectedValue as string, out var queueLimit) ? queueLimit : 2;
         if (!int.TryParse(RunnerQueueCpuThresholdText.Text, out var cpuThreshold) || cpuThreshold < 50 || cpuThreshold > 100 ||
             !int.TryParse(RunnerQueueMemoryThresholdText.Text, out var memoryThreshold) || memoryThreshold < 50 || memoryThreshold > 100)
@@ -108,11 +184,14 @@ public partial class SettingsWindow : Window
 
     private void Detect_Click(object sender, RoutedEventArgs e)
     {
-        var roots = _settingsService.DetectRunnerRoots(PatternText.Text);
+        var roots = _settingsService.DetectRunnerRoots();
         if (roots.Count == 0)
         {
             MessageBox.Show(
-                UiLanguage.Choose("No he encontrado carpetas de runner en el nivel raíz de las unidades locales.\n\nPuedes añadir manualmente la carpeta que contiene actions-runner*.", "No runner folders were found at the root of local drives.\n\nYou can add the folder containing actions-runner* manually."),
+                UiLanguage.Choose(
+                    "No he encontrado instalaciones válidas de GitHub Actions Runner en las ubicaciones revisadas. Puedes añadir manualmente una raíz que contenga tus runners.",
+                    "No valid GitHub Actions Runner installations were found in the inspected locations. You can manually add a root that contains your runners.",
+                    "No s'han trobat instal·lacions vàlides de GitHub Actions Runner a les ubicacions revisades. Pots afegir manualment una arrel que contingui els teus runners."),
                 UiLanguage.Choose("Detección automática", "Automatic detection"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -120,6 +199,7 @@ public partial class SettingsWindow : Window
         }
 
         RootsText.Text = string.Join(Environment.NewLine, roots);
+        RefreshQueueRunnerChoices(_workingSettings);
     }
 
     private void Export_Click(object sender, RoutedEventArgs e)
@@ -177,7 +257,7 @@ public partial class SettingsWindow : Window
             var missingRunnerRootsBeforeRepair = imported.RunnerRoots.Count(path => !Directory.Exists(path));
             if (imported.RunnerRoots.Count > 0 && missingRunnerRootsBeforeRepair == imported.RunnerRoots.Count)
             {
-                var detectedRoots = _settingsService.DetectRunnerRoots(imported.FolderPattern);
+                var detectedRoots = _settingsService.DetectRunnerRoots();
                 if (PortableRepositoryPaths.RepairRunnerRoots(imported, detectedRoots))
                     automaticNotes.Add(UiLanguage.Choose($"Runners ajustados automáticamente a este PC: {string.Join(", ", imported.RunnerRoots)}.", $"Runner roots adjusted for this PC: {string.Join(", ", imported.RunnerRoots)}.", $"Runners ajustats automàticament a aquest PC: {string.Join(", ", imported.RunnerRoots)}."));
             }
