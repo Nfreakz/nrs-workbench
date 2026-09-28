@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added
+- Adds a right-click runner context menu with Start, Stop, Restart, folder, diagnostics and GitHub actions.
 - Adds an explicit Smart Queue runner pool so selected runners can participate while other detected runners remain untouched.
 
 ### Improved
