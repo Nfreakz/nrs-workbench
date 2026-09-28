@@ -43,6 +43,7 @@ public sealed class MainViewModel : ObservableObject
     private double _cpuPercent;
     private double _memoryPercent;
     private double _diskPercent;
+    private string _dominantRunnerVersion = string.Empty;
 
     public ObservableCollection<RunnerInfo> Runners { get; } = [];
     public IReadOnlyList<RunnerInfo> AllRunners => _allRunners;
@@ -89,6 +90,8 @@ public sealed class MainViewModel : ObservableObject
             ClearRunnerSearchCommand.RaiseCanExecuteChanged();
         }
     }
+
+    public string DominantRunnerVersion => _dominantRunnerVersion;
 
     public string RunnerViewSummary => string.IsNullOrWhiteSpace(RunnerSearchText)
         ? UiLanguage.Choose($"{TotalCount} runners", $"{TotalCount} runners")
@@ -288,6 +291,18 @@ public sealed class MainViewModel : ObservableObject
             StatusText = UiLanguage.Choose("Actualizando runners...", "Refreshing runners...");
             var rows = await Task.Run(_discovery.Discover);
             _allRunners = rows;
+            var dominantVersion = rows
+                .Where(runner => !string.IsNullOrWhiteSpace(runner.Version))
+                .GroupBy(runner => runner.Version.Trim(), StringComparer.OrdinalIgnoreCase)
+                .OrderByDescending(group => group.Count())
+                .ThenBy(group => group.Key, StringComparer.OrdinalIgnoreCase)
+                .Select(group => group.Key)
+                .FirstOrDefault() ?? string.Empty;
+            if (!string.Equals(_dominantRunnerVersion, dominantVersion, StringComparison.OrdinalIgnoreCase))
+            {
+                _dominantRunnerVersion = dominantVersion;
+                RaisePropertyChanged(nameof(DominantRunnerVersion));
+            }
             UpdateRunnerView();
 
             _lastUpdated = DateTimeOffset.Now;
