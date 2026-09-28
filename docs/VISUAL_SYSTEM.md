@@ -52,6 +52,8 @@ NRS Workbench is information-dense, but information should remain readable at no
 
 The main runner table should favour compact rows and horizontal grouping over stacked metadata when the same information can remain legible on one line. Context menus and other popups must use the graphite theme instead of falling back to high-contrast native white/blue chrome.
 
+Working views may use draggable splitters for secondary panes such as details and logs. A secondary pane should be collapsible when doing so returns useful working space to the primary table. Header/status chrome should stay compact enough that the main data surface remains the dominant part of the window.
+
 ## Branding
 
 The Neo RS name may appear discreetly in footers/About using normal Segoe UI and muted text. Avoid signature/script styling, neon glow, gradients or oversized brand marks inside working views.
