@@ -33,8 +33,10 @@ Scope:
 
 ## v0.18.5
 
-Feedback and diagnostics.
+Runner control, discovery, feedback and diagnostics.
 
+- Detect runner installations from their real files rather than folder-name prefixes.
+- Let users choose which detected runners participate in Smart Queue; excluded runners are not started, stopped or counted toward the queue limit.
 - In-app **Report an Issue**.
 - In-app **Suggest Feature**.
 - Reviewable, sanitized diagnostics bundle.
