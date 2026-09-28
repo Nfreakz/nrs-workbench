@@ -44,7 +44,7 @@ public partial class SettingsWindow : Window
         RefreshQueueRunnerChoices(settings);
     }
 
-    private IReadOnlyList<string> RootsFromForm() => RootsText.Text
+    private List<string> RootsFromForm() => RootsText.Text
         .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
         .Select(path => path.Trim())
         .Where(path => path.Length > 0)
