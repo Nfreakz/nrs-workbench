@@ -7,21 +7,21 @@
 - Do not use this repository's paths, credentials, runner registrations, deployment decisions or release tags for any other Neo RS application.
 - Default branch: `main`. Review its live HEAD, PRs, CI and Releases before modifying anything.
 
-## Current verified state · 2026-09-28
+## Current verified state · 2026-09-29
 
 ### Published baseline
 
-- Latest published release before the current release preparation: `v0.18.3 Public Preview`.
-- v0.18.4 release candidate is on `main` at `9ea411d7f161ae51222731c77bf6d4d7fc21f89a`.
-- Post-merge CI for the v0.18.4 candidate completed successfully.
+- Latest verified published release: `v0.18.3 Public Preview`.
+- `v0.18.4` tag exists, but the GitHub Release and ZIP were not available when this document was updated. The release workflow's publish step failed; PR #26 addresses recovery without moving the tag.
+- `main` at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`; post-merge CI #323 completed successfully.
 - Manual Windows validation of Repositories, Settings and compact runner details passed.
 - GitHub Release notes use curated CHANGELOG sections instead of an automatic list of every PR.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
 
 ### main
 
-- Current v0.18.4 release candidate on `main`: `9ea411d7f161ae51222731c77bf6d4d7fc21f89a`.
-- Release documentation gate changes are isolated in `docs/v0.18.4-release-doc-gate`.
+- v0.18.4 implementation and documentation gate are merged on `main`.
+- PR #25 (runner discovery and Smart Queue selection) remains separate and must not be described as part of the tagged v0.18.4 build.
 - Professional graphite UI is the approved visual baseline.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
 
@@ -33,7 +33,7 @@ The implementation and final polish are merged to `main`.
 - Version metadata: `0.18.4`.
 - Manual Windows validation passed.
 - CI on the final implementation commit passed.
-- CHANGELOG/README release wording is prepared. The documentation gate now also requires the writing standard and Wiki review before tagging `v0.18.4`.
+- The Wiki was reviewed and updated. README and Wiki distinguish the published v0.18.3 ZIP from the tagged v0.18.4 source.
 
 Scope:
 - contextual safe-action guidance for the selected repository;
@@ -54,12 +54,10 @@ Scope:
 
 ## Next sequence
 
-1. Merge PR #24 after its green CI.
-2. Review/update the GitHub Wiki for v0.18.4. Do not mark this complete without reading the live pages.
-3. Verify final `main` CI and the release documentation against `docs/WRITING_STYLE.md`.
-4. Create tag `v0.18.4` only after explicit approval.
-5. Verify the Release workflow creates the GitHub Release and `NRSWorkbench-v0.18.4-win-x64.zip`.
-6. Verify the published notes, asset checksum and README links before calling the release complete.
+1. Resolve PR #26 and verify its CI. Do not recreate or move `v0.18.4`.
+2. Recover the Release workflow for the existing tag only after the release process is approved.
+3. Verify GitHub Release, `NRSWorkbench-v0.18.4-win-x64.zip`, checksum and final README/Wiki links before announcing publication.
+4. Keep PR #25's feature work outside the v0.18.4 release.
 
 ## Future roadmap
 
