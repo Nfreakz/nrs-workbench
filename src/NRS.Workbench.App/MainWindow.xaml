@@ -270,7 +270,8 @@
         </Grid>
 
         <!-- Smart runner queue -->
-        <Border Grid.Row="2" Style="{StaticResource PanelCard}" Padding="12,8" Margin="0,0,0,10">
+        <Border Grid.Row="2" Style="{StaticResource PanelCard}" Padding="12,8" Margin="0,0,0,10"
+                Visibility="{Binding QueuePanelVisibility}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
