@@ -199,7 +199,10 @@ public sealed class RunnerQueueCoordinator
                     _stopRequestedAt.Remove(path);
                     _readySince.Remove(path);
                 }
-                if (removed.Any(path => _stoppedByQueue.Remove(path)))
+                var removedOwnedStop = false;
+                foreach (var path in removed)
+                    removedOwnedStop |= _stoppedByQueue.Remove(path);
+                if (removedOwnedStop)
                     PersistOwnedStops();
 
                 _configuredQueuePaths.Clear();
