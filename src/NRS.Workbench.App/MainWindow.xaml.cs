@@ -25,6 +25,7 @@ public partial class MainWindow : Window
     private bool _allowExit;
     private readonly Dictionary<string, RunnerState> _previousStates = new(StringComparer.OrdinalIgnoreCase);
     private bool _stateSnapshotInitialized;
+    private double _detailPanelExpandedHeight = 220d;
 
     public MainWindow()
     {
@@ -126,6 +127,21 @@ public partial class MainWindow : Window
     {
         _runnerQueue.TogglePaused();
         await RefreshAndUpdateTrayAsync();
+    }
+
+    private void DetailPanelSplitter_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (DetailPanelRow.ActualHeight > 12)
+        {
+            _detailPanelExpandedHeight = Math.Max(140d, DetailPanelRow.ActualHeight);
+            DetailPanelRow.Height = new GridLength(0);
+        }
+        else
+        {
+            DetailPanelRow.Height = new GridLength(Math.Max(140d, _detailPanelExpandedHeight));
+        }
+
+        e.Handled = true;
     }
 
     private void RunnerGrid_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
