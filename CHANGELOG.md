@@ -7,6 +7,8 @@
 - Adds an explicit Smart Queue runner pool so selected runners can participate while other detected runners remain untouched.
 
 ### Improved
+- Moves the optional Buy Me a Coffee action into the fixed Settings header so it is visible without scrolling, while keeping it separate from functional settings.
+- Adds clearer spacing between runner progress metadata and the Mode column.
 - Hides the Smart Queue dashboard when the queue is disabled so the runner table gets that vertical space back.
 - Makes the lower Details/Log area vertically resizable; double-clicking its splitter collapses or restores it.
 - Removes the redundant runner-detail title, moves status and quick actions beside the runner name, and arranges metadata in two compact columns so Details and Log can share a shorter default height.
