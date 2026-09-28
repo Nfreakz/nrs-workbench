@@ -27,6 +27,9 @@ internal static class RunnerQueueSmoke
         ResourceGuardBlocksStartsUntilMemoryRecovers();
         QueuePauseFreezesRotationWithoutTouchingBusyJobs();
         QueueSnapshotDistinguishesWaitingAndManualStops();
+        CustomQueuePoolIgnoresExcludedRunners();
+        CustomQueuePoolCanStartSelectedStoppedRunner();
+        ChangingQueuePoolAdmitsNewSelection();
     }
 
     private static void AllStoppedQueueBootstrapsAndLaterManualStopsAreRespected()
@@ -371,6 +374,76 @@ internal static class RunnerQueueSmoke
                queue.Snapshot.ManualStoppedAliases.SequenceEqual(["manual"]) &&
                queue.Snapshot.NextAlias == "queued",
             "queue snapshot separates queue-owned waiting runners from manually stopped runners");
+    }
+
+
+    private static void CustomQueuePoolIgnoresExcludedRunners()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var selected = Runner("selected", RunnerState.Ready);
+        var excluded = Runner("excluded", RunnerState.Ready);
+        var settings = new RunnerSettings
+        {
+            RunnerQueueEnabled = true,
+            RunnerQueueUseAllRunners = false,
+            RunnerQueueIncludedPaths = [selected.FolderPath],
+            RunnerQueueLimit = 1
+        };
+
+        queue.ReconcileAsync([selected, excluded], settings, DateTimeOffset.UnixEpoch)
+            .GetAwaiter().GetResult();
+
+        Assert(control.Stopped.Count == 0 && control.Started.Count == 0,
+            "custom queue pool does not stop or count an excluded online runner");
+    }
+
+    private static void CustomQueuePoolCanStartSelectedStoppedRunner()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var selected = Runner("selected", RunnerState.Stopped);
+        var excluded = Runner("excluded", RunnerState.Ready);
+        var settings = new RunnerSettings
+        {
+            RunnerQueueEnabled = true,
+            RunnerQueueUseAllRunners = false,
+            RunnerQueueIncludedPaths = [selected.FolderPath],
+            RunnerQueueLimit = 1,
+            RunnerQueueResourceGuardEnabled = false
+        };
+
+        queue.ReconcileAsync([selected, excluded], settings, DateTimeOffset.UnixEpoch)
+            .GetAwaiter().GetResult();
+
+        Assert(control.Started.SequenceEqual(["selected"]) && control.Stopped.Count == 0,
+            "custom queue pool can start a selected stopped runner without touching excluded runners");
+    }
+
+    private static void ChangingQueuePoolAdmitsNewSelection()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var first = Runner("first", RunnerState.Ready);
+        var second = Runner("second", RunnerState.Stopped);
+        var settings = new RunnerSettings
+        {
+            RunnerQueueEnabled = true,
+            RunnerQueueUseAllRunners = false,
+            RunnerQueueIncludedPaths = [first.FolderPath],
+            RunnerQueueLimit = 1,
+            RunnerQueueResourceGuardEnabled = false
+        };
+
+        queue.ReconcileAsync([first, second], settings, DateTimeOffset.UnixEpoch)
+            .GetAwaiter().GetResult();
+
+        settings.RunnerQueueIncludedPaths = [second.FolderPath];
+        queue.ReconcileAsync([first, second], settings, DateTimeOffset.UnixEpoch.AddSeconds(5))
+            .GetAwaiter().GetResult();
+
+        Assert(control.Started.SequenceEqual(["second"]) && control.Stopped.Count == 0,
+            "changing the custom queue pool admits the newly selected runner without controlling the removed runner");
     }
 
     private static SystemResourceSnapshot Resources(double cpu, double memoryPercent)
