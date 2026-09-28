@@ -102,17 +102,7 @@ jobs:
           $encodedTag = [System.Uri]::EscapeDataString($tag)
           $releaseByTagUri = "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/$encodedTag"
 
-          $changelog = Get-Content -LiteralPath '.\\CHANGELOG.md' -Raw
-          $escapedVersion = [regex]::Escape($version)
-          $notesPattern = '(?ms)^## \[' + $escapedVersion + '\][^\r\n]*\r?\n(?<body>.*?)(?=^## \[|\z)'
-          $notesMatch = [regex]::Match($changelog, $notesPattern)
-          if (-not $notesMatch.Success) {
-            throw "CHANGELOG.md does not contain release notes for $tag."
-          }
-          $releaseNotes = $notesMatch.Groups['body'].Value.Trim()
-          if ([string]::IsNullOrWhiteSpace($releaseNotes)) {
-            throw "Release notes for $tag are empty."
-          }
+          $releaseNotes = (& .\\scripts\\get-release-notes.ps1 -Version $version) -join "`n"
 
           try {
             $release = Invoke-RestMethod -Method Get -Uri $releaseByTagUri -Headers $headers -ErrorAction Stop
