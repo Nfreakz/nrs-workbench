@@ -15,13 +15,14 @@ Published Public Preview.
 
 ## v0.18.4
 
-Repository Guidance candidate integrated into `main` and undergoing final polish.
+Repository Guidance release candidate ready for publication.
 
 Current implementation:
-- PR #18 merged into `main`.
-- Main integration commit: `77a4a633b4b90af1067f9155d823dda31304aa9e`.
+- PR #18 and PR #22 merged into `main`.
+- Final implementation commit: `8ea7f8d1eb471f5360c09e341ec1205fe50c02c3`.
 - Post-merge Windows CI completed successfully.
-- Final polish is isolated in `polish/v0.18.4-final`.
+- Manual Windows validation passed.
+- Release preparation is isolated in `release/v0.18.4`.
 
 Scope:
 - Contextual safe-action guidance with a clearer recommendation hierarchy.
