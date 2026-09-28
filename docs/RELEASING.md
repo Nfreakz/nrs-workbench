@@ -4,16 +4,20 @@ NRS Workbench publishes pre-release builds before a stable `v1.0.0`.
 
 ## Before tagging
 
+Read `docs/WRITING_STYLE.md` before editing any public release text. Documentation is part of the release gate, not a post-release cleanup.
+
 1. Build the solution in Release mode.
 2. Run `tests/NRS.Workbench.SmokeTests`.
 3. Run `scripts/public-audit.ps1`.
 4. Confirm the version in `Directory.Build.props` and `CHANGELOG.md`.
-5. Check that the README and Wiki clearly distinguish features in the release tag from features only on development `main`; do not advertise unreleased features as included in the downloadable ZIP.
-6. Review `SECURITY.md` and `docs/PRIVACY.md` if any credential-adjacent behavior changed.
-7. Confirm `LICENSE` still references `PolyForm-Noncommercial-1.0.0` and that commercial licensing language has not drifted.
-8. Confirm the repository-scoped Windows x64 self-hosted runner is online. Hosted GitHub runners are not used by project policy.
-9. Verify import preview, keep/replace/cancel choices and missing-path warnings on the destination PC.
-10. Obtain explicit approval before merging to main, creating a tag or publishing a release.
+5. Review and update every release-facing document affected by the version: `README.md`, `CHANGELOG.md`, `docs/HANDOFF.md`, `docs/ROADMAP.md`, the GitHub Wiki, and any user/security/privacy/testing documentation touched by the change.
+6. Check that README and Wiki clearly distinguish the latest published release from a release candidate or development `main`; do not advertise unreleased features as included in the downloadable ZIP.
+7. Review `SECURITY.md` and `docs/PRIVACY.md` if any credential-adjacent behavior changed.
+8. Confirm `LICENSE` still references `PolyForm-Noncommercial-1.0.0` and that commercial licensing language has not drifted.
+9. Confirm the repository-scoped Windows x64 self-hosted runner is online. Hosted GitHub runners are not used by project policy.
+10. Verify import preview, keep/replace/cancel choices and missing-path warnings on the destination PC.
+11. Confirm the GitHub Wiki has been reviewed for the current version. If Wiki access is unavailable, do not claim it is updated; record that gap and close it before tagging.
+12. Obtain explicit approval before merging to main, creating a tag or publishing a release.
 
 ## Published v0.18.1 and v0.18.2
 
