@@ -19,7 +19,7 @@ public static class RunnerFolderDiscovery
         try
         {
             if (IsRunnerFolder(root))
-                folders.Add(Path.GetFullPath(root));
+                return [Path.GetFullPath(root)];
 
             foreach (var folder in Directory.EnumerateDirectories(root, "*", SearchOption.TopDirectoryOnly))
             {
