@@ -87,6 +87,6 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 6. Change the selected pool while NRS Workbench remains open and verify newly selected runners become eligible without automatically controlling runners removed from the pool.
 7. Export/import portable settings and verify the queue selection mode and selected runner paths round-trip without credentials.
 
-8. With a BUSY runner visible in the main table, verify the current action, compact step/time metadata and estimated percentage share one line above the progress bar, and confirm the 42 px rows do not clip status pills or text.
+8. With a BUSY runner visible in the main table, verify the current action, compact step/time metadata and estimated percentage share one line above the progress bar. Confirm 40 px rows and the shorter header do not clip status pills, text or the progress bar.
 
-9. Right-click a runner row and verify that row becomes selected before the context menu opens. Check Start, Stop and Restart enablement matches the selected runner state and Smart Queue safety rules; Folder, Diagnostics and GitHub actions must target the right-clicked runner.
+9. Right-click a runner row and verify that row becomes selected before the context menu opens. The menu must use the graphite dark theme with readable text and a neutral hover state, not the native white/blue Windows menu. Check Start, Stop and Restart enablement matches the selected runner state and Smart Queue safety rules; Folder, Diagnostics and GitHub actions must target the right-clicked runner.
