@@ -3,11 +3,11 @@
 ## [Unreleased]
 
 ### Added
-- Adds a right-click runner context menu with Start, Stop, Restart, folder, diagnostics and GitHub actions.
+- Adds a dark, high-contrast right-click runner context menu with Start, Stop, Restart, folder, diagnostics and GitHub actions.
 - Adds an explicit Smart Queue runner pool so selected runners can participate while other detected runners remain untouched.
 
 ### Improved
-- Makes the main runner table more compact by placing step/time progress metadata on the same line as the current action and estimated percentage.
+- Makes the main runner table denser and better balanced: step/time metadata shares the action line, row/header height is reduced, and compact status/metadata columns leave more room for GitHub target and progress.
 - Detects GitHub Actions runner installations from their actual runner files instead of requiring an `actions-runner*` folder name.
 - Keeps runner discovery shallow while allowing configured runner folders and common parent folders to be found without a naming convention.
 
