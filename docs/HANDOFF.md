@@ -61,9 +61,23 @@ Scope:
 5. Verify the Release workflow creates the GitHub Release and `NRSWorkbench-v0.18.4-win-x64.zip`.
 6. Verify the published notes, asset checksum and README links before calling the release complete.
 
+## v0.18.5 work in progress
+
+Branch: `feat/v0.18.5-runner-pool-discovery`.
+
+Current scope:
+- runner discovery validates real runner installation files instead of relying on the `actions-runner*` folder prefix;
+- automatic discovery remains shallow and can find common parent folders one level below a drive root;
+- Settings can use all detected runners or an explicit Smart Queue pool;
+- runners outside the selected pool are not started, stopped or counted against the Smart Queue limit;
+- portable settings preserve the queue-pool selection;
+- smoke coverage includes non-standard runner folder names, empty prefixed folders and selected/excluded queue behavior.
+
+This work is not part of the tagged v0.18.4 build.
+
 ## Future roadmap
 
-- v0.18.5: Feedback & Diagnostics.
+- v0.18.5: Runner control, discovery, Feedback & Diagnostics.
 - v0.19.0: GitHub Actions Control.
 - Product website/SEO remains a separate web project or explicitly approved repository.
 - GitLab support only if real demand appears.
