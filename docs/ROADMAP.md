@@ -15,14 +15,14 @@ Published Public Preview.
 
 ## v0.18.4
 
-Repository Guidance release candidate awaiting the final documentation/Wiki gate.
+Repository Guidance is tagged as v0.18.4. The GitHub Release and ZIP are pending recovery of the failed publish step; the tagged source must remain unchanged.
 
 Current implementation:
 - PR #18 and PR #22 merged into `main`.
-- Current release-prep commit on `main`: `9ea411d7f161ae51222731c77bf6d4d7fc21f89a`.
+- Documentation gate merged at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`.
 - Post-merge Windows CI completed successfully.
 - Manual Windows validation passed.
-- Final documentation gate is isolated in `docs/v0.18.4-release-doc-gate`.
+- The GitHub Wiki was reviewed and updated. PR #26 contains the release workflow recovery; PR #25 is separate feature work.
 
 Scope:
 - Contextual safe-action guidance with a clearer recommendation hierarchy.

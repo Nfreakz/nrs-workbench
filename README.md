@@ -1,12 +1,16 @@
 # NRS Workbench
 
 <p align="center">
-  <img src="src/NRS.Workbench.App/Assets/NRSWorkbench.png" alt="NRS Workbench" width="180" />
+  <img src="src/NRS.Workbench.App/Assets/NRSWorkbench.png" alt="NRS Workbench icon" width="96" />
 </p>
 
 **A local Windows dashboard for Git repositories and GitHub Actions self-hosted runners.**
 
-**Latest published release: [v0.18.3 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.3)** · **v0.18.4 release candidate is ready on `main` but not published yet** · [What's new](CHANGELOG.md)
+**Latest published release: [v0.18.3 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.3)** · **v0.18.4 is tagged, but its release ZIP is not published** · [What's new](CHANGELOG.md)
+
+![NRS Workbench project preview with representative runner data](docs/images/nrs-workbench-project-preview-v0.18.4.png)
+
+Project preview based on the v0.18.4 interface. Runner names, repositories, paths and logs are fictional; use the release ZIP for the actual application.
 
 **New in v0.18.4:** contextual repository guidance, session-only Git action history, clearer AHEAD/BEHIND visibility, safer Pull/Push revalidation, compact-layout fixes, and optional Buy Me a Coffee support in Settings.
 
@@ -20,11 +24,11 @@ NRS Workbench brings your local runners and Git working trees into one desktop a
 
 **En català:** La candidata v0.18.4 millora la gestió de repositoris amb recomanacions contextuals, historial d'accions i comprovacions més segures abans de Pull i Push.
 
-### Main window
+### Earlier main window
 
-![NRS Workbench v0.18.0 main window showing runner status, logs and PC resource usage; private details redacted](docs/images/nrs-workbench-v0.18.0-redacted.png)
+![NRS Workbench v0.18.0 main window with private details redacted](docs/images/nrs-workbench-v0.18.0-redacted.png)
 
-Screenshot from Windows. Computer, runner and repository names, paths and log content have been redacted.
+Archived v0.18.0 screenshot. The project preview above shows the later interface with fictional data.
 
 ## Who is NRS Workbench for?
 
