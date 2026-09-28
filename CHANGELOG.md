@@ -2,14 +2,21 @@
 
 ## [Unreleased]
 
-### Planned for v0.18.4
-- Prevents a stalled local Git inspection from leaving the Repositories view waiting indefinitely.
-- Keeps runner details accessible in compact layouts instead of clipping the lower fields and actions.
-- Adds contextual repository guidance with a clearer visual recommendation for the next safe action.
-- Adds a session-only repository action history with an explicit empty state before the first action.
-- Improves AHEAD, BEHIND and local-change visibility in the repository summary.
-- Re-checks repository state immediately before Pull and Push to block stale or unsafe operations.
+## [0.18.4] - 2026-09-28
+
+### Added
+- Adds contextual repository guidance that explains the next safe Git action for the selected repository.
+- Adds a session-only history for repository actions started from NRS Workbench.
 - Adds a Buy Me a Coffee support card in Settings with a short optional-support message.
+
+### Improved
+- Makes AHEAD, BEHIND and local-change visibility clearer in the repository summary.
+- Re-checks repository state immediately before Pull and Push so stale snapshots cannot trigger unsafe operations.
+- Keeps runner details accessible in compact layouts with an internal scroll area.
+- Makes the repository recommendation panel easier to scan and gives the session history an explicit empty state.
+
+### Fixed
+- Prevents a stalled local Git inspection from leaving the Repositories view waiting indefinitely.
 
 ## [0.18.3] - 2026-09-27
 
