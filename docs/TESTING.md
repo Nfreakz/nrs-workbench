@@ -92,3 +92,7 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 9. Right-click a runner row and verify that row becomes selected before the context menu opens. The menu must use the graphite dark theme with readable text and a neutral hover state, not the native white/blue Windows menu. Check Start, Stop and Restart enablement matches the selected runner state and Smart Queue safety rules; Folder, Diagnostics and GitHub actions must target the right-clicked runner.
 
 10. Disable Smart Queue in Settings and verify the Smart Queue dashboard disappears completely and the runner table expands into the freed vertical space. Re-enable Smart Queue and verify the dashboard returns with its current state.
+
+11. Resize the lower Details/Log area by dragging the horizontal splitter. Double-click it to collapse the panel and double-click again to restore it; the runner table must use the freed height without layout gaps.
+12. At 100% Windows scaling, verify the compact header, toolbar, search/sort row and host-resource strip remain readable and do not clip text or controls. The runner table should show more rows than before without reducing body text below the visual-system minimum.
+13. Select several runner rows and verify the selection uses a restrained graphite highlight rather than a strong blue fill. Confirm PID, RAM, uptime and version remain readable in the narrower metadata columns.
