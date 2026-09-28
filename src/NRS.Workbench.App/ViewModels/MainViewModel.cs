@@ -35,6 +35,7 @@ public sealed class MainViewModel : ObservableObject
     private string _queueReasonText = string.Empty;
     private string _queuePauseButtonText = UiLanguage.Choose("Pausar cola", "Pause queue", "Pausar cua");
     private bool _queueControlsEnabled;
+    private Visibility _queuePanelVisibility = Visibility.Collapsed;
     private DateTimeOffset _lastUpdated;
     private string _cpuUseText = "—";
     private string _memoryUseText = "—";
@@ -117,9 +118,11 @@ public sealed class MainViewModel : ObservableObject
     public string QueueReasonText { get => _queueReasonText; private set => SetProperty(ref _queueReasonText, value); }
     public string QueuePauseButtonText { get => _queuePauseButtonText; private set => SetProperty(ref _queuePauseButtonText, value); }
     public bool QueueControlsEnabled { get => _queueControlsEnabled; private set => SetProperty(ref _queueControlsEnabled, value); }
+    public Visibility QueuePanelVisibility { get => _queuePanelVisibility; private set => SetProperty(ref _queuePanelVisibility, value); }
 
     public void UpdateQueueSnapshot(RunnerQueueSnapshot snapshot)
     {
+        QueuePanelVisibility = snapshot.Enabled ? Visibility.Visible : Visibility.Collapsed;
         QueueStatusText = snapshot.StatusText;
         QueueStateText = snapshot.Enabled
             ? snapshot.Paused
