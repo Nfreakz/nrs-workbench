@@ -86,3 +86,5 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 5. Select a stopped runner while an excluded runner is already online; verify Smart Queue may start the selected runner without touching the excluded one.
 6. Change the selected pool while NRS Workbench remains open and verify newly selected runners become eligible without automatically controlling runners removed from the pool.
 7. Export/import portable settings and verify the queue selection mode and selected runner paths round-trip without credentials.
+
+8. With a BUSY runner visible in the main table, verify the current action, compact step/time metadata and estimated percentage share one line above the progress bar, and confirm the 42 px rows do not clip status pills or text.
