@@ -10,13 +10,13 @@ Read `docs/WRITING_STYLE.md` before editing any public release text. Documentati
 2. Run `tests/NRS.Workbench.SmokeTests`.
 3. Run `scripts/public-audit.ps1`.
 4. Confirm the version in `Directory.Build.props` and `CHANGELOG.md`.
-5. Review and update every release-facing document affected by the version: `README.md`, `CHANGELOG.md`, `docs/HANDOFF.md`, `docs/ROADMAP.md`, the mirrored `wiki/` pages, and any user/security/privacy/testing documentation touched by the change.
+5. Review and update every release-facing document affected by the version: `README.md`, `CHANGELOG.md`, `docs/HANDOFF.md`, `docs/ROADMAP.md`, the GitHub Wiki, and any user/security/privacy/testing documentation touched by the change.
 6. Check that README and Wiki clearly distinguish the latest published release from a release candidate or development `main`; do not advertise unreleased features as included in the downloadable ZIP.
 7. Review `SECURITY.md` and `docs/PRIVACY.md` if any credential-adjacent behavior changed.
 8. Confirm `LICENSE` still references `PolyForm-Noncommercial-1.0.0` and that commercial licensing language has not drifted.
 9. Confirm the repository-scoped Windows x64 self-hosted runner is online. Hosted GitHub runners are not used by project policy.
 10. Verify import preview, keep/replace/cancel choices and missing-path warnings on the destination PC.
-11. Keep the repository `wiki/` mirror as the editable source for Wiki pages. Before release work, run `scripts/sync-wiki.ps1 -Direction Pull` once if the live Wiki may contain newer manual edits. After the reviewed `wiki/` changes are merged, run `scripts/sync-wiki.ps1 -Direction Push` to publish them to the GitHub Wiki. Do not tag until the mirror and live Wiki are synchronized.
+11. Confirm the GitHub Wiki has been reviewed for the current version. If Wiki access is unavailable in the current tool session, do not claim it is updated; use the GitHub Wiki editor or another available GitHub interface that exposes the live Wiki, as was done when the Wiki was originally created.
 12. Obtain explicit approval before merging to main, creating a tag or publishing a release.
 
 ## Published v0.18.1 and v0.18.2
