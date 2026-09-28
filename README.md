@@ -24,12 +24,6 @@ NRS Workbench brings your local runners and Git working trees into one desktop a
 
 **En català:** La candidata v0.18.4 millora la gestió de repositoris amb recomanacions contextuals, historial d'accions i comprovacions més segures abans de Pull i Push.
 
-### Earlier main window
-
-![NRS Workbench v0.18.0 main window with private details redacted](docs/images/nrs-workbench-v0.18.0-redacted.png)
-
-Archived v0.18.0 screenshot. The project preview above shows the later interface with fictional data.
-
 ## Who is NRS Workbench for?
 
 - **Developers maintaining self-hosted GitHub Actions runners:** monitor runner state, current work and locally retained execution history from one Windows desktop.
