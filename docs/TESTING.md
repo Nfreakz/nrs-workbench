@@ -98,3 +98,5 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 13. Select several runner rows and verify the selection uses a restrained graphite highlight rather than a strong blue fill. Confirm PID, RAM, uptime and version remain readable in the narrower metadata columns.
 
 14. With runners on two different runner versions, verify the most common version stays muted while the uncommon version is highlighted in amber. With a single version across all runners, all version values should remain muted.
+
+15. In the lower runner pane, verify there is no redundant "Runner details" heading. Status plus folder/GitHub quick actions must sit beside the runner name, metadata must use two compact columns, and both Details and Log must share the same shorter default height without clipping BUSY progress information.
