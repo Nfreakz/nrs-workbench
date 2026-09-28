@@ -25,7 +25,7 @@ public partial class MainWindow : Window
     private bool _allowExit;
     private readonly Dictionary<string, RunnerState> _previousStates = new(StringComparer.OrdinalIgnoreCase);
     private bool _stateSnapshotInitialized;
-    private double _detailPanelExpandedHeight = 220d;
+    private double _detailPanelExpandedHeight = 195d;
 
     public MainWindow()
     {
@@ -133,12 +133,12 @@ public partial class MainWindow : Window
     {
         if (DetailPanelRow.ActualHeight > 12)
         {
-            _detailPanelExpandedHeight = Math.Max(140d, DetailPanelRow.ActualHeight);
+            _detailPanelExpandedHeight = Math.Max(125d, DetailPanelRow.ActualHeight);
             DetailPanelRow.Height = new GridLength(0);
         }
         else
         {
-            DetailPanelRow.Height = new GridLength(Math.Max(140d, _detailPanelExpandedHeight));
+            DetailPanelRow.Height = new GridLength(Math.Max(125d, _detailPanelExpandedHeight));
         }
 
         e.Handled = true;
