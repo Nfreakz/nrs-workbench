@@ -96,3 +96,5 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 11. Resize the lower Details/Log area by dragging the horizontal splitter. Double-click it to collapse the panel and double-click again to restore it; the runner table must use the freed height without layout gaps.
 12. At 100% Windows scaling, verify the compact header, toolbar, search/sort row and host-resource strip remain readable and do not clip text or controls. The runner table should show more rows than before without reducing body text below the visual-system minimum.
 13. Select several runner rows and verify the selection uses a restrained graphite highlight rather than a strong blue fill. Confirm PID, RAM, uptime and version remain readable in the narrower metadata columns.
+
+14. With runners on two different runner versions, verify the most common version stays muted while the uncommon version is highlighted in amber. With a single version across all runners, all version values should remain muted.
