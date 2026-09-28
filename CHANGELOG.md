@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added
+- Adds an explicit Smart Queue runner pool so selected runners can participate while other detected runners remain untouched.
+
+### Improved
+- Detects GitHub Actions runner installations from their actual runner files instead of requiring an `actions-runner*` folder name.
+- Keeps runner discovery shallow while allowing configured runner folders and common parent folders to be found without a naming convention.
+
 ## [0.18.4] - 2026-09-28
 
 ### Added
