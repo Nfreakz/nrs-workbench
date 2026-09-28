@@ -50,6 +50,8 @@ Repository and runner state badges may use a subtle tinted background, but the t
 
 NRS Workbench is information-dense, but information should remain readable at normal Windows scaling. Avoid labels below 10.5 px. Prefer fewer visible separators and larger spacing groups over many small bordered boxes.
 
+The main runner table should favour compact rows and horizontal grouping over stacked metadata when the same information can remain legible on one line. Context menus and other popups must use the graphite theme instead of falling back to high-contrast native white/blue chrome.
+
 ## Branding
 
 The Neo RS name may appear discreetly in footers/About using normal Segoe UI and muted text. Avoid signature/script styling, neon glow, gradients or oversized brand marks inside working views.
