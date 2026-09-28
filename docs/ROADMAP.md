@@ -15,14 +15,14 @@ Published Public Preview.
 
 ## v0.18.4
 
-Repository Guidance release candidate ready for publication.
+Repository Guidance release candidate awaiting the final documentation/Wiki gate.
 
 Current implementation:
 - PR #18 and PR #22 merged into `main`.
-- Final implementation commit: `8ea7f8d1eb471f5360c09e341ec1205fe50c02c3`.
+- Current release-prep commit on `main`: `9ea411d7f161ae51222731c77bf6d4d7fc21f89a`.
 - Post-merge Windows CI completed successfully.
 - Manual Windows validation passed.
-- Release preparation is isolated in `release/v0.18.4`.
+- Final documentation gate is isolated in `docs/v0.18.4-release-doc-gate`.
 
 Scope:
 - Contextual safe-action guidance with a clearer recommendation hierarchy.

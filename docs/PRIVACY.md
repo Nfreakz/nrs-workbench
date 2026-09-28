@@ -1,6 +1,6 @@
 # Privacy
 
-NRS Workbench is local-first and does not include telemetry.
+NRS Workbench is local-first and does not include telemetry. The optional Buy Me a Coffee control opens the external support website only after the user clicks it; NRS Workbench does not send application data or diagnostics with that action.
 
 The application can store local runner roots, repository paths, display preferences and notification preferences in `%LOCALAPPDATA%\NRSWorkbench\settings.json`. Application diagnostics are written locally under `%LOCALAPPDATA%\NRSWorkbench\logs`.
 

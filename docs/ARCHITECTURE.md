@@ -14,7 +14,7 @@ The application delegates repository operations to the user's installed `git.exe
 
 Runner diagnostics are read from local self-hosted runner files. Credential files are intentionally outside the application's supported diagnostic surface.
 
-Repository write actions are deliberately conservative. Pull is fast-forward-only, push is blocked when the known remote state is ahead, commits require explicit file selection, and unresolved conflicts block automated writes.
+Repository write actions are deliberately conservative. Pull is fast-forward-only, push is blocked when the known remote state is ahead, commits require explicit file selection, and unresolved conflicts block automated writes. Before Pull or Push, NRS Workbench re-inspects the repository and refuses the operation if the working tree, branch or synchronization state no longer matches the displayed snapshot. Repository inspection is bounded so a stalled local Git process does not leave the Repositories view waiting indefinitely.
 
 ## Local data
 

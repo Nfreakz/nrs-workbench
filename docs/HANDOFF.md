@@ -7,12 +7,12 @@
 - Do not use this repository's paths, credentials, runner registrations, deployment decisions or release tags for any other Neo RS application.
 - Default branch: `main`. Review its live HEAD, PRs, CI and Releases before modifying anything.
 
-## Current verified state · 2026-09-27
+## Current verified state · 2026-09-28
 
 ### Published baseline
 
 - Latest published release before the current release preparation: `v0.18.3 Public Preview`.
-- v0.18.4 release candidate is on `main` at `8ea7f8d1eb471f5360c09e341ec1205fe50c02c3`.
+- v0.18.4 release candidate is on `main` at `9ea411d7f161ae51222731c77bf6d4d7fc21f89a`.
 - Post-merge CI for the v0.18.4 candidate completed successfully.
 - Manual Windows validation of Repositories, Settings and compact runner details passed.
 - GitHub Release notes use curated CHANGELOG sections instead of an automatic list of every PR.
@@ -20,8 +20,8 @@
 
 ### main
 
-- Current v0.18.4 release candidate on `main`: `8ea7f8d1eb471f5360c09e341ec1205fe50c02c3`.
-- Release-prep changes are isolated in `release/v0.18.4`.
+- Current v0.18.4 release candidate on `main`: `9ea411d7f161ae51222731c77bf6d4d7fc21f89a`.
+- Release documentation gate changes are isolated in `docs/v0.18.4-release-doc-gate`.
 - Professional graphite UI is the approved visual baseline.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
 
@@ -33,7 +33,7 @@ The implementation and final polish are merged to `main`.
 - Version metadata: `0.18.4`.
 - Manual Windows validation passed.
 - CI on the final implementation commit passed.
-- Release preparation finalizes CHANGELOG/README wording before tagging `v0.18.4`.
+- CHANGELOG/README release wording is prepared. The documentation gate now also requires the writing standard and Wiki review before tagging `v0.18.4`.
 
 Scope:
 - contextual safe-action guidance for the selected repository;
@@ -54,10 +54,12 @@ Scope:
 
 ## Next sequence
 
-1. Validate and merge `release/v0.18.4`.
-2. Tag the final release-prep commit as `v0.18.4`.
-3. Verify the release workflow creates the GitHub Release and Windows x64 ZIP.
-4. Verify release notes and asset checksum before calling the release complete.
+1. Merge PR #24 after its green CI.
+2. Review/update the GitHub Wiki for v0.18.4. Do not mark this complete without reading the live pages.
+3. Verify final `main` CI and the release documentation against `docs/WRITING_STYLE.md`.
+4. Create tag `v0.18.4` only after explicit approval.
+5. Verify the Release workflow creates the GitHub Release and `NRSWorkbench-v0.18.4-win-x64.zip`.
+6. Verify the published notes, asset checksum and README links before calling the release complete.
 
 ## Future roadmap
 
