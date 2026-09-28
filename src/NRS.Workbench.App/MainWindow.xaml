@@ -344,7 +344,58 @@
 
         <!-- Runner table -->
         <Border Grid.Row="4" Style="{StaticResource PanelCard}" ClipToBounds="True" Margin="0,0,0,14">
-            <DataGrid ItemsSource="{Binding Runners}" SelectedItem="{Binding SelectedRunner, Mode=TwoWay}" AlternationCount="2" CanUserSortColumns="False" RowHeight="42" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <DataGrid x:Name="RunnerGrid"
+                      ItemsSource="{Binding Runners}"
+                      SelectedItem="{Binding SelectedRunner, Mode=TwoWay}"
+                      AlternationCount="2"
+                      CanUserSortColumns="False"
+                      RowHeight="42"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      PreviewMouseRightButtonDown="RunnerGrid_PreviewMouseRightButtonDown">
+                <DataGrid.ContextMenu>
+                    <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"
+                                 Background="#171A1F" Foreground="#F1F3F5"
+                                 BorderBrush="#303640" BorderThickness="1" Padding="4">
+                        <ContextMenu.Resources>
+                            <Style TargetType="{x:Type MenuItem}">
+                                <Setter Property="Foreground" Value="#F1F3F5"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Padding" Value="11,7"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type MenuItem}">
+                                            <Border x:Name="MenuItemChrome"
+                                                    Background="{TemplateBinding Background}"
+                                                    CornerRadius="4"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter ContentSource="Header"
+                                                                  RecognizesAccessKey="True"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsHighlighted" Value="True">
+                                                    <Setter TargetName="MenuItemChrome" Property="Background" Value="#252B33"/>
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" Value="0.38"/>
+                                                    <Setter Property="Cursor" Value="Arrow"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ContextMenu.Resources>
+                        <MenuItem Header="{local:Tr Source='Iniciar'}" Command="{Binding StartCommand}"/>
+                        <MenuItem Header="{local:Tr Source='Parar'}" Command="{Binding StopCommand}"/>
+                        <MenuItem Header="{local:Tr Source='Reiniciar'}" Command="{Binding RestartCommand}"/>
+                        <Separator Margin="5,3" Background="#303640"/>
+                        <MenuItem Header="{local:Tr Source='Abrir carpeta'}" Command="{Binding OpenFolderCommand}"/>
+                        <MenuItem Header="{local:Tr Source='Abrir diagnóstico'}" Command="{Binding OpenDiagCommand}"/>
+                        <MenuItem Header="{local:Tr Source='Abrir en GitHub'}" Command="{Binding OpenGitHubCommand}"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="{local:Tr Source='ESTADO'}" Width="112">
                         <DataGridTemplateColumn.CellTemplate>
