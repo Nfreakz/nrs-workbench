@@ -9,7 +9,7 @@ If GitHub authentication is added later, secrets should be stored using Windows-
 
 ## Repository write operations
 
-Repository actions delegate to the user's installed `git.exe`. NRS Workbench does not store Git credentials. Commit creation requires explicit file selection and confirmation, blocks unresolved conflicts, and refuses to silently include staged files outside the selection. Push remains conservative and does not auto-merge or auto-rebase remote changes.
+Repository actions delegate to the user's installed `git.exe`. NRS Workbench does not store Git credentials. Commit creation requires explicit file selection and confirmation, blocks unresolved conflicts, and refuses to silently include staged files outside the selection. Pull and Push re-inspect repository state immediately before writing so stale branch, working-tree or synchronization data blocks the action. Push remains conservative and does not auto-merge or auto-rebase remote changes.
 
 
 ## Public vulnerability reporting
