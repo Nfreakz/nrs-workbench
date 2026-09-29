@@ -134,7 +134,7 @@ The main window shows the application version and live host CPU, RAM and system 
 
 ### Automatic runner queue
 
-> **Introduced in v0.18.1.** The downloadable v0.18.0 ZIP does not include this feature; check [Releases](https://github.com/Nfreakz/nrs-workbench/releases) for v0.18.1 binary availability.
+> **Introduced in v0.18.1.** The downloadable v0.18.0 ZIP does not include this feature.
 
 Enable the optional queue in **Settings** to keep at most one or two runners connected. When the limit is reached, idle runners rotate every 45 seconds so a runner with matching labels can come online; GitHub keeps jobs queued while no matching runner is available. Active jobs are left running. Keep NRS Workbench open or in the system tray for the queue to continue managing runners. Turning off the queue restores runners that the queue stopped during the current app session; runners already stopped manually are left stopped. After closing and reopening NRS Workbench, runners stopped in an earlier session may need to be started manually.
 
