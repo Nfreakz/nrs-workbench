@@ -9,55 +9,27 @@
 
 ## Current verified state · 2026-09-29
 
-### Published baseline
-
-- Latest verified published release: `v0.18.3 Public Preview`.
-- `v0.18.4` tag exists, but the GitHub Release and ZIP are still pending. Release run #16 built, tested, audited and packaged the tagged source successfully, then failed because the publish step still invoked the helper from the tagged checkout instead of the separate `.release-tools` checkout. The current fix points the publish step explicitly at `.release-tools/scripts/get-release-notes.ps1` and its CHANGELOG without moving the tag.
-- `main` at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`; post-merge CI #323 completed successfully.
-- Manual Windows validation of Repositories, Settings and compact runner details passed.
-- GitHub Release notes use curated CHANGELOG sections instead of an automatic list of every PR.
+- Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4), built from tag `v0.18.4` at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`.
+- Published Windows asset: `NRSWorkbench-v0.18.4-win-x64.zip`. GitHub reports SHA256 `8f1f427dec4a04becc393faecf11a37ea31c98c67c6cc33d40cb16498635cc1a`.
+- The tag predates later release automation and image repairs on `main`. Those later commits are not part of the tagged source or ZIP.
+- Manual Windows validation of Repositories, Settings and compact runner details passed before tagging.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
-
-### main
-
-- v0.18.4 implementation and documentation gate are merged on `main`.
-- PR #25 (runner discovery and Smart Queue selection) remains separate and must not be described as part of the tagged v0.18.4 build.
-- Professional graphite UI is the approved visual baseline.
+- PR #25 (runner discovery and Smart Queue selection) is separate feature work and is not part of v0.18.4.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
 
-## v0.18.4 release candidate
+## v0.18.4 scope
 
-The implementation and final polish are merged to `main`.
+- Contextual safe-action guidance for the selected repository.
+- Session-only in-memory history for Fetch, Pull, Push, Commit and local branch switches.
+- Visible AHEAD/BEHIND and local-change summary.
+- Repository state re-inspected immediately before Pull/Push; stale state blocks write actions.
+- Git inspection timeout.
+- Compact runner-details layout fix.
+- Optional Buy Me a Coffee link in Settings, opened only on click.
 
-- PR #18 and PR #22 are merged.
-- Version metadata: `0.18.4`.
-- Manual Windows validation passed.
-- CI on the final implementation commit passed.
-- The Wiki was reviewed and updated. README and Wiki distinguish the published v0.18.3 ZIP from the tagged v0.18.4 source.
+## Release documentation
 
-Scope:
-- contextual safe-action guidance for the selected repository;
-- session-only in-memory history for Fetch, Pull, Push, Commit and local branch switches;
-- visible BEHIND summary and correct dirty-repository counting;
-- repository state re-inspected immediately before Pull/Push;
-- stale branch, working-tree or local-commit state blocks write actions;
-- no automatic merge, rebase, reset, stash, remote creation or branch creation.
-
-## Validation for v0.18.4
-
-1. Build and smoke tests must pass on the trusted Windows runner.
-2. Manually check CLEAN, CHANGES, AHEAD, BEHIND, DIVERGED/CONFLICT and no-remote guidance.
-3. Verify Fetch, Pull, Push, Commit and branch-switch history is session-only.
-4. Verify Pull is blocked if the working tree changes after the displayed snapshot.
-5. Verify Push is blocked if the branch changes after the displayed snapshot.
-6. Check Repositories layout at normal Windows scaling before merge.
-
-## Next sequence
-
-1. Resolve PR #26 and verify its CI. Do not recreate or move `v0.18.4`.
-2. Recover the Release workflow for the existing tag only after the release process is approved.
-3. Verify GitHub Release, `NRSWorkbench-v0.18.4-win-x64.zip`, checksum and final README/Wiki links before announcing publication.
-4. Keep PR #25's feature work outside the v0.18.4 release.
+README and the GitHub Wiki describe the published ZIP. The preview image uses fictional runner, repository, path and log data. Before the next version, read `docs/WRITING_STYLE.md`, review affected documentation and the real GitHub Wiki, and distinguish released features from work on `main`.
 
 ## Future roadmap
 

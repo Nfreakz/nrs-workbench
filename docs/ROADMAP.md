@@ -15,21 +15,15 @@ Published Public Preview.
 
 ## v0.18.4
 
-Repository Guidance is tagged as v0.18.4. The GitHub Release and ZIP are pending recovery of the failed publish step; the tagged source must remain unchanged.
+Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4).
 
-Current implementation:
-- PR #18 and PR #22 merged into `main`.
-- Documentation gate merged at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`.
-- Post-merge Windows CI completed successfully.
-- Manual Windows validation passed.
-- The GitHub Wiki was reviewed and updated. PR #26 contains the release workflow recovery; PR #25 is separate feature work.
-
-Scope:
-- Contextual safe-action guidance with a clearer recommendation hierarchy.
-- Session-only repository action history with an explicit empty state.
-- Clear AHEAD/BEHIND/dirty visibility.
-- Revalidation immediately before Pull/Push.
+- Contextual repository guidance and session-only action history.
+- Clear AHEAD/BEHIND and local-change summary.
+- Revalidation immediately before Pull/Push and a timeout for Git inspection.
+- Compact runner-details layout fix.
 - Optional Buy Me a Coffee card in Settings.
+
+PR #25's runner discovery and Smart Queue selection work is separate from this release.
 
 ## v0.18.5
 

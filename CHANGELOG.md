@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [0.18.4] - 2026-09-28
+## [0.18.4] - 2026-09-29
 
 ### Added
 - Adds contextual repository guidance that explains the next safe Git action for the selected repository.
