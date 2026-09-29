@@ -12,7 +12,7 @@
 ### Published baseline
 
 - Latest verified published release: `v0.18.3 Public Preview`.
-- `v0.18.4` tag exists, but the GitHub Release and ZIP were not available when this document was updated. The release workflow's publish step failed; PR #26 addresses recovery without moving the tag.
+- `v0.18.4` tag exists, but the GitHub Release and ZIP are still pending. The first recovery run built, tested, audited and packaged the tagged source successfully, then failed because the tag checkout does not contain the newer `scripts/get-release-notes.ps1` helper. The follow-up fix keeps the tagged source immutable and checks out current release tooling separately only after packaging.
 - `main` at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`; post-merge CI #323 completed successfully.
 - Manual Windows validation of Repositories, Settings and compact runner details passed.
 - GitHub Release notes use curated CHANGELOG sections instead of an automatic list of every PR.
