@@ -112,7 +112,15 @@ jobs:
           $encodedTag = [System.Uri]::EscapeDataString($tag)
           $releaseByTagUri = "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/$encodedTag"
 
-          $releaseNotes = (& .\\scripts\\get-release-notes.ps1 -Version $version) -join "`n"
+          $releaseNotesScript = Join-Path $PWD '.release-tools\scripts\get-release-notes.ps1'
+          $releaseChangelog = Join-Path $PWD '.release-tools\CHANGELOG.md'
+          if (-not (Test-Path -LiteralPath $releaseNotesScript -PathType Leaf)) {
+            throw "Release notes helper not found: $releaseNotesScript"
+          }
+          if (-not (Test-Path -LiteralPath $releaseChangelog -PathType Leaf)) {
+            throw "Release changelog not found: $releaseChangelog"
+          }
+          $releaseNotes = (& $releaseNotesScript -Version $version -ChangelogPath $releaseChangelog) -join "`n"
 
           try {
             $release = Invoke-RestMethod -Method Get -Uri $releaseByTagUri -Headers $headers -ErrorAction Stop
