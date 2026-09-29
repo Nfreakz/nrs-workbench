@@ -6,7 +6,7 @@
 
 **A local Windows dashboard for Git repositories and GitHub Actions self-hosted runners.**
 
-**Latest published release: [v0.18.3 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.3)** · **v0.18.4 is tagged, but its release ZIP is not published** · [What's new](CHANGELOG.md)
+**Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4)** · [What's new](CHANGELOG.md)
 
 <p align="center"><a href="docs/images/nrs-workbench-project-preview-v0.18.4.png"><img src="docs/images/nrs-workbench-project-preview-v0.18.4.png" alt="NRS Workbench project preview with representative runner data" width="720"></a></p>
 
@@ -14,15 +14,15 @@ Project preview based on the v0.18.4 interface. Runner names, repositories, path
 
 **New in v0.18.4:** contextual repository guidance, session-only Git action history, clearer AHEAD/BEHIND visibility, safer Pull/Push revalidation, compact-layout fixes, and optional Buy Me a Coffee support in Settings.
 
-NRS Workbench brings your local runners and Git working trees into one desktop app. In the **v0.18.4 release candidate**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
+NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.4**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
 
 **New in v0.18.1:** The optional automatic runner queue can keep one or two runners connected and rotate idle runners while GitHub holds jobs for stopped runners. Active jobs are not intentionally interrupted. This feature is absent from the v0.18.0 ZIP. See [Automatic runner queue](#automatic-runner-queue) for operational limits.
 
 **Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-**En español:** La candidata v0.18.4 mejora la gestión de repositorios con recomendaciones contextuales, historial de acciones y comprobaciones más seguras antes de Pull y Push.
+**En español:** La versión v0.18.4 mejora la gestión de repositorios con recomendaciones contextuales, historial de acciones y comprobaciones antes de Pull y Push.
 
-**En català:** La candidata v0.18.4 millora la gestió de repositoris amb recomanacions contextuals, historial d'accions i comprovacions més segures abans de Pull i Push.
+**En català:** La versió v0.18.4 millora la gestió de repositoris amb recomanacions contextuals, historial d'accions i comprovacions abans de Pull i Push.
 
 ## Who is NRS Workbench for?
 
@@ -30,9 +30,9 @@ NRS Workbench brings your local runners and Git working trees into one desktop a
 - **People managing several local Git repositories:** inspect working-tree state and use guarded Fetch, Pull, Push, Commit and local branch switching without jumping between folders.
 - **Small homelab and development setups:** keep host CPU, memory and disk usage visible next to runner activity, with an optional one- or two-runner queue to limit simultaneous listeners.
 
-The **v0.18.4 tagged source** adds repository guidance, synchronization status and Pull/Push revalidation. These changes are not in the downloadable v0.18.3 ZIP.
+The **v0.18.4 ZIP** includes repository guidance, synchronization status and Pull/Push revalidation.
 
-**Try it:** [Download the published v0.18.3 Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.3/NRSWorkbench-v0.18.3-win-x64.zip) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
+**Try it:** [Download the published v0.18.4 Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.4/NRSWorkbench-v0.18.4-win-x64.zip) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
 
 ## Public preview readiness
 
