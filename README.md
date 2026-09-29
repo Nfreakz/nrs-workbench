@@ -8,7 +8,7 @@
 
 **Latest published release: [v0.18.3 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.3)** · **v0.18.4 is tagged, but its release ZIP is not published** · [What's new](CHANGELOG.md)
 
-![NRS Workbench project preview with representative runner data](docs/images/nrs-workbench-project-preview-v0.18.4.png)
+<p align="center"><a href="docs/images/nrs-workbench-project-preview-v0.18.4.png"><img src="docs/images/nrs-workbench-project-preview-v0.18.4.png" alt="NRS Workbench project preview with representative runner data" width="720"></a></p>
 
 Project preview based on the v0.18.4 interface. Runner names, repositories, paths and logs are fictional; use the release ZIP for the actual application.
 
