@@ -86,6 +86,16 @@ jobs:
           Write-Host "ZIP SHA256: $((Get-FileHash -Algorithm SHA256 -LiteralPath $name).Hash)"
           "PACKAGE=$name" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
+      - name: Checkout release tooling
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          path: .release-tools
+          sparse-checkout: |
+            scripts/get-release-notes.ps1
+            CHANGELOG.md
+          sparse-checkout-cone-mode: false
+
       - name: Create or reuse GitHub prerelease and upload package
         env:
           GITHUB_TOKEN: ${{ github.token }}
