@@ -4,11 +4,19 @@ on:
   push:
     tags:
       - 'v*'
-  # Explicit tag dispatch is needed when the approved tag is created by GITHUB_TOKEN.
+  # Manual dispatch can recover a failed tag release without moving the tag.
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing version tag to publish, for example v0.18.4'
+        required: true
+        type: string
 
 permissions:
   contents: write
+
+env:
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
 
 defaults:
   run:
@@ -21,9 +29,9 @@ jobs:
     runs-on: [self-hosted, Windows, X64]
     timeout-minutes: 30
     steps:
-      - name: Verify release runs against a version tag
+      - name: Verify release target format
         run: |
-          if ($env:GITHUB_REF -notmatch '^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$') {
+          if ($env:RELEASE_TAG -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') {
             throw "Releases must target an explicit version tag."
           }
 
@@ -38,8 +46,17 @@ jobs:
           }
           git --version
 
-      - name: Checkout
+      - name: Verify release tag exists
+        run: |
+          git ls-remote --exit-code --tags "https://github.com/$env:GITHUB_REPOSITORY.git" "refs/tags/$env:RELEASE_TAG" | Out-Null
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release tag does not exist: $env:RELEASE_TAG"
+          }
+
+      - name: Checkout release tag
         uses: actions/checkout@v5
+        with:
+          ref: ${{ env.RELEASE_TAG }}
 
       - name: Verify local release toolchain
         run: |
@@ -60,7 +77,7 @@ jobs:
 
       - name: Package
         run: |
-          $name = "NRSWorkbench-$env:GITHUB_REF_NAME-win-x64.zip"
+          $name = "NRSWorkbench-$env:RELEASE_TAG-win-x64.zip"
           $exe = '.\\dist\\win-x64\\NRSWorkbench.exe'
           if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) { throw "Portable EXE was not generated." }
           Compress-Archive -Path .\\dist\\win-x64\\* -DestinationPath $name -Force
@@ -68,6 +85,16 @@ jobs:
           if ((Get-Item -LiteralPath $name).Length -lt 1MB) { throw "Release ZIP is unexpectedly small." }
           Write-Host "ZIP SHA256: $((Get-FileHash -Algorithm SHA256 -LiteralPath $name).Hash)"
           "PACKAGE=$name" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Checkout release tooling
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          path: .release-tools
+          sparse-checkout: |
+            scripts/get-release-notes.ps1
+            CHANGELOG.md
+          sparse-checkout-cone-mode: false
 
       - name: Create or reuse GitHub prerelease and upload package
         env:
@@ -80,24 +107,20 @@ jobs:
             'X-GitHub-Api-Version' = '2022-11-28'
           }
 
-          $tag = $env:GITHUB_REF_NAME
+          $tag = $env:RELEASE_TAG
           $version = $tag.TrimStart('v')
           $encodedTag = [System.Uri]::EscapeDataString($tag)
           $releaseByTagUri = "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/$encodedTag"
 
-          $changelog = Get-Content -LiteralPath '.\\CHANGELOG.md' -Raw
-          $escapedVersion = [regex]::Escape($version)
-          $notesMatch = [regex]::Match(
-            $changelog,
-            "(?ms)^## \\[$escapedVersion\\][^\\r\\n]*\\r?\\n(?<body>.*?)(?=^## \\[|\\z)"
-          )
-          if (-not $notesMatch.Success) {
-            throw "CHANGELOG.md does not contain release notes for $tag."
+          $releaseNotesScript = Join-Path $PWD '.release-tools\scripts\get-release-notes.ps1'
+          $releaseChangelog = Join-Path $PWD '.release-tools\CHANGELOG.md'
+          if (-not (Test-Path -LiteralPath $releaseNotesScript -PathType Leaf)) {
+            throw "Release notes helper not found: $releaseNotesScript"
           }
-          $releaseNotes = $notesMatch.Groups['body'].Value.Trim()
-          if ([string]::IsNullOrWhiteSpace($releaseNotes)) {
-            throw "Release notes for $tag are empty."
+          if (-not (Test-Path -LiteralPath $releaseChangelog -PathType Leaf)) {
+            throw "Release changelog not found: $releaseChangelog"
           }
+          $releaseNotes = (& $releaseNotesScript -Version $version -ChangelogPath $releaseChangelog) -join "`n"
 
           try {
             $release = Invoke-RestMethod -Method Get -Uri $releaseByTagUri -Headers $headers -ErrorAction Stop

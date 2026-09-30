@@ -15,21 +15,15 @@ Published Public Preview.
 
 ## v0.18.4
 
-Repository Guidance release candidate awaiting the final documentation/Wiki gate.
+Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4).
 
-Current implementation:
-- PR #18 and PR #22 merged into `main`.
-- Current release-prep commit on `main`: `9ea411d7f161ae51222731c77bf6d4d7fc21f89a`.
-- Post-merge Windows CI completed successfully.
-- Manual Windows validation passed.
-- Final documentation gate is isolated in `docs/v0.18.4-release-doc-gate`.
-
-Scope:
-- Contextual safe-action guidance with a clearer recommendation hierarchy.
-- Session-only repository action history with an explicit empty state.
-- Clear AHEAD/BEHIND/dirty visibility.
-- Revalidation immediately before Pull/Push.
+- Contextual repository guidance and session-only action history.
+- Clear AHEAD/BEHIND and local-change summary.
+- Revalidation immediately before Pull/Push and a timeout for Git inspection.
+- Compact runner-details layout fix.
 - Optional Buy Me a Coffee card in Settings.
+
+PR #25's runner discovery and Smart Queue selection work is separate from this release.
 
 ## v0.18.5
 

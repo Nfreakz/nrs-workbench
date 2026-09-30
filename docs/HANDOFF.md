@@ -7,73 +7,43 @@
 - Do not use this repository's paths, credentials, runner registrations, deployment decisions or release tags for any other Neo RS application.
 - Default branch: `main`. Review its live HEAD, PRs, CI and Releases before modifying anything.
 
-## Current verified state · 2026-09-28
+## Current verified state · 2026-09-30
 
-### Published baseline
-
-- Latest published release before the current release preparation: `v0.18.3 Public Preview`.
-- v0.18.4 release candidate is on `main` at `9ea411d7f161ae51222731c77bf6d4d7fc21f89a`.
-- Post-merge CI for the v0.18.4 candidate completed successfully.
-- Manual Windows validation of Repositories, Settings and compact runner details passed.
-- GitHub Release notes use curated CHANGELOG sections instead of an automatic list of every PR.
+- Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4), built from tag `v0.18.4` at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`.
+- Published Windows asset: `NRSWorkbench-v0.18.4-win-x64.zip`. GitHub reports SHA256 `8f1f427dec4a04becc393faecf11a37ea31c98c67c6cc33d40cb16498635cc1a`.
+- The tag predates later release automation and image repairs on `main`. Those later commits are not part of the tagged source or ZIP.
+- Manual Windows validation of Repositories, Settings and compact runner details passed before tagging.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
-
-### main
-
-- Current v0.18.4 release candidate on `main`: `9ea411d7f161ae51222731c77bf6d4d7fc21f89a`.
-- Release documentation gate changes are isolated in `docs/v0.18.4-release-doc-gate`.
-- Professional graphite UI is the approved visual baseline.
+- PR #25 (runner discovery and Smart Queue selection) is separate feature work and is not part of v0.18.4.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
 
-## v0.18.4 release candidate
+## v0.18.4 scope
 
-The implementation and final polish are merged to `main`.
+- Contextual safe-action guidance for the selected repository.
+- Session-only in-memory history for Fetch, Pull, Push, Commit and local branch switches.
+- Visible AHEAD/BEHIND and local-change summary.
+- Repository state re-inspected immediately before Pull/Push; stale state blocks write actions.
+- Git inspection timeout.
+- Compact runner-details layout fix.
+- Optional Buy Me a Coffee link in Settings, opened only on click.
 
-- PR #18 and PR #22 are merged.
-- Version metadata: `0.18.4`.
-- Manual Windows validation passed.
-- CI on the final implementation commit passed.
-- CHANGELOG/README release wording is prepared. The documentation gate now also requires the writing standard and Wiki review before tagging `v0.18.4`.
+## Release documentation
 
-Scope:
-- contextual safe-action guidance for the selected repository;
-- session-only in-memory history for Fetch, Pull, Push, Commit and local branch switches;
-- visible BEHIND summary and correct dirty-repository counting;
-- repository state re-inspected immediately before Pull/Push;
-- stale branch, working-tree or local-commit state blocks write actions;
-- no automatic merge, rebase, reset, stash, remote creation or branch creation.
+README and the GitHub Wiki describe the published ZIP. The preview image uses fictional runner, repository, path and log data. Before the next version, read `docs/WRITING_STYLE.md`, review affected documentation and the real GitHub Wiki, and distinguish released features from work on `main`.
 
-## Validation for v0.18.4
-
-1. Build and smoke tests must pass on the trusted Windows runner.
-2. Manually check CLEAN, CHANGES, AHEAD, BEHIND, DIVERGED/CONFLICT and no-remote guidance.
-3. Verify Fetch, Pull, Push, Commit and branch-switch history is session-only.
-4. Verify Pull is blocked if the working tree changes after the displayed snapshot.
-5. Verify Push is blocked if the branch changes after the displayed snapshot.
-6. Check Repositories layout at normal Windows scaling before merge.
-
-## Next sequence
-
-1. Merge PR #24 after its green CI.
-2. Review/update the GitHub Wiki for v0.18.4. Do not mark this complete without reading the live pages.
-3. Verify final `main` CI and the release documentation against `docs/WRITING_STYLE.md`.
-4. Create tag `v0.18.4` only after explicit approval.
-5. Verify the Release workflow creates the GitHub Release and `NRSWorkbench-v0.18.4-win-x64.zip`.
-6. Verify the published notes, asset checksum and README links before calling the release complete.
-
-## v0.18.5 work in progress
+## PR #25 · work in progress
 
 Branch: `feat/v0.18.5-runner-pool-discovery`.
 
 Current scope:
-- runner discovery validates real runner installation files instead of relying on the `actions-runner*` folder prefix;
+- runner discovery validates real runner installation markers instead of relying on the folder name;
 - automatic discovery remains shallow and can find common parent folders one level below a drive root;
 - Settings can use all detected runners or an explicit Smart Queue pool;
-- runners outside the selected pool are not started, stopped or counted against the Smart Queue limit;
-- portable settings preserve the queue-pool selection;
-- smoke coverage includes non-standard runner folder names, empty prefixed folders and selected/excluded queue behavior.
+- runners outside the selected pool are not started, stopped, rotated or counted against the Smart Queue limit;
+- runner rows, context menus and Details/Log layout have received a compact graphite UI pass;
+- portable settings and smoke tests cover the queue-pool selection.
 
-This work is not part of the tagged v0.18.4 build.
+This work remains unreleased and is not part of the tagged v0.18.4 ZIP. Reconcile and validate PR #25 against current `main` before any merge or version decision.
 
 ## Future roadmap
 

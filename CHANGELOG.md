@@ -17,7 +17,7 @@
 - Detects GitHub Actions runner installations from their actual runner files instead of requiring an `actions-runner*` folder name.
 - Keeps runner discovery shallow while allowing configured runner folders and common parent folders to be found without a naming convention.
 
-## [0.18.4] - 2026-09-28
+## [0.18.4] - 2026-09-29
 
 ### Added
 - Adds contextual repository guidance that explains the next safe Git action for the selected repository.
