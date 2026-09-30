@@ -21,3 +21,10 @@ When the repository enables GitHub Private Vulnerability Reporting, use the repo
 Remote URLs are sanitized before display. Application diagnostics and Git command errors pass through a best-effort secret redactor for embedded HTTP(S) user-info and GitHub token-shaped values. HTTP(S)/SSH user-info is removed and browser links to GitHub are reconstructed without embedded credentials. Diff preview uses `--no-ext-diff --no-textconv`. Untracked-file preview refuses reparse points, and repository scanning skips reparse-point directories.
 
 Git commits use the user's installed Git and therefore preserve normal local Git behavior, including repository/user Git configuration and hooks. Only add repositories you trust, just as you would before running Git commands from a terminal.
+
+
+## Diagnostic export
+
+Feedback & Diagnostics never uploads data automatically and does not embed webhook credentials. The generated bundle contains only application-generated text and a README; it does not copy runner `_diag`, `.runner`, `.credentials`, `.credentials_rsaparams`, repository files, `settings.json` or remote URLs.
+
+The preview/export passes through the existing token/URL-user-info redactor and a contextual redactor for configured local paths plus Windows user/machine identity. This is a best-effort privacy boundary, not a guarantee that arbitrary third-party error text contains no identifying information, so the user must review the displayed preview before sharing it.

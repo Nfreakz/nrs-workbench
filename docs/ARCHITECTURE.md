@@ -19,3 +19,8 @@ Repository write actions are deliberately conservative. Pull is fast-forward-onl
 ## Local data
 
 Settings and application logs live under `%LOCALAPPDATA%\NRSWorkbench`. Legacy `%LOCALAPPDATA%\RunnerManager\settings.json` is migrated once when the NRS Workbench settings file does not yet exist. The legacy file is not deleted.
+
+
+## Feedback and diagnostics
+
+Feedback links are simple browser launches to the repository's GitHub issue templates and require no GitHub API token. Diagnostic export is generated locally from a small environment/configuration summary and the tail of the NRS Workbench application log. The generated text is sanitized and displayed before export; the ZIP is created only after the user chooses a local destination. No upload service or background telemetry path exists.

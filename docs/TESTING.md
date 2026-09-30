@@ -103,3 +103,14 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 
 16. Open Settings and verify the Buy Me a Coffee button is visible in the fixed top header without scrolling. The old support card must not remain lower in the settings list.
 17. With one or more BUSY runners, verify the progress percentage and the Mode column have a clear visual gap at 100% scaling and do not read as one combined value.
+
+
+## v0.18.5 Feedback & Diagnostics manual checks
+
+1. Open **Settings → Feedback & diagnostics** and verify the window uses the existing graphite visual system and remains usable at normal Windows scaling.
+2. Use **Report an issue** and **Suggest improvement**. Each action must open the matching GitHub issue template in the browser; NRS Workbench must not attach or upload any diagnostics.
+3. Review the diagnostics preview. It must show environment/configuration counts without raw runner roots, repository paths, remote URLs, settings.json or runner `_diag` contents.
+4. Add a synthetic token-shaped string and a configured local path to the application log in a test environment; refresh the preview and verify both are redacted. Also verify Windows user/machine identity is not exposed.
+5. Save the diagnostics ZIP. Verify it contains only `diagnostics.txt` and `README.txt`, and that the displayed preview matches `diagnostics.txt`.
+6. Cancel the Save dialog and verify no file is created and no network request is made.
+7. Trigger a controlled UI exception in a development build and verify the error is logged locally and the user can choose to open Feedback & diagnostics. Declining must simply close the error prompt.
