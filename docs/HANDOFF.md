@@ -35,6 +35,8 @@ README and the GitHub Wiki describe the published ZIP. The preview image uses fi
 
 Branch: `feat/v0.18.5-runner-pool-discovery`.
 
+Reconciled with current `main` on 2026-09-30. Run CI on the reconciled HEAD before any merge or version decision.
+
 Current scope:
 - runner discovery validates real runner installation markers instead of relying on the folder name;
 - automatic discovery remains shallow and can find common parent folders one level below a drive root;
