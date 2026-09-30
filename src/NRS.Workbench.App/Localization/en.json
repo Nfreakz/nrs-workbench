@@ -17,7 +17,6 @@
   "Activar notificaciones de escritorio": "Enable desktop notifications",
   "Activar cola automática de runners": "Enable automatic runner queue",
   "Máximo de runners conectados": "Maximum connected runners",
-
   "NRS Workbench valida el contenido real del runner. El nombre de la carpeta no importa.": "NRS Workbench validates the actual runner contents. The folder name does not matter.",
   "Runners que participan en la cola": "Runners participating in the queue",
   "Puedes dejar fuera runners que no quieras usar ahora. La cola no los iniciará, detendrá ni contará para el límite.": "You can leave out runners you do not want to use now. The queue will not start, stop or count them toward the limit.",
@@ -223,5 +222,19 @@
   "Abre la página de apoyo de Neo RS en Buy Me a Coffee.": "Open the Neo RS support page on Buy Me a Coffee.",
   "RECOMENDACIÓN": "RECOMMENDATION",
   "Sin actividad todavía": "No activity yet",
-  "Las acciones que inicies desde NRS Workbench aparecerán aquí durante esta sesión.": "Actions started from NRS Workbench will appear here during this session."
+  "Las acciones que inicies desde NRS Workbench aparecerán aquí durante esta sesión.": "Actions started from NRS Workbench will appear here during this session.",
+  "Feedback y diagnóstico": "Feedback & diagnostics",
+  "Reporta problemas, propone mejoras y prepara un diagnóstico local antes de compartir nada.": "Report problems, suggest improvements and prepare local diagnostics before sharing anything.",
+  "Reportar problema": "Report an issue",
+  "Abre la plantilla de bugs en GitHub. No se adjunta ningún archivo automáticamente.": "Opens the GitHub bug template. No file is attached automatically.",
+  "Abrir issue de problema": "Open bug issue",
+  "Sugerir mejora": "Suggest improvement",
+  "Abre la plantilla de mejoras en GitHub.": "Opens the GitHub feature request template.",
+  "Abrir propuesta de mejora": "Open feature request",
+  "Diagnóstico revisable": "Reviewable diagnostics",
+  "El texto de abajo es exactamente el contenido principal que se guardará en el ZIP. Revísalo antes de compartirlo.": "The text below is exactly the main content that will be saved in the ZIP. Review it before sharing.",
+  "Actualizar vista previa": "Refresh preview",
+  "Nada se sube automáticamente. El ZIP se guarda solo donde tú elijas.": "Nothing is uploaded automatically. The ZIP is saved only where you choose.",
+  "Copiar": "Copy",
+  "Guardar ZIP...": "Save ZIP..."
 }

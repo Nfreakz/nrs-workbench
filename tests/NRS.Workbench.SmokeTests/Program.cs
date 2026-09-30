@@ -256,6 +256,20 @@ internal static class Program
                 !redactedMessage.Contains("password123", StringComparison.Ordinal) &&
                 !redactedMessage.Contains(syntheticToken, StringComparison.Ordinal) &&
                 redactedMessage.Contains("https://***@github.com", StringComparison.OrdinalIgnoreCase), redactedMessage);
+
+            var contextualDiagnostics = DiagnosticSanitizer.Sanitize(
+                $"failure on C:\\Users\\Alice\\work\\private-repo from ALICE-PC for Alice token {syntheticToken}",
+                [@"C:\Users\Alice\work\private-repo"],
+                userName: "Alice",
+                machineName: "ALICE-PC",
+                userProfile: @"C:\Users\Alice",
+                localAppData: @"C:\Users\Alice\AppData\Local");
+            Check("diagnostic bundle sanitizer removes configured paths and local identity",
+                !contextualDiagnostics.Contains("private-repo", StringComparison.OrdinalIgnoreCase) &&
+                !contextualDiagnostics.Contains("ALICE-PC", StringComparison.OrdinalIgnoreCase) &&
+                !contextualDiagnostics.Contains(@"C:\Users\Alice", StringComparison.OrdinalIgnoreCase) &&
+                !contextualDiagnostics.Contains(syntheticToken, StringComparison.Ordinal) &&
+                contextualDiagnostics.Contains("<CONFIGURED_PATH>", StringComparison.Ordinal), contextualDiagnostics);
         }
         catch (Exception ex)
         {
