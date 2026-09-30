@@ -14,4 +14,7 @@
     <Description>Local developer control center for Git repositories and GitHub Actions self-hosted runners on Windows.</Description>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="RepositoryUrl" Value="https://github.com/Nfreakz/nrs-workbench" />
+  </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows;
 using Microsoft.Win32;
 using NRS.Workbench.App.Services;
@@ -7,8 +8,9 @@ namespace NRS.Workbench.App;
 
 public partial class FeedbackWindow : Window
 {
-    private const string BugUrl = "https://github.com/Nfreakz/nrs-workbench/issues/new?template=bug_report.yml";
-    private const string FeatureUrl = "https://github.com/Nfreakz/nrs-workbench/issues/new?template=feature_request.yml";
+    private static readonly string RepositoryUrl = ResolveRepositoryUrl();
+    private static readonly string BugUrl = RepositoryUrl + "/issues/new?template=bug_report.yml";
+    private static readonly string FeatureUrl = RepositoryUrl + "/issues/new?template=feature_request.yml";
 
     private readonly DiagnosticBundleService _diagnostics;
     private DiagnosticPreview _preview = new(string.Empty, false, 0);
@@ -108,6 +110,18 @@ public partial class FeedbackWindow : Window
             MessageBox.Show(UiLanguage.Choose("No se pudo abrir GitHub en el navegador.", "Could not open GitHub in the browser.", "No s'ha pogut obrir GitHub al navegador."),
                 "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+    }
+
+    private static string ResolveRepositoryUrl()
+    {
+        var value = typeof(FeedbackWindow).Assembly
+            .GetCustomAttributes<AssemblyMetadataAttribute>()
+            .FirstOrDefault(attribute => string.Equals(attribute.Key, "RepositoryUrl", StringComparison.Ordinal))
+            ?.Value;
+
+        return string.IsNullOrWhiteSpace(value)
+            ? "https://github.com"
+            : value.TrimEnd('/');
     }
 
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
