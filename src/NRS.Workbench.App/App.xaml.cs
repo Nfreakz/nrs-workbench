@@ -15,11 +15,30 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             AppLogger.Error("Unhandled UI exception", args.Exception);
-            MessageBox.Show(
-                UiLanguage.Choose($"Se ha producido un error inesperado.\n\n{args.Exception.Message}\n\nConsulta el log de NRS Workbench para más detalles.", $"An unexpected error occurred.\n\n{args.Exception.Message}\n\nSee the NRS Workbench log for details.", $"S\u0027ha produït un error inesperat.\n\n{args.Exception.Message}\n\nConsulta el log de NRS Workbench per obtenir-ne més detalls."),
+            var choice = MessageBox.Show(
+                UiLanguage.Choose(
+                    $"Se ha producido un error inesperado.\n\n{SensitiveDataRedactor.Redact(args.Exception.Message)}\n\nEl detalle se ha guardado en el log local. ¿Abrir Feedback y diagnóstico para revisarlo o exportarlo?",
+                    $"An unexpected error occurred.\n\n{SensitiveDataRedactor.Redact(args.Exception.Message)}\n\nDetails were saved to the local log. Open Feedback & diagnostics to review or export them?",
+                    $"S'ha produït un error inesperat.\n\n{SensitiveDataRedactor.Redact(args.Exception.Message)}\n\nEl detall s'ha desat al log local. Vols obrir Feedback i diagnòstic per revisar-lo o exportar-lo?"),
                 "NRS Workbench",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Error,
+                MessageBoxResult.Yes);
+
+            if (choice == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    var feedback = new FeedbackWindow(new SettingsService());
+                    if (Current?.MainWindow is { IsLoaded: true } owner) feedback.Owner = owner;
+                    feedback.ShowDialog();
+                }
+                catch (Exception feedbackError)
+                {
+                    AppLogger.Error("Could not open feedback window after UI exception", feedbackError);
+                }
+            }
+
             args.Handled = true;
         };
 

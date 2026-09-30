@@ -161,6 +161,12 @@ public partial class SettingsWindow : Window
         return true;
     }
 
+    private void Feedback_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new FeedbackWindow(_settingsService) { Owner = this };
+        dialog.ShowDialog();
+    }
+
     private void Support_Click(object sender, RoutedEventArgs e)
     {
         const string supportUrl = "https://buymeacoffee.com/neors";
