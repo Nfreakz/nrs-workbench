@@ -1,5 +1,8 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using NRS.Workbench.App.Services;
 using NRS.Workbench.App.ViewModels;
@@ -22,6 +25,7 @@ public partial class MainWindow : Window
     private bool _allowExit;
     private readonly Dictionary<string, RunnerState> _previousStates = new(StringComparer.OrdinalIgnoreCase);
     private bool _stateSnapshotInitialized;
+    private double _detailPanelExpandedHeight = 195d;
 
     public MainWindow()
     {
@@ -123,6 +127,35 @@ public partial class MainWindow : Window
     {
         _runnerQueue.TogglePaused();
         await RefreshAndUpdateTrayAsync();
+    }
+
+    private void DetailPanelSplitter_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (DetailPanelRow.ActualHeight > 12)
+        {
+            _detailPanelExpandedHeight = Math.Max(125d, DetailPanelRow.ActualHeight);
+            DetailPanelRow.Height = new GridLength(0);
+        }
+        else
+        {
+            DetailPanelRow.Height = new GridLength(Math.Max(125d, _detailPanelExpandedHeight));
+        }
+
+        e.Handled = true;
+    }
+
+    private void RunnerGrid_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        DependencyObject? current = e.OriginalSource as DependencyObject;
+        while (current is not null && current is not DataGridRow)
+            current = VisualTreeHelper.GetParent(current);
+
+        if (current is DataGridRow row)
+        {
+            row.IsSelected = true;
+            RunnerGrid.CurrentItem = row.Item;
+            RunnerGrid.Focus();
+        }
     }
 
     private void ProcessStateTransitions(IReadOnlyList<RunnerInfo> runners)

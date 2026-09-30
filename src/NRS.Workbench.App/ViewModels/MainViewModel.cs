@@ -35,6 +35,7 @@ public sealed class MainViewModel : ObservableObject
     private string _queueReasonText = string.Empty;
     private string _queuePauseButtonText = UiLanguage.Choose("Pausar cola", "Pause queue", "Pausar cua");
     private bool _queueControlsEnabled;
+    private Visibility _queuePanelVisibility = Visibility.Collapsed;
     private DateTimeOffset _lastUpdated;
     private string _cpuUseText = "—";
     private string _memoryUseText = "—";
@@ -42,6 +43,7 @@ public sealed class MainViewModel : ObservableObject
     private double _cpuPercent;
     private double _memoryPercent;
     private double _diskPercent;
+    private string _dominantRunnerVersion = string.Empty;
 
     public ObservableCollection<RunnerInfo> Runners { get; } = [];
     public IReadOnlyList<RunnerInfo> AllRunners => _allRunners;
@@ -89,6 +91,8 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
+    public string DominantRunnerVersion => _dominantRunnerVersion;
+
     public string RunnerViewSummary => string.IsNullOrWhiteSpace(RunnerSearchText)
         ? UiLanguage.Choose($"{TotalCount} runners", $"{TotalCount} runners")
         : UiLanguage.Choose($"{Runners.Count} de {TotalCount} runners", $"{Runners.Count} of {TotalCount} runners", $"{Runners.Count} de {TotalCount} runners");
@@ -117,9 +121,11 @@ public sealed class MainViewModel : ObservableObject
     public string QueueReasonText { get => _queueReasonText; private set => SetProperty(ref _queueReasonText, value); }
     public string QueuePauseButtonText { get => _queuePauseButtonText; private set => SetProperty(ref _queuePauseButtonText, value); }
     public bool QueueControlsEnabled { get => _queueControlsEnabled; private set => SetProperty(ref _queueControlsEnabled, value); }
+    public Visibility QueuePanelVisibility { get => _queuePanelVisibility; private set => SetProperty(ref _queuePanelVisibility, value); }
 
     public void UpdateQueueSnapshot(RunnerQueueSnapshot snapshot)
     {
+        QueuePanelVisibility = snapshot.Enabled ? Visibility.Visible : Visibility.Collapsed;
         QueueStatusText = snapshot.StatusText;
         QueueStateText = snapshot.Enabled
             ? snapshot.Paused
@@ -285,6 +291,18 @@ public sealed class MainViewModel : ObservableObject
             StatusText = UiLanguage.Choose("Actualizando runners...", "Refreshing runners...");
             var rows = await Task.Run(_discovery.Discover);
             _allRunners = rows;
+            var dominantVersion = rows
+                .Where(runner => !string.IsNullOrWhiteSpace(runner.Version))
+                .GroupBy(runner => runner.Version.Trim(), StringComparer.OrdinalIgnoreCase)
+                .OrderByDescending(group => group.Count())
+                .ThenBy(group => group.Key, StringComparer.OrdinalIgnoreCase)
+                .Select(group => group.Key)
+                .FirstOrDefault() ?? string.Empty;
+            if (!string.Equals(_dominantRunnerVersion, dominantVersion, StringComparison.OrdinalIgnoreCase))
+            {
+                _dominantRunnerVersion = dominantVersion;
+                RaisePropertyChanged(nameof(DominantRunnerVersion));
+            }
             UpdateRunnerView();
 
             _lastUpdated = DateTimeOffset.Now;

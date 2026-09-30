@@ -17,6 +17,8 @@ public sealed class RunnerSettings
     public string RunnerSortMode { get; set; } = "manual";
     public List<string> RunnerDisplayOrder { get; set; } = [];
     public bool RunnerQueueEnabled { get; set; }
+    public bool RunnerQueueUseAllRunners { get; set; } = true;
+    public List<string> RunnerQueueIncludedPaths { get; set; } = [];
     public int RunnerQueueLimit { get; set; } = 2;
     public bool RunnerQueueResourceGuardEnabled { get; set; } = true;
     public int RunnerQueueCpuStartThreshold { get; set; } = 85;

@@ -25,22 +25,8 @@ public sealed class RunnerDiscoveryService : IRunnerDiscoveryService
         var settings = _settingsService.Load();
         var folders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var root in settings.RunnerRoots)
-        {
-            try
-            {
-                if (!Directory.Exists(root)) continue;
-                foreach (var folder in Directory.EnumerateDirectories(root, settings.FolderPattern, SearchOption.TopDirectoryOnly))
-                {
-                    if (File.Exists(Path.Combine(folder, ".runner")) || File.Exists(Path.Combine(folder, "run.cmd")))
-                        folders.Add(Path.GetFullPath(folder));
-                }
-            }
-            catch (Exception ex)
-            {
-                AppLogger.Error($"Could not scan runner root '{root}'", ex);
-            }
-        }
+        foreach (var folder in _settingsService.DetectRunnerFolders(settings.RunnerRoots))
+            folders.Add(folder);
 
         return folders.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).Select(BuildRunner).ToList();
     }

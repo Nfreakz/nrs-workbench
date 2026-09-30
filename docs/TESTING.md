@@ -75,3 +75,31 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 4. With a Pull-enabled repository selected, create a local edit outside NRS Workbench before pressing Pull. Pull must be blocked after the service re-inspects the working tree.
 5. With a Push-enabled repository selected, switch branch outside NRS Workbench before pressing Push. Push must be blocked and ask for a refresh.
 6. Close and reopen NRS Workbench and confirm repository action history is empty; it is intentionally session-only and not telemetry/persistent audit history.
+
+
+## v0.18.5 runner discovery and queue-pool checks
+
+1. Create a valid runner installation under a configured root with a folder name that does not start with `actions-runner`; verify NRS Workbench detects it.
+2. Create an empty folder whose name starts with `actions-runner`; verify it is ignored.
+3. In Settings, disable **Use all detected runners**, select only a subset, save, and verify only those runners appear as Smart Queue participants.
+4. Keep an excluded runner READY while the queue limit is 1; verify the queue does not stop it or count it against the selected pool.
+5. Select a stopped runner while an excluded runner is already online; verify Smart Queue may start the selected runner without touching the excluded one.
+6. Change the selected pool while NRS Workbench remains open and verify newly selected runners become eligible without automatically controlling runners removed from the pool.
+7. Export/import portable settings and verify the queue selection mode and selected runner paths round-trip without credentials.
+
+8. With a BUSY runner visible in the main table, verify the current action, compact step/time metadata and estimated percentage share one line above the progress bar. Confirm 40 px rows and the shorter header do not clip status pills, text or the progress bar.
+
+9. Right-click a runner row and verify that row becomes selected before the context menu opens. The menu must use the graphite dark theme with readable text and a neutral hover state, not the native white/blue Windows menu. Check Start, Stop and Restart enablement matches the selected runner state and Smart Queue safety rules; Folder, Diagnostics and GitHub actions must target the right-clicked runner.
+
+10. Disable Smart Queue in Settings and verify the Smart Queue dashboard disappears completely and the runner table expands into the freed vertical space. Re-enable Smart Queue and verify the dashboard returns with its current state.
+
+11. Resize the lower Details/Log area by dragging the horizontal splitter. Double-click it to collapse the panel and double-click again to restore it; the runner table must use the freed height without layout gaps.
+12. At 100% Windows scaling, verify the compact header, toolbar, search/sort row and host-resource strip remain readable and do not clip text or controls. The runner table should show more rows than before without reducing body text below the visual-system minimum.
+13. Select several runner rows and verify the selection uses a restrained graphite highlight rather than a strong blue fill. Confirm PID, RAM, uptime and version remain readable in the narrower metadata columns.
+
+14. With runners on two different runner versions, verify the most common version stays muted while the uncommon version is highlighted in amber. With a single version across all runners, all version values should remain muted.
+
+15. In the lower runner pane, verify there is no redundant "Runner details" heading. Status plus folder/GitHub quick actions must sit beside the runner name, metadata must use two compact columns, and both Details and Log must share the same shorter default height without clipping BUSY progress information.
+
+16. Open Settings and verify the Buy Me a Coffee button is visible in the fixed top header without scrolling. The old support card must not remain lower in the settings list.
+17. With one or more BUSY runners, verify the progress percentage and the Mode column have a clear visual gap at 100% scaling and do not read as one combined value.

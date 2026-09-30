@@ -14,6 +14,8 @@ Project preview based on the v0.18.4 interface. Runner names, repositories, path
 
 **New in v0.18.4:** contextual repository guidance, session-only Git action history, clearer AHEAD/BEHIND visibility, safer Pull/Push revalidation, compact-layout fixes, and optional Buy Me a Coffee support in Settings.
 
+**In development for v0.18.5:** runner discovery no longer depends on folder naming, and Smart Queue can be limited to an explicit set of runners.
+
 NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.4**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
 
 **New in v0.18.1:** The optional automatic runner queue can keep one or two runners connected and rotate idle runners while GitHub holds jobs for stopped runners. Active jobs are not intentionally interrupted. This feature is absent from the v0.18.0 ZIP. See [Automatic runner queue](#automatic-runner-queue) for operational limits.
@@ -54,7 +56,7 @@ See `docs/TESTING.md`, `docs/PRIVACY.md`, `docs/ARCHITECTURE.md`, `docs/RELEASIN
 
 - Provide one local Windows control center for self-hosted runners and Git repositories.
 - Keep runner control and repository management independent from mandatory GitHub API access.
-- Discover local `actions-runner*` installations.
+- Discover local GitHub Actions runner installations from their actual runner files; folder names do not need an `actions-runner*` prefix.
 - Optionally limit connected runners to one or two and rotate idle runners to reduce host load while GitHub queues jobs for runners that are offline.
 - Show trustworthy runner state (`READY`, `BUSY`, `STOPPED`, etc.).
 - Start, stop and restart interactive runners and Windows-service runners.
@@ -136,7 +138,7 @@ The main window shows the application version and live host CPU, RAM and system 
 
 > **Introduced in v0.18.1.** The downloadable v0.18.0 ZIP does not include this feature.
 
-Enable the optional queue in **Settings** to keep at most one or two runners connected. When the limit is reached, idle runners rotate every 45 seconds so a runner with matching labels can come online; GitHub keeps jobs queued while no matching runner is available. Active jobs are left running. Keep NRS Workbench open or in the system tray for the queue to continue managing runners. Turning off the queue restores runners that the queue stopped during the current app session; runners already stopped manually are left stopped. After closing and reopening NRS Workbench, runners stopped in an earlier session may need to be started manually.
+Enable the optional queue in **Settings** to keep at most one or two selected runners connected. You can use every detected runner or choose an explicit queue pool; runners outside that pool are not started, stopped or counted against the queue limit. When the limit is reached, idle queue participants rotate every 45 seconds so a runner with matching labels can come online; GitHub keeps jobs queued while no matching runner is available. Active jobs are left running. Keep NRS Workbench open or in the system tray for the queue to continue managing runners. Turning off the queue restores runners that the queue stopped during the current app session; runners already stopped manually are left stopped. After closing and reopening NRS Workbench, runners stopped in an earlier session may need to be started manually.
 
 **v0.18.2:** The queue no longer auto-starts runners that were stopped before the queue was enabled or that were stopped outside the queue while it was running. Managed stops are recorded in a local-only journal; after reopening Workbench, a confirmation dialog lists the recorded runner folders before any previously stopped runner is made eligible for recovery. Declining the prompt leaves them stopped. Keep a single Workbench instance managing a runner set. The journal is stored locally, is not included in portable settings exports and is not a backup of runner configuration. Catalan can be selected in **Settings → Language**; restart the app to apply the choice.
 

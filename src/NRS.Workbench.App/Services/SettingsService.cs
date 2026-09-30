@@ -140,14 +140,14 @@ public sealed class SettingsService
 
     public IReadOnlyList<string> DetectRunnerRoots(string? folderPattern = null)
     {
-        var pattern = string.IsNullOrWhiteSpace(folderPattern) ? "actions-runner*" : folderPattern.Trim();
+        _ = folderPattern; // Legacy portable-setting compatibility. Detection validates runner contents, not names.
         var roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         // First inspect every ancestor of the executable, INCLUDING the drive root.
         // This covers both development builds and a portable app placed near runners.
         for (var current = new DirectoryInfo(AppContext.BaseDirectory); current is not null; current = current.Parent)
         {
-            if (ContainsRunnerFolder(current.FullName, pattern))
+            if (RunnerFolderDiscovery.ContainsRunnerFolder(current.FullName))
                 roots.Add(Path.GetFullPath(current.FullName));
         }
 
@@ -161,8 +161,17 @@ public sealed class SettingsService
                 if (drive.DriveType is not (DriveType.Fixed or DriveType.Removable)) continue;
 
                 var root = drive.RootDirectory.FullName;
-                if (ContainsRunnerFolder(root, pattern))
+                if (RunnerFolderDiscovery.ContainsRunnerFolder(root))
                     roots.Add(Path.GetFullPath(root));
+
+                // Also inspect one directory level below the drive root. This finds
+                // layouts such as C:\actions-github\<runner> without relying on a
+                // folder-name prefix and without recursively crawling the drive.
+                foreach (var candidateRoot in Directory.EnumerateDirectories(root, "*", SearchOption.TopDirectoryOnly))
+                {
+                    if (RunnerFolderDiscovery.ContainsRunnerFolder(candidateRoot))
+                        roots.Add(Path.GetFullPath(candidateRoot));
+                }
             }
             catch (Exception ex)
             {
@@ -171,6 +180,15 @@ public sealed class SettingsService
         }
 
         return roots.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList();
+    }
+
+    public IReadOnlyList<string> DetectRunnerFolders(IEnumerable<string> roots)
+    {
+        var folders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var root in roots ?? [])
+            folders.UnionWith(RunnerFolderDiscovery.FindRunnerFolders(root));
+
+        return folders.OrderBy(path => path, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
     private RunnerSettings CreateDefaults()
@@ -199,29 +217,9 @@ public sealed class SettingsService
         return current.FullName;
     }
 
-    private static bool ContainsRunnerFolder(string root, string pattern)
-    {
-        try
-        {
-            if (!Directory.Exists(root)) return false;
-            return Directory.EnumerateDirectories(root, pattern, SearchOption.TopDirectoryOnly)
-                .Any(IsRunnerFolder);
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private static bool IsRunnerFolder(string folder)
-    {
-        return File.Exists(Path.Combine(folder, ".runner")) ||
-               File.Exists(Path.Combine(folder, "run.cmd"));
-    }
-
     private static bool AnyConfiguredRootContainsRunner(RunnerSettings settings)
     {
-        return settings.RunnerRoots.Any(root => ContainsRunnerFolder(root, settings.FolderPattern));
+        return settings.RunnerRoots.Any(RunnerFolderDiscovery.ContainsRunnerFolder);
     }
 
     private static void Normalize(RunnerSettings settings)
@@ -229,6 +227,7 @@ public sealed class SettingsService
         settings.RunnerRoots ??= [];
         settings.RepositoryPaths ??= [];
         settings.RunnerDisplayOrder ??= [];
+        settings.RunnerQueueIncludedPaths ??= [];
         settings.RunnerRoots = settings.RunnerRoots
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Select(x => x.Trim())
@@ -240,6 +239,11 @@ public sealed class SettingsService
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
         settings.RunnerDisplayOrder = settings.RunnerDisplayOrder
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        settings.RunnerQueueIncludedPaths = settings.RunnerQueueIncludedPaths
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Select(x => x.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -286,6 +290,8 @@ public sealed class SettingsService
         public string RunnerSortMode { get; set; } = "manual";
         public List<string> RunnerDisplayOrder { get; set; } = [];
         public bool RunnerQueueEnabled { get; set; }
+        public bool RunnerQueueUseAllRunners { get; set; } = true;
+        public List<string> RunnerQueueIncludedPaths { get; set; } = [];
         public int RunnerQueueLimit { get; set; } = 2;
         public bool RunnerQueueResourceGuardEnabled { get; set; } = true;
         public int RunnerQueueCpuStartThreshold { get; set; } = 85;
@@ -308,6 +314,8 @@ public sealed class SettingsService
             RunnerSortMode = settings.RunnerSortMode,
             RunnerDisplayOrder = settings.RunnerDisplayOrder?.ToList() ?? [],
             RunnerQueueEnabled = settings.RunnerQueueEnabled,
+            RunnerQueueUseAllRunners = settings.RunnerQueueUseAllRunners,
+            RunnerQueueIncludedPaths = settings.RunnerQueueIncludedPaths?.ToList() ?? [],
             RunnerQueueLimit = settings.RunnerQueueLimit,
             RunnerQueueResourceGuardEnabled = settings.RunnerQueueResourceGuardEnabled,
             RunnerQueueCpuStartThreshold = settings.RunnerQueueCpuStartThreshold,
@@ -331,6 +339,8 @@ public sealed class SettingsService
             RunnerSortMode = RunnerSortMode,
             RunnerDisplayOrder = RunnerDisplayOrder?.ToList() ?? [],
             RunnerQueueEnabled = RunnerQueueEnabled,
+            RunnerQueueUseAllRunners = RunnerQueueUseAllRunners,
+            RunnerQueueIncludedPaths = RunnerQueueIncludedPaths?.ToList() ?? [],
             RunnerQueueLimit = RunnerQueueLimit,
             RunnerQueueResourceGuardEnabled = RunnerQueueResourceGuardEnabled,
             RunnerQueueCpuStartThreshold = RunnerQueueCpuStartThreshold,

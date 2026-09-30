@@ -7,7 +7,7 @@
 - Do not use this repository's paths, credentials, runner registrations, deployment decisions or release tags for any other Neo RS application.
 - Default branch: `main`. Review its live HEAD, PRs, CI and Releases before modifying anything.
 
-## Current verified state · 2026-09-29
+## Current verified state · 2026-09-30
 
 - Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4), built from tag `v0.18.4` at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`.
 - Published Windows asset: `NRSWorkbench-v0.18.4-win-x64.zip`. GitHub reports SHA256 `8f1f427dec4a04becc393faecf11a37ea31c98c67c6cc33d40cb16498635cc1a`.
@@ -31,9 +31,25 @@
 
 README and the GitHub Wiki describe the published ZIP. The preview image uses fictional runner, repository, path and log data. Before the next version, read `docs/WRITING_STYLE.md`, review affected documentation and the real GitHub Wiki, and distinguish released features from work on `main`.
 
+## PR #25 · work in progress
+
+Branch: `feat/v0.18.5-runner-pool-discovery`.
+
+Reconciled with current `main` on 2026-09-30. CI #423 passed on the reconciled implementation. Manual Windows validation also passed for runner discovery, Smart Queue pool selection/exclusion, runner controls and the compact UI.
+
+Current scope:
+- runner discovery validates real runner installation markers instead of relying on the folder name;
+- automatic discovery remains shallow and can find common parent folders one level below a drive root;
+- Settings can use all detected runners or an explicit Smart Queue pool;
+- runners outside the selected pool are not started, stopped, rotated or counted against the Smart Queue limit;
+- runner rows, context menus and Details/Log layout have received a compact graphite UI pass;
+- portable settings and smoke tests cover the queue-pool selection.
+
+This work remains unreleased and is not part of the tagged v0.18.4 ZIP. Reconcile and validate PR #25 against current `main` before any merge or version decision.
+
 ## Future roadmap
 
-- v0.18.5: Feedback & Diagnostics.
+- v0.18.5: Runner control, discovery, Feedback & Diagnostics.
 - v0.19.0: GitHub Actions Control.
 - Product website/SEO remains a separate web project or explicitly approved repository.
 - GitLab support only if real demand appears.
