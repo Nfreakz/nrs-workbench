@@ -14,7 +14,7 @@ Project preview based on the v0.18.4 interface. Runner names, repositories, path
 
 **New in v0.18.4:** contextual repository guidance, session-only Git action history, clearer AHEAD/BEHIND visibility, safer Pull/Push revalidation, compact-layout fixes, and optional Buy Me a Coffee support in Settings.
 
-**In development for v0.18.5:** runner discovery no longer depends on folder naming, and Smart Queue can be limited to an explicit set of runners.
+**In development for v0.18.5:** runner discovery no longer depends on folder naming, Smart Queue can be limited to an explicit set of runners, and Feedback & Diagnostics adds reviewable local diagnostic export plus direct issue/feature-report entry points. None of this changes the published v0.18.4 ZIP.
 
 NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.4**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
 

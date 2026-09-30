@@ -31,11 +31,19 @@
 
 README and the GitHub Wiki describe the published ZIP. The preview image uses fictional runner, repository, path and log data. Before the next version, read `docs/WRITING_STYLE.md`, review affected documentation and the real GitHub Wiki, and distinguish released features from work on `main`.
 
-## PR #25 · work in progress
+## v0.18.5 development state
 
-Branch: `feat/v0.18.5-runner-pool-discovery`.
+Runner discovery / Smart Queue pool work was manually validated on Windows and merged through PR #25. Current main after that merge: `463c3e09aef7812ad2d3a90e8cf07c4f48355b64`.
 
-Reconciled with current `main` on 2026-09-30. CI #423 passed on the reconciled implementation. Manual Windows validation also passed for runner discovery, Smart Queue pool selection/exclusion, runner controls and the compact UI.
+Current feature branch: `feat/v0.18.5-feedback-diagnostics`.
+
+Feedback & Diagnostics development scope:
+- open the repository's bug and feature-request templates from the app;
+- generate an exact local preview before export;
+- export only generated diagnostic text plus a README in a user-selected ZIP;
+- sanitize configured paths, local user/machine identity, HTTP(S) user-info and GitHub token-shaped strings;
+- never upload diagnostics automatically;
+- improve the unexpected-UI-error path so the user can review/export diagnostics.
 
 Current scope:
 - runner discovery validates real runner installation markers instead of relying on the folder name;
@@ -45,7 +53,7 @@ Current scope:
 - runner rows, context menus and Details/Log layout have received a compact graphite UI pass;
 - portable settings and smoke tests cover the queue-pool selection.
 
-This work remains unreleased and is not part of the tagged v0.18.4 ZIP. Reconcile and validate PR #25 against current `main` before any merge or version decision.
+This v0.18.5 work remains unreleased and is not part of the tagged v0.18.4 ZIP. Do not publish or bump the version automatically.
 
 ## Future roadmap
 

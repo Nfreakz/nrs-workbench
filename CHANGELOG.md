@@ -5,9 +5,12 @@
 ### Added
 - Adds a dark, high-contrast right-click runner context menu with Start, Stop, Restart, folder, diagnostics and GitHub actions.
 - Adds an explicit Smart Queue runner pool so selected runners can participate while other detected runners remain untouched.
+- Adds an in-app Feedback & Diagnostics window with direct bug/feature templates and a reviewable local diagnostics preview.
+- Adds local ZIP diagnostics export containing generated environment/configuration summaries plus a sanitized application-log tail; nothing is uploaded automatically.
 
 ### Improved
 - Moves the optional Buy Me a Coffee action into the fixed Settings header so it is visible without scrolling, while keeping it separate from functional settings.
+- Gives unexpected UI errors a direct path to the reviewable diagnostics window after recording the error locally.
 - Adds clearer spacing between runner progress metadata and the Mode column.
 - Hides the Smart Queue dashboard when the queue is disabled so the runner table gets that vertical space back.
 - Makes the lower Details/Log area vertically resizable; double-clicking its splitter collapses or restores it.
