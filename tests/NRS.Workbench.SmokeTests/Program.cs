@@ -44,6 +44,22 @@ internal static class Program
             RunnerListOrganizer.Arrange(candidates, "manual", moved, " BETA ").Single().FolderPath == runnerB.FolderPath &&
             candidates.Length == 3);
 
+        var originalProfile = Environment.GetEnvironmentVariable("NRS_WORKBENCH_PROFILE");
+        try
+        {
+            Environment.SetEnvironmentVariable("NRS_WORKBENCH_PROFILE", null);
+            var normalData = AppDataPaths.SettingsDirectory;
+            Environment.SetEnvironmentVariable("NRS_WORKBENCH_PROFILE", "preview");
+            var previewData = AppDataPaths.SettingsDirectory;
+            Check("preview profile uses isolated local data",
+                !string.Equals(normalData, previewData, StringComparison.OrdinalIgnoreCase) &&
+                previewData.EndsWith("NRSWorkbenchPreview", StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("NRS_WORKBENCH_PROFILE", originalProfile);
+        }
+
         var root = Path.Combine(Path.GetTempPath(), "nrs-workbench-smoke-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
 

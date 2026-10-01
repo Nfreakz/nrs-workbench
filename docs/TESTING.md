@@ -114,3 +114,16 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 5. Save the diagnostics ZIP. Verify it contains only `diagnostics.txt` and `README.txt`, and that the displayed preview matches `diagnostics.txt`.
 6. Cancel the Save dialog and verify no file is created and no network request is made.
 7. Trigger a controlled UI exception in a development build and verify the error is logged locally and the user can choose to open Feedback & diagnostics. Declining must simply close the error prompt.
+
+
+## Preview worktree launcher
+
+For manual feature testing, keep the normal checkout on `main` and run `RUN_PREVIEW.cmd`.
+
+The launcher fetches `origin/qa-preview`, creates or refreshes a sibling disposable worktree, closes any running NRS Workbench instance, copies the normal settings into the isolated preview profile, builds Release and launches the preview. The normal checkout is never switched to the feature branch.
+
+Manual checks:
+1. Run `RUN_ME_FIRST.cmd` and verify the normal window title is `NRS Workbench`.
+2. Run `RUN_PREVIEW.cmd`; verify the normal checkout remains on `main` and the preview window title is `NRS Workbench · PREVIEW`.
+3. Change a harmless setting in preview, exit, then reopen normal. The normal setting must be unchanged.
+4. Re-run preview after moving `qa-preview`; the existing worktree must move to the new preview HEAD without a branch switch in the normal checkout.

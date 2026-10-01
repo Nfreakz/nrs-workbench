@@ -62,6 +62,18 @@ jobs:
             throw "build-and-run.ps1 contains PowerShell syntax errors."
           }
 
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path '.\scripts\run-preview.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host "::error::$($_.Message)" }
+            throw "run-preview.ps1 contains PowerShell syntax errors."
+          }
+
       - name: Validate release note extraction
         run: |
           $tokens = $null
