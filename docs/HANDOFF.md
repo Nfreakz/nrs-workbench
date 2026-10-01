@@ -7,14 +7,14 @@
 - Do not use this repository's paths, credentials, runner registrations, deployment decisions or release tags for any other Neo RS application.
 - Default branch: `main`. Review its live HEAD, PRs, CI and Releases before modifying anything.
 
-## Current verified state · 2026-09-30
+## Current verified state · 2026-10-01
 
 - Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4), built from tag `v0.18.4` at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`.
 - Published Windows asset: `NRSWorkbench-v0.18.4-win-x64.zip`. GitHub reports SHA256 `8f1f427dec4a04becc393faecf11a37ea31c98c67c6cc33d40cb16498635cc1a`.
 - The tag predates later release automation and image repairs on `main`. Those later commits are not part of the tagged source or ZIP.
 - Manual Windows validation of Repositories, Settings and compact runner details passed before tagging.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
-- PR #25 (runner discovery and Smart Queue selection) is separate feature work and is not part of v0.18.4.
+- PR #25 (runner discovery and Smart Queue selection) is merged to `main`; it remains outside the tagged v0.18.4 release.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
 
 ## v0.18.4 scope
@@ -33,9 +33,11 @@ README and the GitHub Wiki describe the published ZIP. The preview image uses fi
 
 ## v0.18.5 development state
 
-Runner discovery / Smart Queue pool work was manually validated on Windows and merged through PR #25. Current main after that merge: `463c3e09aef7812ad2d3a90e8cf07c4f48355b64`.
+Runner discovery / Smart Queue pool work was manually validated on Windows and merged through PR #25. Preview-worktree infrastructure was merged through PR #36. Current verified `main`: `c8250ddc39866591a3a73111c70af2ee44fdeeae` with post-merge CI #436 SUCCESS.
 
 Current feature branch: `feat/v0.18.5-feedback-diagnostics`.
+
+PR #35 is 0 commits behind current `main`. CI #437 passed on the reconciled implementation. Manual Windows validation is pending through `RUN_PREVIEW.cmd`; `qa-preview` points to the PR head used for that test.
 
 Feedback & Diagnostics development scope:
 - open the repository's bug and feature-request templates from the app;
