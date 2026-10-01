@@ -74,7 +74,7 @@ try {
     Stop-WorkbenchInstances
 
     Write-Host 'Actualizando canal de pruebas...'
-    & git -C $root fetch origin qa-preview --prune
+    & git -C $root fetch origin +refs/heads/qa-preview:refs/remotes/origin/qa-preview --prune
     if ($LASTEXITCODE -ne 0) {
         throw 'No se ha podido descargar origin/qa-preview.'
     }
