@@ -30,6 +30,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        if (AppDataPaths.IsPreview) Title = "NRS Workbench · PREVIEW";
         SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
 
         _settings = new SettingsService();

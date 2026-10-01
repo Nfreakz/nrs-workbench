@@ -7,10 +7,7 @@ public static class AppLogger
 
     public static void Initialize()
     {
-        var folder = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "NRSWorkbench",
-            "logs");
+        var folder = Path.Combine(AppDataPaths.SettingsDirectory, "logs");
         Directory.CreateDirectory(folder);
         _logFile = Path.Combine(folder, "nrs-workbench.log");
         Info("NRS Workbench starting");

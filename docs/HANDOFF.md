@@ -53,3 +53,14 @@ This work remains unreleased and is not part of the tagged v0.18.4 ZIP. Reconcil
 - v0.19.0: GitHub Actions Control.
 - Product website/SEO remains a separate web project or explicitly approved repository.
 - GitLab support only if real demand appears.
+
+
+## Preview testing workflow
+
+The normal checkout remains on `main` and is the day-to-day NRS Workbench copy.
+
+- `RUN_ME_FIRST.cmd` updates, builds and runs the normal checkout.
+- `RUN_PREVIEW.cmd` never switches the normal checkout. It fetches the disposable remote `qa-preview` channel into a sibling Git worktree named `<repo>-preview`, builds it and launches only that copy.
+- The launchers close an existing NRS Workbench process first. Normal and preview are intentionally one-or-the-other, not concurrent.
+- Preview uses `%LOCALAPPDATA%\NRSWorkbenchPreview`. Before launch, its `settings.json` is refreshed from the normal profile so real runner/repository registrations can be tested without persisting preview changes into the normal profile. The queue recovery journal is not copied.
+- `qa-preview` is only a movable test pointer. It is not a release branch and never replaces the feature branch/PR as source of truth.

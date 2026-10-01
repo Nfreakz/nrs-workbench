@@ -128,20 +128,11 @@ try {
     Write-Host ''
 
     Write-Host 'Comprobando si hay una instancia anterior abierta...'
-    $candidateExecutables = @($exe, $legacyWorkspaceExe, $legacyRunnerExe) | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf }
-    foreach ($candidate in $candidateExecutables) {
-        $target = [IO.Path]::GetFullPath($candidate)
-        $processName = [IO.Path]::GetFileNameWithoutExtension($candidate)
-        $matches = @(
-            Get-Process -Name $processName -ErrorAction SilentlyContinue |
-                Where-Object {
-                    try { [IO.Path]::GetFullPath($_.Path) -eq $target }
-                    catch { $false }
-                }
-        )
-
+    $processNames = @('NRSWorkbench', 'GitHubWorkspaceManager', 'RunnerManager')
+    foreach ($processName in $processNames) {
+        $matches = @(Get-Process -Name $processName -ErrorAction SilentlyContinue)
         foreach ($process in $matches) {
-            Write-Host "Cerrando $([IO.Path]::GetFileName($candidate)) PID $($process.Id)..."
+            Write-Host "Cerrando $processName PID $($process.Id)..."
             try { [void]$process.CloseMainWindow() } catch { }
             try { [void]$process.WaitForExit(1200) } catch { }
             $process.Refresh()

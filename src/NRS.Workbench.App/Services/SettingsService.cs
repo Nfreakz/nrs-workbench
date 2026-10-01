@@ -18,8 +18,7 @@ public sealed class SettingsService
 
     public SettingsService()
     {
-        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        SettingsDirectory = Path.Combine(localAppData, "NRSWorkbench");
+        SettingsDirectory = AppDataPaths.SettingsDirectory;
         SettingsPath = Path.Combine(SettingsDirectory, "settings.json");
     }
 
@@ -119,7 +118,7 @@ public sealed class SettingsService
 
     private void TryMigrateLegacySettings()
     {
-        if (File.Exists(SettingsPath)) return;
+        if (File.Exists(SettingsPath) || AppDataPaths.IsPreview) return;
 
         try
         {
