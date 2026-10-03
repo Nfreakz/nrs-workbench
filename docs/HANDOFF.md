@@ -44,6 +44,7 @@ Runtime-resilience follow-up after a real long-running-session failure:
 - periodic runner/resource faults are caught and rate-limited in the local log instead of surfacing a modal dialog every tick;
 - the last-resort UI exception dialog is throttled to one report per minute during an error burst;
 - unobserved task exceptions are recorded and marked observed;
+- the tray menu is no longer rebuilt every few seconds when nothing changed; old WinForms menu items are disposed when a rebuild is actually required;
 - the exact historical exception still requires the local pre-fix application log for confirmation.
 
 Feedback & Diagnostics development scope:

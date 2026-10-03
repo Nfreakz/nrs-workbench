@@ -6,6 +6,7 @@
 - Prevents automatic runner/queue refresh cycles from overlapping when one cycle takes longer than the configured interval.
 - Contains periodic refresh/resource failures inside their background loops so one recurring fault cannot open an error dialog on every timer tick.
 - Throttles repeated last-resort UI error dialogs and records unobserved task exceptions locally for later diagnosis.
+- Avoids rebuilding the WinForms tray menu on every timer refresh; it is rebuilt only when runner identity/state changes and replaced items are explicitly disposed.
 
 ### Added
 - Adds a dark, high-contrast right-click runner context menu with Start, Stop, Restart, folder, diagnostics and GitHub actions.
