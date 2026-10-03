@@ -2,8 +2,8 @@ name: CI
 
 on:
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - qa-preview
   workflow_dispatch:
 
 # Keep only the newest validation for each branch. Older queued builds must not
