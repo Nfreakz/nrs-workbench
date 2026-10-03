@@ -7,7 +7,7 @@
 - Do not use this repository's paths, credentials, runner registrations, deployment decisions or release tags for any other Neo RS application.
 - Default branch: `main`. Review its live HEAD, PRs, CI and Releases before modifying anything.
 
-## Current verified state · 2026-10-01
+## Current verified state · 2026-10-03
 
 - Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4), built from tag `v0.18.4` at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`.
 - Published Windows asset: `NRSWorkbench-v0.18.4-win-x64.zip`. GitHub reports SHA256 `8f1f427dec4a04becc393faecf11a37ea31c98c67c6cc33d40cb16498635cc1a`.
@@ -33,11 +33,9 @@ README and the GitHub Wiki describe the published ZIP. The preview image uses fi
 
 ## v0.18.5 development state
 
-Runner discovery / Smart Queue pool work was manually validated on Windows and merged through PR #25. Preview-worktree infrastructure was merged through PR #36. Current verified `main`: `c8250ddc39866591a3a73111c70af2ee44fdeeae` with post-merge CI #436 SUCCESS.
+Runner discovery / Smart Queue pool work was manually validated on Windows and merged through PR #25. Preview-worktree infrastructure was merged through PR #36. Feedback, diagnostics and long-running runtime hardening were manually validated and merged through PR #35. Current verified `main`: `154af34d58f49d847e33d2b5101095a8e436cf8b` with post-merge CI #449 SUCCESS.
 
-Current feature branch: `feat/v0.18.5-feedback-diagnostics`.
-
-PR #35 is 0 commits behind current `main`. CI #437 passed on the reconciled implementation. Manual Windows validation is pending through `RUN_PREVIEW.cmd`; `qa-preview` points to the PR head used for that test.
+Current feature branch: `feat/v0.18.5-runner-doctor`.
 
 Runtime-resilience follow-up after a real long-running-session failure:
 - automatic runner/queue refresh is now single-flight; a slow cycle causes later timer ticks to be skipped instead of queued;
@@ -65,6 +63,21 @@ Current scope:
 - portable settings and smoke tests cover the queue-pool selection.
 
 This v0.18.5 work remains unreleased and is not part of the tagged v0.18.4 ZIP. Do not publish or bump the version automatically.
+
+
+## Runner Doctor development scope
+
+Runner Doctor is a local, read-only health view for detected runners.
+
+- classifies each runner as OK, Attention or Problem from explainable local checks;
+- verifies runner folder availability, essential installation markers, local registration marker, current state, listener/worker processes, service presence/state, runner version and local `_diag` history;
+- treats STOPPED as a valid state rather than an automatic fault;
+- flags BUSY runners whose latest Worker log has not changed for more than 30 minutes as Attention, not as a definitive failure;
+- never reads `.credentials` or `.credentials_rsaparams`;
+- does not start, stop, re-register, repair or update runners;
+- offers only read-oriented actions: refresh diagnosis, open runner folder, open `_diag` and copy a redacted summary.
+
+This remains unreleased v0.18.5 development. Do not publish or bump the version automatically.
 
 ## Future roadmap
 

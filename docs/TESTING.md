@@ -143,3 +143,18 @@ Manual checks:
 2. Leave preview running for more than one minute and verify `LastHeartbeatAt` advances while `StartedAt` remains unchanged.
 3. Exit normally through NRS Workbench and verify the runtime-session marker is removed and the local app log records a clean shutdown.
 4. In a development test only, terminate the process externally. Restart preview and verify the local app log records the previous session as an unclean shutdown with start and last-heartbeat timestamps.
+
+
+## v0.18.5 Runner Doctor manual checks
+
+1. Open **Runner Doctor** from the main toolbar and verify the window follows the graphite visual system, remains readable at normal Windows scaling and does not crowd the main dashboard.
+2. Verify each detected runner appears once with **OK**, **Attention** or **Problem**, plus state, mode, version, latest local activity and a short summary.
+3. Select a healthy interactive runner and verify installation, `.runner`, listener/worker, version and `_diag` checks explain why the runner is healthy.
+4. Stop a healthy runner intentionally and verify **STOPPED** is not classified as a fault by itself.
+5. For a service-installed runner, verify Runner Doctor reports the Windows service and its current native state. A missing configured service must become **Problem**.
+6. On a safe test copy, remove or rename one installation marker such as `run.cmd` or `bin/Runner.Listener.exe`; verify the runner becomes **Problem** without Runner Doctor attempting any repair.
+7. Verify a missing `.runner` registration marker becomes **Problem** and the doctor never reads `.credentials` or `.credentials_rsaparams`.
+8. With a BUSY runner, verify an active Worker process is reported. A BUSY snapshot without a Worker process should produce **Attention** rather than performing any action.
+9. Verify **Open folder** and **Open _diag** target only the selected runner. Missing `_diag` must show an informational message rather than failing.
+10. Use **Copy summary** and verify the copied text contains the selected runner diagnosis but passes through the existing sensitive-data redactor.
+11. Press **Refresh diagnosis** while runner states change and verify the list updates without starting, stopping, registering or reconfiguring any runner.
