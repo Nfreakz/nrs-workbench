@@ -31,11 +31,13 @@
 
 README and the GitHub Wiki describe the published ZIP. The preview image uses fictional runner, repository, path and log data. Before the next version, read `docs/WRITING_STYLE.md`, review affected documentation and the real GitHub Wiki, and distinguish released features from work on `main`.
 
-## v0.18.5 development state
+## v0.18.5 release-candidate state
 
-Runner discovery / Smart Queue pool work was manually validated on Windows and merged through PR #25. Preview-worktree infrastructure was merged through PR #36. Feedback, diagnostics and long-running runtime hardening were manually validated and merged through PR #35. Current verified `main`: `154af34d58f49d847e33d2b5101095a8e436cf8b` with post-merge CI #449 SUCCESS.
+Runner discovery / Smart Queue pool work was manually validated on Windows and merged through PR #25. Preview-worktree infrastructure was merged through PR #36. Feedback, diagnostics and long-running runtime hardening were manually validated and merged through PR #35. Runner Doctor was manually validated and merged through PR #37. Current verified pre-release baseline: `main` at `de4eb2ebb868a9d4b9cd29d0229ff47a1d4b7e7f` with post-merge CI #454 SUCCESS.
 
-Current feature branch: `feat/v0.18.5-runner-doctor`.
+Current release-preparation branch: `release/v0.18.5`.
+
+The release candidate changes version metadata to 0.18.5 and closes the changelog section for 2026-10-03. The latest published binary remains v0.18.4 until an immutable v0.18.5 tag exists and the Release workflow uploads `NRSWorkbench-v0.18.5-win-x64.zip`.
 
 Runtime-resilience follow-up after a real long-running-session failure:
 - automatic runner/queue refresh is now single-flight; a slow cycle causes later timer ticks to be skipped instead of queued;
@@ -62,10 +64,10 @@ Current scope:
 - runner rows, context menus and Details/Log layout have received a compact graphite UI pass;
 - portable settings and smoke tests cover the queue-pool selection.
 
-This v0.18.5 work remains unreleased and is not part of the tagged v0.18.4 ZIP. Do not publish or bump the version automatically.
+All intended v0.18.5 product work is merged and manually exercised. The code remains unreleased until the v0.18.5 release tag/package is created and verified.
 
 
-## Runner Doctor development scope
+## Runner Doctor v0.18.5 scope
 
 Runner Doctor is a local, read-only health view for detected runners.
 
@@ -77,7 +79,7 @@ Runner Doctor is a local, read-only health view for detected runners.
 - does not start, stop, re-register, repair or update runners;
 - offers only read-oriented actions: refresh diagnosis, open runner folder, open `_diag` and copy a redacted summary.
 
-This remains unreleased v0.18.5 development. Do not publish or bump the version automatically.
+Runner Doctor is part of the v0.18.5 release candidate and was manually validated on the real Windows runner set.
 
 ## Future roadmap
 

@@ -6,25 +6,23 @@
 
 **A local Windows dashboard for Git repositories and GitHub Actions self-hosted runners.**
 
-**Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4)** · [What's new](CHANGELOG.md)
+**Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4)** · **Release candidate: v0.18.5 Public Preview** · [What's new](CHANGELOG.md)
 
 <p align="center"><a href="docs/images/nrs-workbench-project-preview-v0.18.4.png"><img src="docs/images/nrs-workbench-project-preview-v0.18.4.png" alt="NRS Workbench project preview with representative runner data" width="720"></a></p>
 
-Project preview based on the v0.18.4 interface. Runner names, repositories, paths and logs are fictional; use the release ZIP for the actual application.
+Project preview based on the v0.18.4 main interface. Runner names, repositories, paths and logs are fictional. v0.18.5 adds Runner Doctor and Feedback & Diagnostics views that are not shown in this image.
 
-**New in v0.18.4:** contextual repository guidance, session-only Git action history, clearer AHEAD/BEHIND visibility, safer Pull/Push revalidation, compact-layout fixes, and optional Buy Me a Coffee support in Settings.
+**Release candidate v0.18.5:** runner discovery uses real installation markers instead of folder naming; Smart Queue can target an explicit runner pool; Runner Doctor explains local runner health; Feedback & Diagnostics provides review-before-share diagnostic export; and long-running refresh/error handling is more resilient.
 
-**In development for v0.18.5:** runner discovery no longer depends on folder naming, Smart Queue can be limited to an explicit set of runners, and Feedback & Diagnostics adds reviewable local diagnostic export plus direct issue/feature-report entry points. None of this changes the published v0.18.4 ZIP.
-
-NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.4**, check runner status and current jobs, inspect locally retained job history, see your PC's CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
+NRS Workbench brings your local runners and Git working trees into one desktop app. In the **v0.18.5 release candidate**, check runner status and current jobs, inspect locally retained job history, review Runner Doctor checks, export sanitized diagnostics after previewing them, see host CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
 
 **New in v0.18.1:** The optional automatic runner queue can keep one or two runners connected and rotate idle runners while GitHub holds jobs for stopped runners. Active jobs are not intentionally interrupted. This feature is absent from the v0.18.0 ZIP. See [Automatic runner queue](#automatic-runner-queue) for operational limits.
 
 **Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-**En español:** La versión v0.18.4 mejora la gestión de repositorios con recomendaciones contextuales, historial de acciones y comprobaciones antes de Pull y Push.
+**En español:** La candidata v0.18.5 añade Runner Doctor, diagnósticos revisables, selección explícita de runners para Smart Queue y mejoras de estabilidad en sesiones largas.
 
-**En català:** La versió v0.18.4 millora la gestió de repositoris amb recomanacions contextuals, historial d'accions i comprovacions abans de Pull i Push.
+**En català:** La candidata v0.18.5 afegeix Runner Doctor, diagnòstics revisables, selecció explícita de runners per a Smart Queue i millores d'estabilitat en sessions llargues.
 
 ## Who is NRS Workbench for?
 
@@ -32,7 +30,7 @@ NRS Workbench brings your local runners and Git working trees into one desktop a
 - **People managing several local Git repositories:** inspect working-tree state and use guarded Fetch, Pull, Push, Commit and local branch switching without jumping between folders.
 - **Small homelab and development setups:** keep host CPU, memory and disk usage visible next to runner activity, with an optional one- or two-runner queue to limit simultaneous listeners.
 
-The **v0.18.4 ZIP** includes repository guidance, synchronization status and Pull/Push revalidation.
+The published **v0.18.4 ZIP** remains the current download until v0.18.5 is tagged and its release workflow produces the new Windows package.
 
 **Try it:** [Download the published v0.18.4 Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.4/NRSWorkbench-v0.18.4-win-x64.zip) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
 
