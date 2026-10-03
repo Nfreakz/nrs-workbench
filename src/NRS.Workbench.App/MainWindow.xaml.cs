@@ -281,6 +281,21 @@ public partial class MainWindow : Window
         window.ShowDialog();
     }
 
+    private void RunnerDoctor_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new RunnerDoctorWindow(
+            new RunnerDoctorService(new WindowsServiceController()),
+            async () =>
+            {
+                await _viewModel.RefreshAsync();
+                return _viewModel.AllRunners.ToList();
+            })
+        {
+            Owner = this
+        };
+        window.ShowDialog();
+    }
+
     private async void Settings_Click(object sender, RoutedEventArgs e)
     {
         if (_viewModel.EditSettings(this))

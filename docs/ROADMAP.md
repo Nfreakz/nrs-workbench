@@ -37,10 +37,12 @@ Runner control, discovery, feedback and diagnostics.
 - Better unexpected-error/crash-report flow.
 - No automatic upload of logs and no embedded private webhook credentials.
 - Anonymous diagnostics submission only if a future backend is justified and explicit user consent is implemented.
+- **Runner Doctor** with local, explainable health checks for installation, registration, process/service state, version and `_diag` activity. The first iteration remains read-only and does not auto-repair or update runners.
 
 Development status (not published):
 - runner discovery and explicit Smart Queue pool selection are merged to `main`;
-- Feedback & Diagnostics is being implemented as a local-first, review-before-share workflow.
+- Feedback & Diagnostics plus long-running runtime hardening are merged to `main`;
+- Runner Doctor is the active v0.18.5 development block.
 
 ## v0.19.0
 

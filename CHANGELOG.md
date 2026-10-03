@@ -10,6 +10,8 @@
 - Adds a privacy-safe runtime session heartbeat so a later startup can distinguish a hard/unclean process termination from a normal exit even when no managed exception reached the application logger.
 
 ### Added
+- Adds **Runner Doctor**, a read-only local health view with explainable OK / Attention / Problem checks for runner installation, registration, process/service state, version and local `_diag` activity.
+- Adds direct Runner Doctor actions to refresh the diagnosis, open the selected runner folder or `_diag`, and copy a redacted summary without reading runner credentials.
 - Adds a dark, high-contrast right-click runner context menu with Start, Stop, Restart, folder, diagnostics and GitHub actions.
 - Adds an explicit Smart Queue runner pool so selected runners can participate while other detected runners remain untouched.
 - Adds an in-app Feedback & Diagnostics window with direct bug/feature templates and a reviewable local diagnostics preview.
