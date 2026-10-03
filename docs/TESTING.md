@@ -127,3 +127,11 @@ Manual checks:
 2. Run `RUN_PREVIEW.cmd`; verify the normal checkout remains on `main` and the preview window title is `NRS Workbench · PREVIEW`.
 3. Change a harmless setting in preview, exit, then reopen normal. The normal setting must be unchanged.
 4. Re-run preview after moving `qa-preview`; the existing worktree must move to the new preview HEAD without a branch switch in the normal checkout.
+
+
+## v0.18.5 long-running runtime-resilience checks
+
+1. Keep the preview running across repeated automatic refresh intervals while forcing one refresh cycle to take longer than the configured interval. Verify later ticks are skipped rather than queued and the UI remains responsive.
+2. In a development/test build, force the automatic refresh path to throw repeatedly. Verify the failure is logged locally but does not open one modal error window per timer tick.
+3. Force repeated unhandled UI exceptions inside the one-minute cooldown. Verify only the first opens the Feedback & diagnostics prompt; later exceptions remain logged/throttled instead of creating a dialog storm.
+4. Verify a later successful automatic refresh clears the skipped-cycle counter and normal periodic operation continues.

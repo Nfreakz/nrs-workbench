@@ -39,6 +39,13 @@ Current feature branch: `feat/v0.18.5-feedback-diagnostics`.
 
 PR #35 is 0 commits behind current `main`. CI #437 passed on the reconciled implementation. Manual Windows validation is pending through `RUN_PREVIEW.cmd`; `qa-preview` points to the PR head used for that test.
 
+Runtime-resilience follow-up after a real long-running-session failure:
+- automatic runner/queue refresh is now single-flight; a slow cycle causes later timer ticks to be skipped instead of queued;
+- periodic runner/resource faults are caught and rate-limited in the local log instead of surfacing a modal dialog every tick;
+- the last-resort UI exception dialog is throttled to one report per minute during an error burst;
+- unobserved task exceptions are recorded and marked observed;
+- the exact historical exception still requires the local pre-fix application log for confirmation.
+
 Feedback & Diagnostics development scope:
 - open the repository's bug and feature-request templates from the app;
 - generate an exact local preview before export;

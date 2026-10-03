@@ -5,6 +5,8 @@ namespace NRS.Workbench.App;
 
 public partial class App : Application
 {
+    private readonly FaultBurstThrottle _uiFaultDialogs = new(TimeSpan.FromMinutes(1));
+
     protected override void OnStartup(StartupEventArgs e)
     {
         AppLogger.Initialize();
@@ -12,8 +14,26 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
             AppLogger.Error("Unhandled AppDomain exception", args.ExceptionObject as Exception);
 
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            AppLogger.Error("Unobserved task exception", args.Exception);
+            args.SetObserved();
+        };
+
         DispatcherUnhandledException += (_, args) =>
         {
+            var decision = _uiFaultDialogs.Register(DateTimeOffset.UtcNow);
+            if (!decision.ShouldReport)
+            {
+                if (decision.SuppressedSinceLastReport == 1 || decision.SuppressedSinceLastReport % 20 == 0)
+                    AppLogger.Error($"Suppressed repeated UI error dialog ({decision.SuppressedSinceLastReport} in current cooldown)", args.Exception);
+                args.Handled = true;
+                return;
+            }
+
+            if (decision.SuppressedSinceLastReport > 0)
+                AppLogger.Info($"Suppressed {decision.SuppressedSinceLastReport} repeated UI error dialog(s) during the previous cooldown.");
+
             AppLogger.Error("Unhandled UI exception", args.Exception);
             var choice = MessageBox.Show(
                 UiLanguage.Choose(

@@ -21,7 +21,11 @@ public partial class MainWindow : Window
     private readonly SettingsService _settings;
     private readonly TrayIconService _tray;
     private readonly RunnerQueueCoordinator _runnerQueue;
+    private readonly NonOverlappingOperationGate _automaticRefreshGate = new();
+    private readonly FaultBurstThrottle _automaticRefreshFaults = new(TimeSpan.FromMinutes(1));
+    private readonly FaultBurstThrottle _resourceRefreshFaults = new(TimeSpan.FromMinutes(1));
     private SystemResourceSnapshot? _latestResources;
+    private int _skippedAutomaticRefreshes;
     private bool _allowExit;
     private readonly Dictionary<string, RunnerState> _previousStates = new(StringComparer.OrdinalIgnoreCase);
     private bool _stateSnapshotInitialized;
@@ -57,9 +61,9 @@ public partial class MainWindow : Window
             exit: () => Dispatcher.Invoke(ExitApplication));
 
         _timer = new DispatcherTimer();
-        _timer.Tick += async (_, _) => await RefreshAndUpdateTrayAsync();
+        _timer.Tick += async (_, _) => await RunAutomaticRefreshAsync();
         _resourceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
-        _resourceTimer.Tick += (_, _) => UpdateSystemResources();
+        _resourceTimer.Tick += (_, _) => RunResourceRefreshSafely();
 
         Loaded += async (_, _) =>
         {
@@ -67,9 +71,9 @@ public partial class MainWindow : Window
             ApplyTimerInterval();
             ApplyTraySetting();
             _timer.Start();
-            UpdateSystemResources();
+            RunResourceRefreshSafely();
             _resourceTimer.Start();
-            await RefreshAndUpdateTrayAsync();
+            await RunAutomaticRefreshAsync();
         };
 
         StateChanged += (_, _) =>
@@ -118,16 +122,59 @@ public partial class MainWindow : Window
         _viewModel.UpdateQueueSnapshot(_runnerQueue.Snapshot);
     }
 
-    private void UpdateSystemResources()
+    private async Task RunAutomaticRefreshAsync()
     {
-        _latestResources = _systemResources.Read();
-        _viewModel.UpdateSystemResources(_latestResources);
+        if (!_automaticRefreshGate.TryEnter())
+        {
+            var skipped = Interlocked.Increment(ref _skippedAutomaticRefreshes);
+            if (skipped == 1 || skipped % 60 == 0)
+                AppLogger.Info($"Automatic refresh skipped because the previous cycle is still running ({skipped} skipped).");
+            return;
+        }
+
+        try
+        {
+            await RunAutomaticRefreshAsync();
+            Interlocked.Exchange(ref _skippedAutomaticRefreshes, 0);
+        }
+        catch (Exception ex)
+        {
+            ReportRecurringFault("Automatic refresh cycle failed", ex, _automaticRefreshFaults);
+        }
+        finally
+        {
+            _automaticRefreshGate.Exit();
+        }
+    }
+
+    private void RunResourceRefreshSafely()
+    {
+        try
+        {
+            _latestResources = _systemResources.Read();
+            _viewModel.UpdateSystemResources(_latestResources);
+        }
+        catch (Exception ex)
+        {
+            ReportRecurringFault("System resource refresh failed", ex, _resourceRefreshFaults);
+        }
+    }
+
+    private static void ReportRecurringFault(string context, Exception exception, FaultBurstThrottle throttle)
+    {
+        var decision = throttle.Register(DateTimeOffset.UtcNow);
+        if (!decision.ShouldReport) return;
+
+        if (decision.SuppressedSinceLastReport > 0)
+            AppLogger.Info($"{context}: suppressed {decision.SuppressedSinceLastReport} repeated failure(s) during cooldown.");
+
+        AppLogger.Error(context, exception);
     }
 
     private async void QueuePause_Click(object sender, RoutedEventArgs e)
     {
         _runnerQueue.TogglePaused();
-        await RefreshAndUpdateTrayAsync();
+        await RunAutomaticRefreshAsync();
     }
 
     private void DetailPanelSplitter_MouseDoubleClick(object sender, MouseButtonEventArgs e)

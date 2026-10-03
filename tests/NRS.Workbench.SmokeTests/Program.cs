@@ -44,6 +44,27 @@ internal static class Program
             RunnerListOrganizer.Arrange(candidates, "manual", moved, " BETA ").Single().FolderPath == runnerB.FolderPath &&
             candidates.Length == 3);
 
+        var recurringGate = new NonOverlappingOperationGate();
+        var gateFirstEntry = recurringGate.TryEnter();
+        var gateSecondEntry = recurringGate.TryEnter();
+        recurringGate.Exit();
+        var gateReentry = recurringGate.TryEnter();
+        recurringGate.Exit();
+        Check("automatic refresh gate prevents overlapping cycles",
+            gateFirstEntry && !gateSecondEntry && gateReentry && !recurringGate.IsEntered);
+
+        var faultThrottle = new FaultBurstThrottle(TimeSpan.FromSeconds(30));
+        var faultStart = new DateTimeOffset(2026, 10, 1, 10, 0, 0, TimeSpan.Zero);
+        var faultFirst = faultThrottle.Register(faultStart);
+        var faultSecond = faultThrottle.Register(faultStart.AddSeconds(5));
+        var faultThird = faultThrottle.Register(faultStart.AddSeconds(10));
+        var faultAfterCooldown = faultThrottle.Register(faultStart.AddSeconds(31));
+        Check("recurring fault throttle suppresses dialog storms",
+            faultFirst.ShouldReport && faultFirst.SuppressedSinceLastReport == 0 &&
+            !faultSecond.ShouldReport && faultSecond.SuppressedSinceLastReport == 1 &&
+            !faultThird.ShouldReport && faultThird.SuppressedSinceLastReport == 2 &&
+            faultAfterCooldown.ShouldReport && faultAfterCooldown.SuppressedSinceLastReport == 2);
+
         var originalProfile = Environment.GetEnvironmentVariable("NRS_WORKBENCH_PROFILE");
         try
         {
