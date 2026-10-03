@@ -97,3 +97,12 @@ The normal checkout remains on `main` and is the day-to-day NRS Workbench copy.
 - Preview uses `%LOCALAPPDATA%\NRSWorkbenchPreview`. Before launch, its `settings.json` is refreshed from the normal profile so real runner/repository registrations can be tested without persisting preview changes into the normal profile. The queue recovery journal is not copied.
 - `qa-preview` is only a movable test pointer. It is not a release branch and never replaces the feature branch/PR as source of truth.
 - automatic CI ignores pushes to `qa-preview`; the source feature branch/PR remains the validated commit, while `workflow_dispatch` stays available if a manual preview-channel run is ever needed.
+
+
+## Linux port spike
+
+Linux support is being explored in `spike/linux-port-foundation` as another platform of the same NRS Workbench product/repository. The existing Windows WPF application remains unchanged during the foundation spike.
+
+See `docs/LINUX_PORT.md`. The current Linux work provides runner-layout detection, systemd integration primitives, `/proc` resource parsers and XDG data/config paths with Windows-executable synthetic smoke coverage. It does not yet provide a Linux desktop binary.
+
+Keep the v0.18.5 release-preparation work isolated from this spike. Do not merge Linux-port changes into the v0.18.5 release candidate.
