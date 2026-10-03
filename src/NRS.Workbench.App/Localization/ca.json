@@ -17,7 +17,6 @@
   "Activar notificaciones de escritorio": "Activar les notificacions d'escriptori",
   "Activar cola automática de runners": "Activar la cua automàtica de runners",
   "Máximo de runners conectados": "Màxim de runners connectats",
-
   "NRS Workbench valida el contenido real del runner. El nombre de la carpeta no importa.": "NRS Workbench valida el contingut real del runner. El nom de la carpeta no importa.",
   "Runners que participan en la cola": "Runners que participen en la cua",
   "Puedes dejar fuera runners que no quieras usar ahora. La cola no los iniciará, detendrá ni contará para el límite.": "Pots deixar fora els runners que no vulguis utilitzar ara. La cua no els iniciarà, aturarà ni comptarà per al límit.",
@@ -343,5 +342,19 @@
   "Abre la página de apoyo de Neo RS en Buy Me a Coffee.": "Obre la pàgina de suport de Neo RS a Buy Me a Coffee.",
   "RECOMENDACIÓN": "RECOMANACIÓ",
   "Sin actividad todavía": "Encara no hi ha activitat",
-  "Las acciones que inicies desde NRS Workbench aparecerán aquí durante esta sesión.": "Les accions que iniciïs des de NRS Workbench apareixeran aquí durant aquesta sessió."
+  "Las acciones que inicies desde NRS Workbench aparecerán aquí durante esta sesión.": "Les accions que iniciïs des de NRS Workbench apareixeran aquí durant aquesta sessió.",
+  "Feedback y diagnóstico": "Feedback i diagnòstic",
+  "Reporta problemas, propone mejoras y prepara un diagnóstico local antes de compartir nada.": "Informa de problemes, proposa millores i prepara un diagnòstic local abans de compartir res.",
+  "Reportar problema": "Informar d'un problema",
+  "Abre la plantilla de bugs en GitHub. No se adjunta ningún archivo automáticamente.": "Obre la plantilla d'errors a GitHub. No s'adjunta cap fitxer automàticament.",
+  "Abrir issue de problema": "Obrir issue de problema",
+  "Sugerir mejora": "Suggerir millora",
+  "Abre la plantilla de mejoras en GitHub.": "Obre la plantilla de millores a GitHub.",
+  "Abrir propuesta de mejora": "Obrir proposta de millora",
+  "Diagnóstico revisable": "Diagnòstic revisable",
+  "El texto de abajo es exactamente el contenido principal que se guardará en el ZIP. Revísalo antes de compartirlo.": "El text de sota és exactament el contingut principal que es desarà al ZIP. Revisa'l abans de compartir-lo.",
+  "Actualizar vista previa": "Actualitzar vista prèvia",
+  "Nada se sube automáticamente. El ZIP se guarda solo donde tú elijas.": "No es puja res automàticament. El ZIP es desa només on tu triïs.",
+  "Copiar": "Copiar",
+  "Guardar ZIP...": "Desar ZIP..."
 }

@@ -105,6 +105,17 @@ This performs the Release build, Git smoke tests and public-source audit in sequ
 17. With one or more BUSY runners, verify the progress percentage and the Mode column have a clear visual gap at 100% scaling and do not read as one combined value.
 
 
+## v0.18.5 Feedback & Diagnostics manual checks
+
+1. Open **Settings → Feedback & diagnostics** and verify the window uses the existing graphite visual system and remains usable at normal Windows scaling.
+2. Use **Report an issue** and **Suggest improvement**. Each action must open the matching GitHub issue template in the browser; NRS Workbench must not attach or upload any diagnostics.
+3. Review the diagnostics preview. It must show environment/configuration counts without raw runner roots, repository paths, remote URLs, settings.json or runner `_diag` contents.
+4. Add a synthetic token-shaped string and a configured local path to the application log in a test environment; refresh the preview and verify both are redacted. Also verify Windows user/machine identity is not exposed.
+5. Save the diagnostics ZIP. Verify it contains only `diagnostics.txt` and `README.txt`, and that the displayed preview matches `diagnostics.txt`.
+6. Cancel the Save dialog and verify no file is created and no network request is made.
+7. Trigger a controlled UI exception in a development build and verify the error is logged locally and the user can choose to open Feedback & diagnostics. Declining must simply close the error prompt.
+
+
 ## Preview worktree launcher
 
 For manual feature testing, keep the normal checkout on `main` and run `RUN_PREVIEW.cmd`.
@@ -116,3 +127,19 @@ Manual checks:
 2. Run `RUN_PREVIEW.cmd`; verify the normal checkout remains on `main` and the preview window title is `NRS Workbench · PREVIEW`.
 3. Change a harmless setting in preview, exit, then reopen normal. The normal setting must be unchanged.
 4. Re-run preview after moving `qa-preview`; the existing worktree must move to the new preview HEAD without a branch switch in the normal checkout.
+
+
+## v0.18.5 long-running runtime-resilience checks
+
+1. Keep the preview running across repeated automatic refresh intervals while forcing one refresh cycle to take longer than the configured interval. Verify later ticks are skipped rather than queued and the UI remains responsive.
+2. In a development/test build, force the automatic refresh path to throw repeatedly. Verify the failure is logged locally but does not open one modal error window per timer tick.
+3. Force repeated unhandled UI exceptions inside the one-minute cooldown. Verify only the first opens the Feedback & diagnostics prompt; later exceptions remain logged/throttled instead of creating a dialog storm.
+4. Verify a later successful automatic refresh clears the skipped-cycle counter and normal periodic operation continues.
+
+
+## Runtime session marker / hard-exit diagnostics
+
+1. Start preview and verify `%LOCALAPPDATA%\NRSWorkbenchPreview\runtime-session.json` is created without repository paths, runner paths or credentials.
+2. Leave preview running for more than one minute and verify `LastHeartbeatAt` advances while `StartedAt` remains unchanged.
+3. Exit normally through NRS Workbench and verify the runtime-session marker is removed and the local app log records a clean shutdown.
+4. In a development test only, terminate the process externally. Restart preview and verify the local app log records the previous session as an unclean shutdown with start and last-heartbeat timestamps.

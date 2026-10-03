@@ -38,6 +38,10 @@ Runner control, discovery, feedback and diagnostics.
 - No automatic upload of logs and no embedded private webhook credentials.
 - Anonymous diagnostics submission only if a future backend is justified and explicit user consent is implemented.
 
+Development status (not published):
+- runner discovery and explicit Smart Queue pool selection are merged to `main`;
+- Feedback & Diagnostics is being implemented as a local-first, review-before-share workflow.
+
 ## v0.19.0
 
 GitHub Actions control.
