@@ -153,6 +153,7 @@ public partial class MainWindow : Window
         {
             _latestResources = _systemResources.Read();
             _viewModel.UpdateSystemResources(_latestResources);
+            (Application.Current as App)?.RecordRuntimeHeartbeat();
         }
         catch (Exception ex)
         {

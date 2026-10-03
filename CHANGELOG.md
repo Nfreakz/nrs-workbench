@@ -7,6 +7,7 @@
 - Contains periodic refresh/resource failures inside their background loops so one recurring fault cannot open an error dialog on every timer tick.
 - Throttles repeated last-resort UI error dialogs and records unobserved task exceptions locally for later diagnosis.
 - Avoids rebuilding the WinForms tray menu on every timer refresh; it is rebuilt only when runner identity/state changes and replaced items are explicitly disposed.
+- Adds a privacy-safe runtime session heartbeat so a later startup can distinguish a hard/unclean process termination from a normal exit even when no managed exception reached the application logger.
 
 ### Added
 - Adds a dark, high-contrast right-click runner context menu with Start, Stop, Restart, folder, diagnostics and GitHub actions.

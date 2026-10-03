@@ -46,6 +46,7 @@ Runtime-resilience follow-up after a real long-running-session failure:
 - unobserved task exceptions are recorded and marked observed;
 - the tray menu is no longer rebuilt every few seconds when nothing changed; old WinForms menu items are disposed when a rebuild is actually required;
 - the exact historical exception still requires the local pre-fix application log for confirmation.
+- the uploaded pre-fix log for the 2026-10-03 incident contains no current managed exception after the 2026-10-01 startup, so a local runtime-session marker/heartbeat is added to detect future hard/unclean exits that bypass WPF exception handlers.
 
 Feedback & Diagnostics development scope:
 - open the repository's bug and feature-request templates from the app;

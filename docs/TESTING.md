@@ -135,3 +135,11 @@ Manual checks:
 2. In a development/test build, force the automatic refresh path to throw repeatedly. Verify the failure is logged locally but does not open one modal error window per timer tick.
 3. Force repeated unhandled UI exceptions inside the one-minute cooldown. Verify only the first opens the Feedback & diagnostics prompt; later exceptions remain logged/throttled instead of creating a dialog storm.
 4. Verify a later successful automatic refresh clears the skipped-cycle counter and normal periodic operation continues.
+
+
+## Runtime session marker / hard-exit diagnostics
+
+1. Start preview and verify `%LOCALAPPDATA%\NRSWorkbenchPreview\runtime-session.json` is created without repository paths, runner paths or credentials.
+2. Leave preview running for more than one minute and verify `LastHeartbeatAt` advances while `StartedAt` remains unchanged.
+3. Exit normally through NRS Workbench and verify the runtime-session marker is removed and the local app log records a clean shutdown.
+4. In a development test only, terminate the process externally. Restart preview and verify the local app log records the previous session as an unclean shutdown with start and last-heartbeat timestamps.

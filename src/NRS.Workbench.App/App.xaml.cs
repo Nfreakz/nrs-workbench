@@ -6,10 +6,22 @@ namespace NRS.Workbench.App;
 public partial class App : Application
 {
     private readonly FaultBurstThrottle _uiFaultDialogs = new(TimeSpan.FromMinutes(1));
+    private RuntimeSessionTracker? _runtimeSession;
 
     protected override void OnStartup(StartupEventArgs e)
     {
         AppLogger.Initialize();
+        _runtimeSession = new RuntimeSessionTracker(AppDataPaths.SettingsDirectory);
+        var previousSession = _runtimeSession.BeginSession(AppDataPaths.IsPreview);
+        if (previousSession is not null)
+        {
+            AppLogger.Error(
+                $"Previous NRS Workbench session ended without a clean shutdown. " +
+                $"session={previousSession.SessionId} pid={previousSession.ProcessId} " +
+                $"started={previousSession.StartedAt:O} lastHeartbeat={previousSession.LastHeartbeatAt:O} " +
+                $"preview={previousSession.Preview}");
+        }
+
         UiLanguage.Select(new SettingsService().Load().Language);
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
             AppLogger.Error("Unhandled AppDomain exception", args.ExceptionObject as Exception);
@@ -63,5 +75,14 @@ public partial class App : Application
         };
 
         base.OnStartup(e);
+    }
+
+    public void RecordRuntimeHeartbeat() => _runtimeSession?.Heartbeat();
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _runtimeSession?.EndSession();
+        AppLogger.Info("NRS Workbench clean shutdown");
+        base.OnExit(e);
     }
 }
