@@ -14,6 +14,7 @@ public sealed class TrayIconService : IDisposable
     private readonly Action _about;
     private readonly Action _exit;
     private Icon? _ownedIcon;
+    private string _menuSignature = string.Empty;
 
     public TrayIconService(Action show, Action refresh, Action startAll, Action stopAll, Action about, Action exit)
     {
@@ -43,7 +44,12 @@ public sealed class TrayIconService : IDisposable
         var busy = runners.Count(x => x.State == RunnerState.Busy);
         var text = $"Workspace · {runners.Count} runners · {busy} busy";
         _icon.Text = text.Length <= 63 ? text : "NRS Workbench";
+
+        var signature = BuildMenuSignature(runners);
+        if (string.Equals(signature, _menuSignature, StringComparison.Ordinal)) return;
+
         RebuildMenu(runners);
+        _menuSignature = signature;
     }
 
 
@@ -58,7 +64,10 @@ public sealed class TrayIconService : IDisposable
 
     private void RebuildMenu(IReadOnlyList<RunnerInfo> runners)
     {
+        var previousItems = _menu.Items.Cast<System.Windows.Forms.ToolStripItem>().ToArray();
         _menu.Items.Clear();
+        foreach (var item in previousItems) item.Dispose();
+
         _menu.Items.Add(new System.Windows.Forms.ToolStripMenuItem("NRS Workbench") { Enabled = false });
 
         if (runners.Count > 0)
@@ -91,6 +100,12 @@ public sealed class TrayIconService : IDisposable
         _menu.Items.Add(UiLanguage.Text("Acerca de · Neo RS"), null, (_, _) => _about());
         _menu.Items.Add(UiLanguage.Choose("Salir", "Exit"), null, (_, _) => _exit());
     }
+
+    private static string BuildMenuSignature(IReadOnlyList<RunnerInfo> runners) =>
+        string.Join("|", runners
+            .OrderBy(x => x.Alias, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(x => x.FolderPath, StringComparer.OrdinalIgnoreCase)
+            .Select(x => $"{x.Alias}\u001f{x.FolderPath}\u001f{(int)x.State}"));
 
     private static string StateGlyph(RunnerState state) => state switch
     {
