@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.18.5] - 2026-10-03
+
 ### Fixed
 - Prevents automatic runner/queue refresh cycles from overlapping when one cycle takes longer than the configured interval.
 - Contains periodic refresh/resource failures inside their background loops so one recurring fault cannot open an error dialog on every timer tick.
