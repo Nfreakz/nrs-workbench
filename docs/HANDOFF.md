@@ -83,3 +83,4 @@ The normal checkout remains on `main` and is the day-to-day NRS Workbench copy.
 - The launchers close an existing NRS Workbench process first. Normal and preview are intentionally one-or-the-other, not concurrent.
 - Preview uses `%LOCALAPPDATA%\NRSWorkbenchPreview`. Before launch, its `settings.json` is refreshed from the normal profile so real runner/repository registrations can be tested without persisting preview changes into the normal profile. The queue recovery journal is not copied.
 - `qa-preview` is only a movable test pointer. It is not a release branch and never replaces the feature branch/PR as source of truth.
+- automatic CI ignores pushes to `qa-preview`; the source feature branch/PR remains the validated commit, while `workflow_dispatch` stays available if a manual preview-channel run is ever needed.
