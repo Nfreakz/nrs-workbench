@@ -134,7 +134,7 @@ public partial class MainWindow : Window
 
         try
         {
-            await RunAutomaticRefreshAsync();
+            await RefreshAndUpdateTrayAsync();
             Interlocked.Exchange(ref _skippedAutomaticRefreshes, 0);
         }
         catch (Exception ex)
