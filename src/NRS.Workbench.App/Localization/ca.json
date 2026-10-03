@@ -356,5 +356,19 @@
   "Actualizar vista previa": "Actualitzar vista prèvia",
   "Nada se sube automáticamente. El ZIP se guarda solo donde tú elijas.": "No es puja res automàticament. El ZIP es desa només on tu triïs.",
   "Copiar": "Copiar",
-  "Guardar ZIP...": "Desar ZIP..."
+  "Guardar ZIP...": "Desar ZIP...",
+  "Runner Doctor": "Runner Doctor",
+  "Runner Doctor · NRS Workbench": "Runner Doctor · NRS Workbench",
+  "Diagnóstico local y explicable de cada runner. No consulta credenciales ni modifica la instalación.": "Diagnòstic local i explicable de cada runner. No consulta credencials ni modifica la instal·lació.",
+  "Actualizar diagnóstico": "Actualitzar diagnòstic",
+  "PROBLEMA": "PROBLEMA",
+  "ALCANCE": "ABAST",
+  "Sin analizar": "Sense analitzar",
+  "Solo señales locales verificables. STOPPED puede ser un estado completamente válido.": "Només senyals locals verificables. STOPPED pot ser un estat completament vàlid.",
+  "ACTIVIDAD": "ACTIVITAT",
+  "RESUMEN": "RESUM",
+  "Selecciona un runner": "Selecciona un runner",
+  "Runner Doctor no inicia, detiene ni reconfigura runners. Las acciones de esta ventana son de consulta.": "Runner Doctor no inicia, atura ni reconfigura runners. Les accions d'aquesta finestra són de consulta.",
+  "Abrir _diag": "Obrir _diag",
+  "Copiar resumen": "Copiar resum"
 }

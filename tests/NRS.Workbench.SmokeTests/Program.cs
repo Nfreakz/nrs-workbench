@@ -65,6 +65,50 @@ internal static class Program
             !faultThird.ShouldReport && faultThird.SuppressedSinceLastReport == 2 &&
             faultAfterCooldown.ShouldReport && faultAfterCooldown.SuppressedSinceLastReport == 2);
 
+        var doctorRoot = Path.Combine(Path.GetTempPath(), "nrs-workbench-doctor-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(doctorRoot);
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(doctorRoot, "bin"));
+            Directory.CreateDirectory(Path.Combine(doctorRoot, "_diag"));
+            File.WriteAllText(Path.Combine(doctorRoot, "run.cmd"), "@echo off");
+            File.WriteAllText(Path.Combine(doctorRoot, "bin", "Runner.Listener.exe"), "test");
+            File.WriteAllText(Path.Combine(doctorRoot, ".runner"), "{}");
+            File.WriteAllText(Path.Combine(doctorRoot, "_diag", "Worker_20261003-120000-utc.log"), "test");
+
+            var doctor = new RunnerDoctorService();
+            var healthyDoctorReport = doctor.AnalyzeRunner(new RunnerInfo
+            {
+                Alias = "doctor-ok",
+                FolderPath = doctorRoot,
+                Mode = RunnerMode.Interactive,
+                State = RunnerState.Ready,
+                ListenerPid = 1234,
+                Version = "2.999.0"
+            });
+            Check("runner doctor accepts a complete interactive runner",
+                healthyDoctorReport.Severity == RunnerDoctorSeverity.Healthy,
+                healthyDoctorReport.SummaryLabel);
+
+            var brokenRoot = Path.Combine(doctorRoot, "broken");
+            Directory.CreateDirectory(brokenRoot);
+            var brokenDoctorReport = doctor.AnalyzeRunner(new RunnerInfo
+            {
+                Alias = "doctor-broken",
+                FolderPath = brokenRoot,
+                Mode = RunnerMode.Interactive,
+                State = RunnerState.Unregistered
+            });
+            Check("runner doctor flags missing installation and registration",
+                brokenDoctorReport.Severity == RunnerDoctorSeverity.Problem &&
+                brokenDoctorReport.Checks.Count(x => x.Severity == RunnerDoctorSeverity.Problem) >= 2,
+                brokenDoctorReport.SummaryLabel);
+        }
+        finally
+        {
+            try { Directory.Delete(doctorRoot, recursive: true); } catch { }
+        }
+
         var originalProfile = Environment.GetEnvironmentVariable("NRS_WORKBENCH_PROFILE");
         try
         {

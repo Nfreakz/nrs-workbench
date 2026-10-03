@@ -286,6 +286,9 @@
                 <Button Style="{StaticResource MainToolbarButton}" Click="Statistics_Click">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource MainIconGlyph}" Text="&#xE9D2;"/><TextBlock Text="{local:Tr Source='Estadísticas'}"/></StackPanel>
                 </Button>
+                <Button Style="{StaticResource MainToolbarButton}" Click="RunnerDoctor_Click">
+                    <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource MainIconGlyph}" Text="&#xE9D9;"/><TextBlock Text="{local:Tr Source='Runner Doctor'}"/></StackPanel>
+                </Button>
                 <Button Style="{StaticResource MainToolbarButton}" Margin="0" Click="Settings_Click">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource MainIconGlyph}" Text="&#xE713;"/><TextBlock Text="{local:Tr Source='Configuración'}"/></StackPanel>
                 </Button>
