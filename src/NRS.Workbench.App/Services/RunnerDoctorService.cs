@@ -65,12 +65,12 @@ public sealed record RunnerDoctorReport(
                 return UiLanguage.Choose(
                     $"{problems} problema{(problems == 1 ? "" : "s")} · {attention} aviso{(attention == 1 ? "" : "s")}",
                     $"{problems} problem{(problems == 1 ? "" : "s")} · {attention} warning{(attention == 1 ? "" : "s")}",
-                    $"{problems} problema{(problems == 1 ? "" : "s")} · {attention} avís{(attention == 1 ? "" : "os")}");
+                    $"{problems} problema{(problems == 1 ? "" : "s")} · {(attention == 1 ? "1 avís" : attention + " avisos")}");
             if (attention > 0)
                 return UiLanguage.Choose(
                     $"{attention} punto{(attention == 1 ? "" : "s")} a revisar",
                     $"{attention} item{(attention == 1 ? "" : "s")} to review",
-                    $"{attention} punt{(attention == 1 ? "" : "s")} a revisar");
+                    attention == 1 ? "1 punt a revisar" : $"{attention} punts a revisar");
             return UiLanguage.Choose("Todo correcto", "All checks passed", "Tot correcte");
         }
     }
@@ -196,7 +196,7 @@ public sealed class RunnerDoctorService
             checks.Add(Ok("Worker", UiLanguage.Choose(
                 $"{runner.WorkerPids.Count} proceso{(runner.WorkerPids.Count == 1 ? "" : "s")} Worker detectado{(runner.WorkerPids.Count == 1 ? "" : "s")}.",
                 $"{runner.WorkerPids.Count} Worker process{(runner.WorkerPids.Count == 1 ? "" : "es")} detected.",
-                $"{runner.WorkerPids.Count} procés{(runner.WorkerPids.Count == 1 ? "" : "s")} Worker detectat{(runner.WorkerPids.Count == 1 ? "" : "s")}.")));
+                runner.WorkerPids.Count == 1 ? "1 procés Worker detectat." : $"{runner.WorkerPids.Count} processos Worker detectats.")));
         }
         else
         {
