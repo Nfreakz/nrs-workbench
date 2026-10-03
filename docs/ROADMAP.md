@@ -27,7 +27,7 @@ PR #25's runner discovery and Smart Queue selection work is separate from this r
 
 ## v0.18.5
 
-Runner control, discovery, feedback and diagnostics.
+Release candidate prepared. Runner control, discovery, feedback and diagnostics.
 
 - Detect runner installations from their real files rather than folder-name prefixes.
 - Let users choose which detected runners participate in Smart Queue; excluded runners are not started, stopped or counted toward the queue limit.
@@ -39,10 +39,12 @@ Runner control, discovery, feedback and diagnostics.
 - Anonymous diagnostics submission only if a future backend is justified and explicit user consent is implemented.
 - **Runner Doctor** with local, explainable health checks for installation, registration, process/service state, version and `_diag` activity. The first iteration remains read-only and does not auto-repair or update runners.
 
-Development status (not published):
+Release-candidate status:
 - runner discovery and explicit Smart Queue pool selection are merged to `main`;
 - Feedback & Diagnostics plus long-running runtime hardening are merged to `main`;
-- Runner Doctor is the active v0.18.5 development block.
+- Runner Doctor is merged to `main` and manually validated on Windows;
+- version metadata and release documentation are being finalized for v0.18.5;
+- v0.19.0 work starts only after v0.18.5 is tagged and its Windows package is verified.
 
 ## v0.19.0
 
