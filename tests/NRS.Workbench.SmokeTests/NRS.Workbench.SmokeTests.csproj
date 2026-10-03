@@ -9,5 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\NRS.Workbench.App\NRS.Workbench.App.csproj" />
     <ProjectReference Include="..\..\src\NRS.Workbench.Core\NRS.Workbench.Core.csproj" />
+    <ProjectReference Include="..\..\src\NRS.Workbench.Platform.Linux\NRS.Workbench.Platform.Linux.csproj" />
   </ItemGroup>
 </Project>

@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NRS.Workbench.Core", "src\N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NRS.Workbench.App", "src\NRS.Workbench.App\NRS.Workbench.App.csproj", "{3CF76A95-A2B0-44AB-A4E3-264DE18EFC84}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NRS.Workbench.Platform.Linux", "src\NRS.Workbench.Platform.Linux\NRS.Workbench.Platform.Linux.csproj", "{A4D07B25-2C91-4B87-8B6E-2B0B94D6F331}"
+EndProject
 Global
     GlobalSection(SolutionConfigurationPlatforms) = preSolution
         Debug|Any CPU = Debug|Any CPU
@@ -20,5 +22,9 @@ Global
         {3CF76A95-A2B0-44AB-A4E3-264DE18EFC84}.Debug|Any CPU.Build.0 = Debug|Any CPU
         {3CF76A95-A2B0-44AB-A4E3-264DE18EFC84}.Release|Any CPU.ActiveCfg = Release|Any CPU
         {3CF76A95-A2B0-44AB-A4E3-264DE18EFC84}.Release|Any CPU.Build.0 = Release|Any CPU
+        {A4D07B25-2C91-4B87-8B6E-2B0B94D6F331}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {A4D07B25-2C91-4B87-8B6E-2B0B94D6F331}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {A4D07B25-2C91-4B87-8B6E-2B0B94D6F331}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {A4D07B25-2C91-4B87-8B6E-2B0B94D6F331}.Release|Any CPU.Build.0 = Release|Any CPU
     EndGlobalSection
 EndGlobal
