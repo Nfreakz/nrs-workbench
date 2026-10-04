@@ -81,6 +81,8 @@ Scope:
 - same-volume runner roots, repository paths, manual runner order and Smart Queue pool paths are persisted as `@portable/` relative tokens and resolved against the current volume root;
 - portable Smart Queue recovery state is tied to a hashed machine fingerprint and ignored on another PC;
 - portable manifest records prepared/pending runners without credentials, access tokens or temporary registration tokens;
+- corrupt or unsafe portable manifests fail closed instead of silently hiding pending migrations, and manifest runner paths must stay inside the portable volume;
+- runner folders, workFolder paths and Runner.Listener paths that traverse Windows reparse points are rejected before portable preparation;
 - bulk preparation is limited to stopped interactive GitHub.com runners;
 - the GitHub access token exists only in the window/session; Workbench requests a short-lived registration token and passes only that token to the runner process via `ACTIONS_RUNNER_INPUT_TOKEN`;
 - runner migration uses local removal plus unattended configure/replace while preserving name, URL, work folder, runner group, custom labels, default-label behavior, ephemeral mode and disable-update mode;
