@@ -145,6 +145,7 @@ public sealed class PortableRunnerPreparationService
                         personalAccessToken,
                         cancellationToken);
                     ValidateRemoteIdentity(registration, remote);
+                    ValidateRemoteAvailability(remote);
                 }
 
                 var registrationToken = await _github.CreateRegistrationTokenAsync(
@@ -184,6 +185,7 @@ public sealed class PortableRunnerPreparationService
         var registration = preflight.Registration;
         var remote = preflight.RemoteMetadata;
         var registrationToken = preflight.RegistrationToken;
+        ValidateRegistrationTokenFreshness(registrationToken);
 
         _manifest.RecordPending(
             candidate.FolderPath,
@@ -295,12 +297,16 @@ public sealed class PortableRunnerPreparationService
             var runnerBinaryAvailable = File.Exists(Path.Combine(folder, "bin", "Runner.Listener.exe"));
             var supportedTarget = IsSupportedTarget(registration.GitHubUrl);
             var safeWorkFolder = IsSafeWorkFolder(folder, registration.WorkFolder);
+            var credentialsPresent =
+                File.Exists(Path.Combine(folder, ".credentials")) &&
+                File.Exists(Path.Combine(folder, ".credentials_rsaparams"));
             var prepared = _manifest.FindPrepared(folder);
             var preparedHere = prepared is not null &&
                                string.Equals(
                                    prepared.MachineFingerprint,
                                    currentFingerprint,
-                                   StringComparison.Ordinal);
+                                   StringComparison.Ordinal) &&
+                               credentialsPresent;
 
             var canPrepare = !serviceMode && !running && !preparedHere && runnerBinaryAvailable && supportedTarget && safeWorkFolder;
             var state = serviceMode
@@ -313,11 +319,13 @@ public sealed class PortableRunnerPreparationService
                             ? UiLanguage.Choose("Destino no compatible · solo github.com", "Unsupported target · github.com only", "Destí no compatible · només github.com")
                             : !safeWorkFolder
                                 ? UiLanguage.Choose("workFolder no portable · revisa la configuración", "Non-portable workFolder · review configuration", "workFolder no portable · revisa la configuració")
-                                : preparedHere
-                                ? UiLanguage.Choose("Listo en este PC", "Ready on this PC", "Llest en aquest PC")
                                 : pending is not null
                                     ? UiLanguage.Choose("Migración pendiente · reintentar", "Migration pending · retry", "Migració pendent · torna-ho a provar")
-                                    : UiLanguage.Choose("Necesita preparación", "Needs preparation", "Necessita preparació");
+                                    : preparedHere
+                                        ? UiLanguage.Choose("Listo en este PC", "Ready on this PC", "Llest en aquest PC")
+                                        : prepared is not null && !credentialsPresent
+                                            ? UiLanguage.Choose("Credenciales locales incompletas · preparar de nuevo", "Local credentials incomplete · prepare again", "Credencials locals incompletes · prepara de nou")
+                                            : UiLanguage.Choose("Necesita preparación", "Needs preparation", "Necessita preparació");
 
             candidates.Add(new PortableRunnerCandidate
             {
@@ -396,6 +404,35 @@ public sealed class PortableRunnerPreparationService
             throw new InvalidOperationException(
                 $"GitHub runner identity mismatch. Local runner '{registration.AgentName}' does not match remote runner '{remote.Name}'.");
         }
+    }
+
+    public static void ValidateRemoteAvailability(GitHubRunnerRemoteMetadata remote)
+    {
+        ArgumentNullException.ThrowIfNull(remote);
+
+        if (remote.IsBusy)
+            throw new InvalidOperationException(
+                "The GitHub runner is still busy on another host. Wait for its job to finish before preparing this copy.");
+
+        if (string.Equals(remote.Status?.Trim(), "online", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException(
+                "The GitHub runner is still online. Stop the old runner instance or wait for GitHub to report it offline before preparing this copy.");
+    }
+
+    public static void ValidateRegistrationTokenFreshness(
+        GitHubRunnerRegistrationToken registrationToken,
+        DateTimeOffset? now = null)
+    {
+        ArgumentNullException.ThrowIfNull(registrationToken);
+        if (string.IsNullOrWhiteSpace(registrationToken.Token))
+            throw new InvalidOperationException("The GitHub runner registration token is empty.");
+
+        if (registrationToken.ExpiresAt is null) return;
+
+        var reference = now ?? DateTimeOffset.UtcNow;
+        if (registrationToken.ExpiresAt <= reference.AddMinutes(1))
+            throw new InvalidOperationException(
+                "The GitHub runner registration token is expired or too close to expiry. Run preflight again before changing local runner configuration.");
     }
 
     public static bool IsSafeWorkFolder(string runnerFolder, string workFolder)

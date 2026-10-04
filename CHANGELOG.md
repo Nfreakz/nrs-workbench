@@ -17,6 +17,8 @@
 - Portable manifests contain no runner credential files or tokens. Machine association is stored only as a one-way hash fingerprint.
 - Smart Queue recovery journals are machine-bound in portable mode, preventing a different PC from automatically restoring runners stopped by the previous host.
 - Service-installed runners are excluded from portable preparation in this release.
+- Remote runners that GitHub still reports online or busy are blocked before replacement, and an expired/nearly expired registration token is rejected before local configuration is removed.
+- A runner is only shown as ready for the current PC when the portable machine association and the expected local credential files are both present.
 
 ## [0.18.6] - Unreleased
 

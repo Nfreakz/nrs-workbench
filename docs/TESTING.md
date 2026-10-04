@@ -201,6 +201,9 @@ Manual checks:
 9. Interrupt a migration after local removal in a disposable test runner, reopen Workbench and verify the pending non-secret manifest allows retry with a fresh GitHub token.
 10. Inspect `Data\settings.json`, `portable-workspace.json`, local logs and queue/runtime state. They must not contain the GitHub access token, runner registration token, `.credentials` contents, raw MachineGuid or raw machine name.
 11. During preflight/preparation, Refresh and runner selection are disabled; closing the window cancels the active operation and clears the password field.
+12. If GitHub reports a selected runner as `online` or `busy`, preflight must stop before local configuration is removed; stop the old host and retry after GitHub reports it offline.
+13. Remove either `.credentials` or `.credentials_rsaparams` from a disposable prepared runner and verify Portable Workspace no longer reports it as ready for this PC.
+14. Simulate an expired/nearly expired registration token and verify preparation stops before `remove --local` is executed.
 
 
 ## v0.18.6 maintenance checks

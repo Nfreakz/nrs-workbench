@@ -142,6 +142,40 @@ internal static class PortableWorkspaceSmoke
 
             Assert(remote.CustomLabels.SequenceEqual(["gpu", "build"]) && remote.HasDefaultLabels,
                 "GitHub runner metadata preserves custom labels and detects default labels");
+
+            PortableRunnerPreparationService.ValidateRemoteAvailability(remote);
+            var onlineBlocked = false;
+            try
+            {
+                PortableRunnerPreparationService.ValidateRemoteAvailability(
+                    remote with { Status = "online" });
+            }
+            catch (InvalidOperationException) { onlineBlocked = true; }
+            var busyBlocked = false;
+            try
+            {
+                PortableRunnerPreparationService.ValidateRemoteAvailability(
+                    remote with { IsBusy = true });
+            }
+            catch (InvalidOperationException) { busyBlocked = true; }
+            Assert(onlineBlocked && busyBlocked,
+                "portable preflight blocks remote runners that GitHub still reports online or busy");
+
+            PortableRunnerPreparationService.ValidateRegistrationTokenFreshness(
+                token,
+                new DateTimeOffset(2026, 10, 4, 14, 0, 0, TimeSpan.Zero));
+            var expiredTokenBlocked = false;
+            try
+            {
+                PortableRunnerPreparationService.ValidateRegistrationTokenFreshness(
+                    token,
+                    new DateTimeOffset(2026, 10, 4, 14, 59, 30, TimeSpan.Zero));
+            }
+            catch (InvalidOperationException) { expiredTokenBlocked = true; }
+            Assert(expiredTokenBlocked,
+                "portable preparation refuses a registration token that is expired or too close to expiry");
+
+
             Assert(token.Token == "temporary-registration-token" &&
                    handler.Calls.Count == 2 &&
                    handler.Calls.All(x => x.Authorization == "Bearer " + sessionPat) &&
@@ -190,7 +224,7 @@ internal static class PortableWorkspaceSmoke
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(
-                        "{\"id\":42,\"name\":\"portable-one\",\"labels\":[{\"name\":\"self-hosted\",\"type\":\"read-only\"},{\"name\":\"Windows\",\"type\":\"read-only\"},{\"name\":\"X64\",\"type\":\"read-only\"},{\"name\":\"gpu\",\"type\":\"custom\"},{\"name\":\"build\",\"type\":\"custom\"}]}")
+                        "{\"id\":42,\"name\":\"portable-one\",\"status\":\"offline\",\"busy\":false,\"labels\":[{\"name\":\"self-hosted\",\"type\":\"read-only\"},{\"name\":\"Windows\",\"type\":\"read-only\"},{\"name\":\"X64\",\"type\":\"read-only\"},{\"name\":\"gpu\",\"type\":\"custom\"},{\"name\":\"build\",\"type\":\"custom\"}]}")
                 });
             }
 

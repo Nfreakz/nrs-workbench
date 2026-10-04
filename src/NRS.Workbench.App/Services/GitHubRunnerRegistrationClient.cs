@@ -8,7 +8,9 @@ namespace NRS.Workbench.App.Services;
 public sealed record GitHubRunnerRemoteMetadata(
     string Name,
     IReadOnlyList<string> CustomLabels,
-    bool HasDefaultLabels);
+    bool HasDefaultLabels,
+    string Status = "",
+    bool IsBusy = false);
 
 public sealed record GitHubRunnerRegistrationToken(string Token, DateTimeOffset? ExpiresAt);
 
@@ -55,7 +57,19 @@ public sealed class GitHubRunnerRegistrationClient
             }
         }
 
-        return new GitHubRunnerRemoteMetadata(name, custom.Distinct(StringComparer.OrdinalIgnoreCase).ToList(), hasDefault);
+        var status = root.TryGetProperty("status", out var statusValue)
+            ? statusValue.GetString() ?? string.Empty
+            : string.Empty;
+        var busy = root.TryGetProperty("busy", out var busyValue) &&
+                   busyValue.ValueKind is JsonValueKind.True or JsonValueKind.False &&
+                   busyValue.GetBoolean();
+
+        return new GitHubRunnerRemoteMetadata(
+            name,
+            custom.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
+            hasDefault,
+            status,
+            busy);
     }
 
     public async Task<GitHubRunnerRegistrationToken> CreateRegistrationTokenAsync(
