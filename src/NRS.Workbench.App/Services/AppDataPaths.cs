@@ -4,16 +4,11 @@ public static class AppDataPaths
 {
     private const string PreviewProfile = "preview";
     private static readonly string BaseDirectoryAtStartup = Path.GetFullPath(AppContext.BaseDirectory);
-    private static readonly bool PreviewAtStartup =
-        string.Equals(
-            Environment.GetEnvironmentVariable("NRS_WORKBENCH_PROFILE"),
-            PreviewProfile,
-            StringComparison.OrdinalIgnoreCase);
     private static readonly bool PortableAtStartup =
-        !PreviewAtStartup && File.Exists(Path.Combine(BaseDirectoryAtStartup, "NRSWorkbench.portable"));
+        !IsPreviewEnvironment() && File.Exists(Path.Combine(BaseDirectoryAtStartup, "NRSWorkbench.portable"));
 
-    public static bool IsPreview => PreviewAtStartup;
-    public static bool IsPortable => PortableAtStartup;
+    public static bool IsPreview => IsPreviewEnvironment();
+    public static bool IsPortable => !IsPreview && PortableAtStartup;
     public static string ApplicationDirectory => BaseDirectoryAtStartup;
     public static string PortableMarkerPath => Path.Combine(BaseDirectoryAtStartup, "NRSWorkbench.portable");
 
@@ -22,6 +17,12 @@ public static class AppDataPaths
         ?? throw new InvalidOperationException("Could not determine the NRS Workbench volume root.");
 
     public static string PortableDataDirectory => Path.Combine(BaseDirectoryAtStartup, "Data");
+
+    private static bool IsPreviewEnvironment() =>
+        string.Equals(
+            Environment.GetEnvironmentVariable("NRS_WORKBENCH_PROFILE"),
+            PreviewProfile,
+            StringComparison.OrdinalIgnoreCase);
 
     public static string SettingsDirectory
     {
