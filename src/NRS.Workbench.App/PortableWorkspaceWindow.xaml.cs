@@ -203,6 +203,7 @@ public partial class PortableWorkspaceWindow : Window
                     var result = await service.PrepareAsync(
                         candidate,
                         preflight[candidate.FolderPath],
+                        pat,
                         _operationCancellation.Token);
                     candidate.ResultText = result.Message;
                     candidate.IsSelected = false;
