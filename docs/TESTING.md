@@ -210,6 +210,9 @@ Manual checks:
 18. In a multi-runner disposable batch, let preflight complete while all runners are offline, then make a later runner appear online/busy before its turn. Its final pre-mutation revalidation must block it without removing its local `.runner`.
 19. Retry a pending migration whose original numeric runner ID is stale but whose target + runner name still identify the remote runner. Preflight must resolve it by name, recheck offline/busy state and continue only when the match is unique.
 20. Let an early batch runner take long enough that a token minted during batch preflight would be near expiry. The later runner must request a fresh registration token immediately before local replacement.
+21. Corrupt `Data\portable-workspace.json` in a disposable copy. Portable runner preparation must fail closed with a visible error instead of treating the manifest as empty or overwriting pending migration state.
+22. Inject an absolute/out-of-volume runner path into a disposable manifest and verify it is rejected. Runner state persisted by Portable Workspace must use `@portable/` paths only.
+23. Point a disposable runner folder, `bin`, `Runner.Listener.exe` or existing workFolder through a Windows reparse point. Portable preparation must refuse it before local configuration removal.
 
 
 ## v0.18.6 maintenance checks
