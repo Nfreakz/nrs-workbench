@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text.Json;
 using NRS.Workbench.Core.Models;
 
@@ -60,27 +61,57 @@ public sealed class MaintenanceService
         _isRunnerActive = isRunnerActive ?? IsRunnerActive;
     }
 
-    public Task<MaintenanceScanResult> ScanAsync(IReadOnlyList<RunnerInfo> runners, int olderThanDays, CancellationToken cancellationToken = default) =>
-        Task.Run(() => Scan(runners, olderThanDays, cancellationToken), cancellationToken);
+    public Task<MaintenanceScanResult> ScanAsync(
+        IReadOnlyList<RunnerInfo> runners,
+        int olderThanDays,
+        CancellationToken cancellationToken = default,
+        IProgress<MaintenanceScanResult>? progress = null) =>
+        Task.Run(() => Scan(runners, olderThanDays, cancellationToken, progress), cancellationToken);
 
     public Task<MaintenanceCleanupResult> CleanupAsync(IReadOnlyList<MaintenanceEntry> entries, CancellationToken cancellationToken = default) =>
         Task.Run(() => Cleanup(entries, cancellationToken), cancellationToken);
 
-    private MaintenanceScanResult Scan(IReadOnlyList<RunnerInfo> runners, int olderThanDays, CancellationToken cancellationToken)
+    private MaintenanceScanResult Scan(
+        IReadOnlyList<RunnerInfo> runners,
+        int olderThanDays,
+        CancellationToken cancellationToken,
+        IProgress<MaintenanceScanResult>? progress)
     {
         olderThanDays = Math.Clamp(olderThanDays, 7, 365);
         var entries = new List<MaintenanceEntry>();
+
         AddWorkbenchLogs(entries);
         AddPreviewLogs(entries);
+        ReportProgress(entries, progress);
 
         foreach (var runner in runners.OrderBy(x => x.Alias, StringComparer.OrdinalIgnoreCase))
         {
             cancellationToken.ThrowIfCancellationRequested();
             AddRunnerDiagnostics(entries, runner, olderThanDays);
+            ReportProgress(entries, progress);
+
             AddRunnerWorkInventory(entries, runner, cancellationToken);
+            ReportProgress(entries, progress);
         }
 
-        return new MaintenanceScanResult(entries, entries.Sum(x => x.TotalBytes), entries.Sum(x => x.ReclaimableBytes));
+        return CreateSnapshot(entries);
+    }
+
+    private static void ReportProgress(
+        List<MaintenanceEntry> entries,
+        IProgress<MaintenanceScanResult>? progress)
+    {
+        if (progress is null) return;
+        progress.Report(CreateSnapshot(entries));
+    }
+
+    private static MaintenanceScanResult CreateSnapshot(List<MaintenanceEntry> entries)
+    {
+        var snapshot = entries.ToList();
+        return new MaintenanceScanResult(
+            snapshot,
+            snapshot.Sum(x => x.TotalBytes),
+            snapshot.Sum(x => x.ReclaimableBytes));
     }
 
     private void AddWorkbenchLogs(List<MaintenanceEntry> entries)
@@ -197,14 +228,20 @@ public sealed class MaintenanceService
 
         if (!Directory.Exists(folder)) return;
         var measured = MeasureTree(folder, cancellationToken);
+        var detail = measured.Complete
+            ? UiLanguage.Choose(
+                "Inventario de _work. No se elimina automáticamente porque puede contener un checkout o archivos de un job.",
+                "_work inventory. It is never deleted automatically because it may contain a checkout or job files.",
+                "Inventari de _work. No s'elimina automàticament perquè pot contenir un checkout o fitxers d'un job.")
+            : UiLanguage.Choose(
+                "Inventario parcial de _work para mantener el escaneo ágil. El tamaño mostrado es un mínimo medido; _work nunca se elimina automáticamente.",
+                "Partial _work inventory to keep scanning responsive. The displayed size is a measured minimum; _work is never deleted automatically.",
+                "Inventari parcial de _work per mantenir l'escaneig àgil. La mida mostrada és un mínim mesurat; _work mai no s'elimina automàticament.");
         entries.Add(new MaintenanceEntry
         {
             Id = "work:" + runner.FolderPath,
             Category = UiLanguage.Choose($"Trabajo · {runner.Alias}", $"Work directory · {runner.Alias}", $"Treball · {runner.Alias}"),
-            Detail = UiLanguage.Choose(
-                "Inventario de _work. No se elimina automáticamente porque puede contener un checkout o archivos de un job.",
-                "_work inventory. It is never deleted automatically because it may contain a checkout or job files.",
-                "Inventari de _work. No s'elimina automàticament perquè pot contenir un checkout o fitxers d'un job."),
+            Detail = detail,
             Location = folder, FileCount = measured.Count, TotalBytes = measured.Bytes, ReclaimableBytes = 0,
             Risk = MaintenanceRisk.Inventory, RiskLabel = UiLanguage.Choose("Solo inventario", "Inventory only", "Només inventari"),
             IsCleanable = false, IsSelected = false
@@ -422,31 +459,57 @@ public sealed class MaintenanceService
         catch { return []; }
     }
 
-    private static (int Count, long Bytes) MeasureTree(string root, CancellationToken cancellationToken)
+    private static (int Count, long Bytes, bool Complete) MeasureTree(
+        string root,
+        CancellationToken cancellationToken)
     {
-        var count = 0; long bytes = 0; var pending = new Stack<string>(); pending.Push(root);
+        const int MaxFilesPerRunner = 20_000;
+        var maxDuration = TimeSpan.FromMilliseconds(750);
+        var stopwatch = Stopwatch.StartNew();
+        var count = 0;
+        long bytes = 0;
+        var pending = new Stack<string>();
+        pending.Push(root);
+
         while (pending.Count > 0)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (count >= MaxFilesPerRunner || stopwatch.Elapsed >= maxDuration)
+                return (count, bytes, false);
+
             var current = pending.Pop();
             try
             {
                 foreach (var file in Directory.EnumerateFiles(current))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    count++; bytes += SafeLength(file);
+                    if (count >= MaxFilesPerRunner || stopwatch.Elapsed >= maxDuration)
+                        return (count, bytes, false);
+                    count++;
+                    bytes += SafeLength(file);
                 }
+
                 foreach (var directory in Directory.EnumerateDirectories(current))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    try { if ((File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0) continue; }
-                    catch { continue; }
+                    if (stopwatch.Elapsed >= maxDuration)
+                        return (count, bytes, false);
+                    try
+                    {
+                        if ((File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0)
+                            continue;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                     pending.Push(directory);
                 }
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
         }
-        return (count, bytes);
+
+        return (count, bytes, true);
     }
 
     private static string ReadWorkFolder(string runnerFolder)
