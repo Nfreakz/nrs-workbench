@@ -9,11 +9,11 @@
 
 ## Current verified state · 2026-10-04
 
-- Current `main`: `0e7688ab49276134a00018c27b60281cc7eb0b01`.
-- `qa-preview` points to the same commit.
-- Application version on `main`: `0.18.7`.
-- Open pull requests at verification time: none.
-- CI #544 for `0e7688ab...`: SUCCESS.
+- Product-code baseline for v0.18.7: `0e7688ab49276134a00018c27b60281cc7eb0b01` (merge of PR #41).
+- At the start of this handoff refresh, `main` and `qa-preview` both pointed to that baseline. Documentation-only commits may advance `main`; always verify the live branch before modifying code.
+- Application version at the v0.18.7 product baseline: `0.18.7`.
+- Open pull requests before this documentation refresh: none.
+- CI #544 for the v0.18.7 product baseline: SUCCESS.
 - Last pure v0.18.6 commit: `0c0202d0036bc23f23015b1d49b887e1cbbb1726`.
 - CI #542 for `0c0202d...`: SUCCESS.
 - Latest published release: [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5).
@@ -80,9 +80,11 @@ Do not create tag `v0.18.6` until these manual checks pass. When approved, the t
 
 PR #41 is MERGED. Portable Workspace is now integrated in `main`.
 
-Merge commit / release candidate:
+Product-code merge commit / release candidate:
 
 `0e7688ab49276134a00018c27b60281cc7eb0b01`
+
+Documentation-only commits after this baseline do not change the v0.18.7 product payload. If any product-code fix is merged, establish and validate a new release candidate instead of silently tagging a later `main`.
 
 Implemented scope:
 
