@@ -79,7 +79,7 @@ public partial class MaintenanceWindow : Window
         {
             var result = await _service.CleanupAsync(selected);
             MessageBox.Show(this,
-                UiLanguage.Choose($"Limpieza completada.\n\nArchivos limpiados: {result.CleanedFiles}\nEspacio liberado: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nFallos: {result.FailedFiles}", $"Cleanup completed.\n\nFiles cleaned: {result.CleanedFiles}\nSpace reclaimed: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nFailures: {result.FailedFiles}", $"Neteja completada.\n\nFitxers netejats: {result.CleanedFiles}\nEspai alliberat: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nErrors: {result.FailedFiles}"),
+                UiLanguage.Choose($"Limpieza completada.\n\nArchivos limpiados: {result.CleanedFiles}\nEspacio liberado: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nBloques omitidos por actividad/cambio de seguridad: {result.SkippedEntries}\nFallos: {result.FailedFiles}", $"Cleanup completed.\n\nFiles cleaned: {result.CleanedFiles}\nSpace reclaimed: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nBlocks skipped because activity/safety changed: {result.SkippedEntries}\nFailures: {result.FailedFiles}", $"Neteja completada.\n\nFitxers netejats: {result.CleanedFiles}\nEspai alliberat: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nBlocs omesos perquè ha canviat l'activitat/seguretat: {result.SkippedEntries}\nErrors: {result.FailedFiles}"),
                 UiLanguage.Text("Mantenimiento"), MessageBoxButton.OK, result.FailedFiles == 0 ? MessageBoxImage.Information : MessageBoxImage.Warning);
             await RefreshAsync();
         }
