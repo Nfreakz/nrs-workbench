@@ -89,6 +89,28 @@ internal static class PortableWorkspaceSmoke
                    manifest.FindPrepared(runner) is not null,
                 "portable manifest records prepared runners without the raw machine name");
 
+            var outsideRunner = Path.Combine(Path.GetTempPath(), "nrs-outside-portable-runner-" + Guid.NewGuid().ToString("N"));
+            var outsideBlocked = false;
+            try
+            {
+                manifest.RecordPending(outsideRunner, registration, [], hasDefaultLabels: true);
+            }
+            catch (InvalidOperationException) { outsideBlocked = true; }
+            Assert(outsideBlocked,
+                "portable manifest refuses absolute runner state outside the portable volume");
+
+            var corruptData = Path.Combine(root, "CorruptData");
+            Directory.CreateDirectory(corruptData);
+            File.WriteAllText(Path.Combine(corruptData, "portable-workspace.json"), "{not-json");
+            var corruptBlocked = false;
+            try
+            {
+                _ = new PortableWorkspaceManifestStore(corruptData, root).Load();
+            }
+            catch (InvalidDataException) { corruptBlocked = true; }
+            Assert(corruptBlocked,
+                "corrupt portable manifest fails closed instead of hiding pending migration state");
+
             Assert(
                 PortableRunnerPreparationService.IsSafeWorkFolder(runner, "_work") &&
                 PortableRunnerPreparationService.IsSafeWorkFolder(runner, Path.Combine("_work", "nested")) &&
