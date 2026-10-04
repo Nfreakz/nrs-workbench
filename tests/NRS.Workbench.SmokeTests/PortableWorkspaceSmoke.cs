@@ -218,6 +218,18 @@ internal static class PortableWorkspaceSmoke
             Assert(expiredTokenBlocked,
                 "portable preparation refuses a registration token that is expired or too close to expiry");
 
+            var distinctTargets = new[]
+            {
+                "https://github.com/acme/project",
+                "https://github.com/acme/project/",
+                "https://github.com/acme/other"
+            }
+            .Select(url => url.TrimEnd('/'))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+            Assert(distinctTargets.Count == 2,
+                "portable bulk preflight can collapse registration-permission checks by GitHub target");
+
 
             Assert(token.Token == "temporary-registration-token" &&
                    remoteByName.Name == "portable-one" &&
