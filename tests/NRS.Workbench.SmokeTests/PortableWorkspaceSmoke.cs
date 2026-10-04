@@ -89,6 +89,13 @@ internal static class PortableWorkspaceSmoke
                    manifest.FindPrepared(runner) is not null,
                 "portable manifest records prepared runners without the raw machine name");
 
+            Assert(
+                PortableRunnerPreparationService.IsSafeWorkFolder(runner, "_work") &&
+                PortableRunnerPreparationService.IsSafeWorkFolder(runner, Path.Combine("_work", "nested")) &&
+                !PortableRunnerPreparationService.IsSafeWorkFolder(runner, @"C:\outside") &&
+                !PortableRunnerPreparationService.IsSafeWorkFolder(runner, @"..\outside"),
+                "portable runner preparation accepts only work folders contained by the runner directory");
+
             var duplicateRegistration = new PortableRunnerRegistration(
                 1, "duplicate-name", "https://github.com/acme/project", "_work", "Default", false, false);
             var duplicateA = new PortableRunnerCandidate

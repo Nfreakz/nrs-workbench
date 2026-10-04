@@ -120,6 +120,8 @@ public sealed class PortableRunnerPreparationService
             {
                 EnsureStoppedInteractive(candidate.FolderPath);
                 EnsureRunnerBinary(candidate.FolderPath);
+                if (!IsSafeWorkFolder(candidate.FolderPath, candidate.Registration.WorkFolder))
+                    throw new InvalidOperationException("The runner workFolder is not a safe relative path inside the runner folder.");
 
                 var pending = _manifest.FindPending(candidate.FolderPath);
                 var localRegistration = PortableRunnerMetadataReader.Read(candidate.FolderPath);
@@ -291,6 +293,7 @@ public sealed class PortableRunnerPreparationService
             var running = IsRunning(folder);
             var runnerBinaryAvailable = File.Exists(Path.Combine(folder, "bin", "Runner.Listener.exe"));
             var supportedTarget = IsSupportedTarget(registration.GitHubUrl);
+            var safeWorkFolder = IsSafeWorkFolder(folder, registration.WorkFolder);
             var prepared = _manifest.FindPrepared(folder);
             var preparedHere = prepared is not null &&
                                string.Equals(
@@ -298,7 +301,7 @@ public sealed class PortableRunnerPreparationService
                                    currentFingerprint,
                                    StringComparison.Ordinal);
 
-            var canPrepare = !serviceMode && !running && !preparedHere && runnerBinaryAvailable && supportedTarget;
+            var canPrepare = !serviceMode && !running && !preparedHere && runnerBinaryAvailable && supportedTarget && safeWorkFolder;
             var state = serviceMode
                 ? UiLanguage.Choose("Servicio · no portable", "Service · not portable", "Servei · no portable")
                 : running
@@ -307,7 +310,9 @@ public sealed class PortableRunnerPreparationService
                         ? UiLanguage.Choose("Instalación incompleta · falta Runner.Listener.exe", "Incomplete installation · Runner.Listener.exe missing", "Instal·lació incompleta · falta Runner.Listener.exe")
                         : !supportedTarget
                             ? UiLanguage.Choose("Destino no compatible · solo github.com", "Unsupported target · github.com only", "Destí no compatible · només github.com")
-                            : preparedHere
+                            : !safeWorkFolder
+                                ? UiLanguage.Choose("workFolder no portable · revisa la configuración", "Non-portable workFolder · review configuration", "workFolder no portable · revisa la configuració")
+                                : preparedHere
                                 ? UiLanguage.Choose("Listo en este PC", "Ready on this PC", "Llest en aquest PC")
                                 : pending is not null
                                     ? UiLanguage.Choose("Migración pendiente · reintentar", "Migration pending · retry", "Migració pendent · torna-ho a provar")
@@ -373,6 +378,26 @@ public sealed class PortableRunnerPreparationService
         {
             GitHubRunnerRegistrationClient.ParseTarget(gitHubUrl);
             return true;
+        }
+        catch { return false; }
+    }
+
+    public static bool IsSafeWorkFolder(string runnerFolder, string workFolder)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(runnerFolder) || string.IsNullOrWhiteSpace(workFolder))
+                return false;
+            if (Path.IsPathFullyQualified(workFolder)) return false;
+
+            var root = Path.GetFullPath(runnerFolder)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var resolved = Path.GetFullPath(Path.Combine(root, workFolder));
+            var relative = Path.GetRelativePath(root, resolved);
+
+            return relative != ".." &&
+                   !relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal) &&
+                   !Path.IsPathRooted(relative);
         }
         catch { return false; }
     }
