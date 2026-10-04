@@ -85,6 +85,10 @@
                     <PasswordBox x:Name="TokenBox" Width="420" HorizontalAlignment="Left" Padding="10,7" Margin="0,6,0,0"/>
                     <TextBlock Text="{local:Tr Source='Para repositorios necesita Administration: write; para organizaciones, Self-hosted runners: write.'}"
                                Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                    <Button Content="{local:Tr Source='Crear token en GitHub'}"
+                            Style="{StaticResource ToolbarButton}" Padding="10,6"
+                            HorizontalAlignment="Left" Margin="0,7,0,0"
+                            Click="OpenGitHubToken_Click"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
                     <Button x:Name="PrepareButton" Content="{local:Tr Source='Preparar seleccionados'}"
