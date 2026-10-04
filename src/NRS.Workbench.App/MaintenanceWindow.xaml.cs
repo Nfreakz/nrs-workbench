@@ -34,11 +34,31 @@ public partial class MaintenanceWindow : Window
         StatusText.Text = UiLanguage.Choose("Escaneando almacenamiento…", "Scanning storage…", "Escanejant l'emmagatzematge…");
         try
         {
-            _lastScan = await _service.ScanAsync(_runnerProvider(), SelectedDays, _scanCancellation.Token);
+            var progress = new Progress<MaintenanceScanResult>(partial =>
+            {
+                _lastScan = partial;
+                MaintenanceGrid.ItemsSource = partial.Entries;
+                MeasuredText.Text = partial.TotalDisplay;
+                ReclaimableText.Text = partial.ReclaimableDisplay;
+                StatusText.Text = UiLanguage.Choose(
+                    $"Escaneando… {partial.Entries.Count} bloque(s) visibles",
+                    $"Scanning… {partial.Entries.Count} block(s) visible",
+                    $"Escanejant… {partial.Entries.Count} bloc(s) visibles");
+            });
+
+            _lastScan = await _service.ScanAsync(
+                _runnerProvider(),
+                SelectedDays,
+                _scanCancellation.Token,
+                progress);
+
             MaintenanceGrid.ItemsSource = _lastScan.Entries;
             MeasuredText.Text = _lastScan.TotalDisplay;
             ReclaimableText.Text = _lastScan.ReclaimableDisplay;
-            StatusText.Text = UiLanguage.Choose($"{_lastScan.Entries.Count} bloque(s) revisados", $"{_lastScan.Entries.Count} block(s) reviewed", $"{_lastScan.Entries.Count} bloc(s) revisats");
+            StatusText.Text = UiLanguage.Choose(
+                $"{_lastScan.Entries.Count} bloque(s) revisados",
+                $"{_lastScan.Entries.Count} block(s) reviewed",
+                $"{_lastScan.Entries.Count} bloc(s) revisats");
         }
         catch (OperationCanceledException) { StatusText.Text = UiLanguage.Choose("Escaneo cancelado", "Scan cancelled", "Escaneig cancel·lat"); }
         catch (Exception ex)
