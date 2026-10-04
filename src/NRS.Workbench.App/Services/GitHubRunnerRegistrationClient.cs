@@ -38,38 +38,44 @@ public sealed class GitHubRunnerRegistrationClient
         await EnsureSuccess(response, "read runner metadata");
 
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+        return ParseRemoteMetadata(json.RootElement);
+    }
+
+    public async Task<GitHubRunnerRemoteMetadata> GetRunnerByNameAsync(
+        string gitHubUrl,
+        string agentName,
+        string personalAccessToken,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(agentName))
+            throw new ArgumentException("Runner name is required.", nameof(agentName));
+
+        var target = ParseTarget(gitHubUrl);
+        var encodedName = Uri.EscapeDataString(agentName.Trim());
+        using var request = CreateRequest(
+            HttpMethod.Get,
+            $"https://api.github.com/{target.ApiPrefix}/actions/runners?name={encodedName}&per_page=100",
+            personalAccessToken);
+        using var response = await _http.SendAsync(request, cancellationToken);
+        await EnsureSuccess(response, "find runner by name");
+
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
         var root = json.RootElement;
-        var name = root.TryGetProperty("name", out var nameValue) ? nameValue.GetString() ?? string.Empty : string.Empty;
-        var custom = new List<string>();
-        var hasDefault = false;
+        if (!root.TryGetProperty("runners", out var runners) || runners.ValueKind != JsonValueKind.Array)
+            throw new InvalidOperationException("GitHub returned an invalid runner list.");
 
-        if (root.TryGetProperty("labels", out var labels) && labels.ValueKind == JsonValueKind.Array)
-        {
-            foreach (var label in labels.EnumerateArray())
-            {
-                var labelName = label.TryGetProperty("name", out var n) ? n.GetString() ?? string.Empty : string.Empty;
-                var type = label.TryGetProperty("type", out var t) ? t.GetString() ?? string.Empty : string.Empty;
-                if (string.IsNullOrWhiteSpace(labelName)) continue;
-                if (string.Equals(type, "custom", StringComparison.OrdinalIgnoreCase))
-                    custom.Add(labelName);
-                else if (string.Equals(type, "read-only", StringComparison.OrdinalIgnoreCase))
-                    hasDefault = true;
-            }
-        }
+        var exactMatches = runners.EnumerateArray()
+            .Where(item =>
+                item.TryGetProperty("name", out var nameValue) &&
+                string.Equals(nameValue.GetString(), agentName.Trim(), StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
-        var status = root.TryGetProperty("status", out var statusValue)
-            ? statusValue.GetString() ?? string.Empty
-            : string.Empty;
-        var busy = root.TryGetProperty("busy", out var busyValue) &&
-                   busyValue.ValueKind is JsonValueKind.True or JsonValueKind.False &&
-                   busyValue.GetBoolean();
+        if (exactMatches.Count == 0)
+            throw new InvalidOperationException($"GitHub runner '{agentName}' was not found.");
+        if (exactMatches.Count > 1)
+            throw new InvalidOperationException($"GitHub returned multiple runners named '{agentName}' for the same target.");
 
-        return new GitHubRunnerRemoteMetadata(
-            name,
-            custom.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
-            hasDefault,
-            status,
-            busy);
+        return ParseRemoteMetadata(exactMatches[0]);
     }
 
     public async Task<GitHubRunnerRegistrationToken> CreateRegistrationTokenAsync(
@@ -123,6 +129,43 @@ public sealed class GitHubRunnerRegistrationClient
         }
 
         throw new NotSupportedException("Could not determine the GitHub repository or organization from the runner URL.");
+    }
+
+    private static GitHubRunnerRemoteMetadata ParseRemoteMetadata(JsonElement root)
+    {
+        var name = root.TryGetProperty("name", out var nameValue)
+            ? nameValue.GetString() ?? string.Empty
+            : string.Empty;
+        var custom = new List<string>();
+        var hasDefault = false;
+
+        if (root.TryGetProperty("labels", out var labels) && labels.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var label in labels.EnumerateArray())
+            {
+                var labelName = label.TryGetProperty("name", out var n) ? n.GetString() ?? string.Empty : string.Empty;
+                var type = label.TryGetProperty("type", out var t) ? t.GetString() ?? string.Empty : string.Empty;
+                if (string.IsNullOrWhiteSpace(labelName)) continue;
+                if (string.Equals(type, "custom", StringComparison.OrdinalIgnoreCase))
+                    custom.Add(labelName);
+                else if (string.Equals(type, "read-only", StringComparison.OrdinalIgnoreCase))
+                    hasDefault = true;
+            }
+        }
+
+        var status = root.TryGetProperty("status", out var statusValue)
+            ? statusValue.GetString() ?? string.Empty
+            : string.Empty;
+        var busy = root.TryGetProperty("busy", out var busyValue) &&
+                   busyValue.ValueKind is JsonValueKind.True or JsonValueKind.False &&
+                   busyValue.GetBoolean();
+
+        return new GitHubRunnerRemoteMetadata(
+            name,
+            custom.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
+            hasDefault,
+            status,
+            busy);
     }
 
     private static HttpRequestMessage CreateRequest(HttpMethod method, string url, string token)
