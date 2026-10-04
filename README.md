@@ -14,7 +14,7 @@ Project preview based on the v0.18.4 main interface. Runner names, repositories,
 
 **New in v0.18.5:** runner discovery uses real installation markers instead of folder naming; Smart Queue can target an explicit runner pool; Runner Doctor explains local runner health; Feedback & Diagnostics provides review-before-share diagnostic export; and long-running refresh/error handling is more resilient.
 
-**In development for v0.18.6:** a Maintenance Center measures Workbench logs, runner diagnostics and runner work directories before cleanup, rotates the application log automatically and keeps history-sensitive cleanup explicit.
+**Integrated for v0.18.6 (not yet published):** the Maintenance Center measures Workbench logs, runner diagnostics and runner work directories before cleanup, rotates the application log automatically and keeps history-sensitive cleanup explicit.
 
 NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.5**, check runner status and current jobs, inspect locally retained job history, review Runner Doctor checks, export sanitized diagnostics after previewing them, see host CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
 
