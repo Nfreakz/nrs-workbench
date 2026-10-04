@@ -154,13 +154,41 @@ public partial class PortableWorkspaceWindow : Window
         {
             var service = new PortableRunnerPreparationService(_settingsService);
             foreach (var candidate in selected)
+                candidate.ResultText = UiLanguage.Choose("Validando acceso…", "Validating access…", "Validant accés…");
+
+            IReadOnlyDictionary<string, PortableRunnerPreflight> preflight;
+            try
+            {
+                preflight = await service.PreflightAsync(selected, pat, _operationCancellation.Token);
+            }
+            catch (Exception ex)
+            {
+                foreach (var candidate in selected)
+                    candidate.ResultText = UiLanguage.Choose("Sin cambios · prevalidación fallida", "No changes · preflight failed", "Sense canvis · prevalidació fallida");
+
+                MessageBox.Show(
+                    this,
+                    UiLanguage.Choose(
+                        $"No se ha modificado ningún runner. La prevalidación de GitHub falló antes de retirar configuraciones locales.\n\n{SensitiveDataRedactor.Redact(ex.Message)}",
+                        $"No runner was modified. GitHub preflight failed before any local configuration was removed.\n\n{SensitiveDataRedactor.Redact(ex.Message)}",
+                        $"No s'ha modificat cap runner. La prevalidació de GitHub ha fallat abans de retirar cap configuració local.\n\n{SensitiveDataRedactor.Redact(ex.Message)}"),
+                    UiLanguage.Choose("Preparar runners", "Prepare runners", "Preparar runners"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            foreach (var candidate in selected)
             {
                 _operationCancellation.Token.ThrowIfCancellationRequested();
                 candidate.IsWorking = true;
                 candidate.ResultText = UiLanguage.Choose("Preparando…", "Preparing…", "Preparant…");
                 try
                 {
-                    var result = await service.PrepareAsync(candidate, pat, _operationCancellation.Token);
+                    var result = await service.PrepareAsync(
+                        candidate,
+                        preflight[candidate.FolderPath],
+                        _operationCancellation.Token);
                     candidate.ResultText = result.Message;
                     candidate.IsSelected = false;
                 }

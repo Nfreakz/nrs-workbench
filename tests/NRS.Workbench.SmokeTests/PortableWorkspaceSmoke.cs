@@ -89,6 +89,32 @@ internal static class PortableWorkspaceSmoke
                    manifest.FindPrepared(runner) is not null,
                 "portable manifest records prepared runners without the raw machine name");
 
+            var duplicateRegistration = new PortableRunnerRegistration(
+                1, "duplicate-name", "https://github.com/acme/project", "_work", "Default", false, false);
+            var duplicateA = new PortableRunnerCandidate
+            {
+                FolderPath = Path.Combine(root, "Runners", "duplicate-a"),
+                DisplayName = "duplicate-name",
+                GitHubUrl = duplicateRegistration.GitHubUrl,
+                StateLabel = "Needs preparation",
+                Registration = duplicateRegistration,
+                CanPrepare = true
+            };
+            var duplicateB = new PortableRunnerCandidate
+            {
+                FolderPath = Path.Combine(root, "Runners", "duplicate-b"),
+                DisplayName = "duplicate-name",
+                GitHubUrl = duplicateRegistration.GitHubUrl,
+                StateLabel = "Needs preparation",
+                Registration = duplicateRegistration with { AgentId = 2 },
+                CanPrepare = true
+            };
+            var duplicateBlocked = false;
+            try { PortableRunnerPreparationService.ValidateSelection([duplicateA, duplicateB]); }
+            catch (InvalidOperationException) { duplicateBlocked = true; }
+            Assert(duplicateBlocked,
+                "portable bulk preparation blocks duplicate target/name identities before touching local runner configuration");
+
             var handler = new FakeGitHubHandler();
             var client = new GitHubRunnerRegistrationClient(new HttpClient(handler));
             const string sessionPat = "session-pat-never-write";

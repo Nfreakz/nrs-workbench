@@ -58,6 +58,11 @@ public sealed class PortableRunnerCandidate : INotifyPropertyChanged
 
 public sealed record PortableRunnerPreparationResult(bool Success, string Message);
 
+public sealed record PortableRunnerPreflight(
+    PortableRunnerRegistration Registration,
+    GitHubRunnerRemoteMetadata RemoteMetadata,
+    GitHubRunnerRegistrationToken RegistrationToken);
+
 public sealed class PortableRunnerPreparationService
 {
     private readonly SettingsService _settings;
@@ -91,44 +96,91 @@ public sealed class PortableRunnerPreparationService
         string personalAccessToken,
         CancellationToken cancellationToken = default)
     {
+        var preflight = (await PreflightAsync([candidate], personalAccessToken, cancellationToken))
+            [candidate.FolderPath];
+        return await PrepareAsync(candidate, preflight, cancellationToken);
+    }
+
+    public async Task<IReadOnlyDictionary<string, PortableRunnerPreflight>> PreflightAsync(
+        IReadOnlyList<PortableRunnerCandidate> candidates,
+        string personalAccessToken,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(candidates);
+        if (string.IsNullOrWhiteSpace(personalAccessToken))
+            throw new ArgumentException("GitHub token is required.", nameof(personalAccessToken));
+
+        ValidateSelection(candidates);
+
+        var result = new Dictionary<string, PortableRunnerPreflight>(StringComparer.OrdinalIgnoreCase);
+        foreach (var candidate in candidates)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                EnsureStoppedInteractive(candidate.FolderPath);
+                EnsureRunnerBinary(candidate.FolderPath);
+
+                var pending = _manifest.FindPending(candidate.FolderPath);
+                var localRegistration = PortableRunnerMetadataReader.Read(candidate.FolderPath);
+                var registration = localRegistration
+                                   ?? pending?.Registration
+                                   ?? candidate.Registration;
+
+                GitHubRunnerRemoteMetadata remote;
+                if (pending is not null && localRegistration is null)
+                {
+                    remote = new GitHubRunnerRemoteMetadata(
+                        pending.Registration.AgentName,
+                        pending.CustomLabels,
+                        pending.HasDefaultLabels);
+                }
+                else
+                {
+                    remote = await _github.GetRunnerAsync(
+                        registration.GitHubUrl,
+                        registration.AgentId,
+                        personalAccessToken,
+                        cancellationToken);
+                }
+
+                var registrationToken = await _github.CreateRegistrationTokenAsync(
+                    registration.GitHubUrl,
+                    personalAccessToken,
+                    cancellationToken);
+
+                result[candidate.FolderPath] = new PortableRunnerPreflight(
+                    registration,
+                    remote,
+                    registrationToken);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                throw new InvalidOperationException(
+                    $"Preflight failed for '{candidate.DisplayName}': {ex.Message}",
+                    ex);
+            }
+        }
+
+        return result;
+    }
+
+    public async Task<PortableRunnerPreparationResult> PrepareAsync(
+        PortableRunnerCandidate candidate,
+        PortableRunnerPreflight preflight,
+        CancellationToken cancellationToken = default)
+    {
         ArgumentNullException.ThrowIfNull(candidate);
+        ArgumentNullException.ThrowIfNull(preflight);
         if (!candidate.CanPrepare)
             return new PortableRunnerPreparationResult(false, "Runner is not eligible for portable preparation.");
-        if (string.IsNullOrWhiteSpace(personalAccessToken))
-            return new PortableRunnerPreparationResult(false, "GitHub token is required.");
 
         EnsureStoppedInteractive(candidate.FolderPath);
+        EnsureRunnerBinary(candidate.FolderPath);
 
-        var pending = _manifest.FindPending(candidate.FolderPath);
-        var localRegistration = PortableRunnerMetadataReader.Read(candidate.FolderPath);
-        var registration = localRegistration
-                           ?? pending?.Registration
-                           ?? candidate.Registration;
-
-        GitHubRunnerRemoteMetadata remote;
-        if (pending is not null && localRegistration is null)
-        {
-            // A previous attempt already removed local machine-bound credentials.
-            // Reuse the non-secret remote metadata captured before that removal so
-            // retry does not depend on the old runner ID still existing remotely.
-            remote = new GitHubRunnerRemoteMetadata(
-                pending.Registration.AgentName,
-                pending.CustomLabels,
-                pending.HasDefaultLabels);
-        }
-        else
-        {
-            remote = await _github.GetRunnerAsync(
-                registration.GitHubUrl,
-                registration.AgentId,
-                personalAccessToken,
-                cancellationToken);
-        }
-
-        var registrationToken = await _github.CreateRegistrationTokenAsync(
-            registration.GitHubUrl,
-            personalAccessToken,
-            cancellationToken);
+        var registration = preflight.Registration;
+        var remote = preflight.RemoteMetadata;
+        var registrationToken = preflight.RegistrationToken;
 
         _manifest.RecordPending(
             candidate.FolderPath,
@@ -237,6 +289,8 @@ public sealed class PortableRunnerPreparationService
 
             var serviceMode = File.Exists(Path.Combine(folder, ".service"));
             var running = IsRunning(folder);
+            var runnerBinaryAvailable = File.Exists(Path.Combine(folder, "bin", "Runner.Listener.exe"));
+            var supportedTarget = IsSupportedTarget(registration.GitHubUrl);
             var prepared = _manifest.FindPrepared(folder);
             var preparedHere = prepared is not null &&
                                string.Equals(
@@ -244,16 +298,20 @@ public sealed class PortableRunnerPreparationService
                                    currentFingerprint,
                                    StringComparison.Ordinal);
 
-            var canPrepare = !serviceMode && !running && !preparedHere;
+            var canPrepare = !serviceMode && !running && !preparedHere && runnerBinaryAvailable && supportedTarget;
             var state = serviceMode
                 ? UiLanguage.Choose("Servicio · no portable", "Service · not portable", "Servei · no portable")
                 : running
                     ? UiLanguage.Choose("En ejecución · detener primero", "Running · stop first", "En execució · atura primer")
-                    : preparedHere
-                        ? UiLanguage.Choose("Listo en este PC", "Ready on this PC", "Llest en aquest PC")
-                        : pending is not null
-                            ? UiLanguage.Choose("Migración pendiente · reintentar", "Migration pending · retry", "Migració pendent · torna-ho a provar")
-                            : UiLanguage.Choose("Necesita preparación", "Needs preparation", "Necessita preparació");
+                    : !runnerBinaryAvailable
+                        ? UiLanguage.Choose("Instalación incompleta · falta Runner.Listener.exe", "Incomplete installation · Runner.Listener.exe missing", "Instal·lació incompleta · falta Runner.Listener.exe")
+                        : !supportedTarget
+                            ? UiLanguage.Choose("Destino no compatible · solo github.com", "Unsupported target · github.com only", "Destí no compatible · només github.com")
+                            : preparedHere
+                                ? UiLanguage.Choose("Listo en este PC", "Ready on this PC", "Llest en aquest PC")
+                                : pending is not null
+                                    ? UiLanguage.Choose("Migración pendiente · reintentar", "Migration pending · retry", "Migració pendent · torna-ho a provar")
+                                    : UiLanguage.Choose("Necesita preparación", "Needs preparation", "Necessita preparació");
 
             candidates.Add(new PortableRunnerCandidate
             {
@@ -282,6 +340,50 @@ public sealed class PortableRunnerPreparationService
         }
     }
 
+    public static void ValidateSelection(IReadOnlyList<PortableRunnerCandidate> candidates)
+    {
+        ArgumentNullException.ThrowIfNull(candidates);
+        if (candidates.Count == 0)
+            throw new InvalidOperationException("No runners were selected for portable preparation.");
+
+        var duplicates = candidates
+            .GroupBy(
+                candidate => candidate.Registration.GitHubUrl.TrimEnd('/') + "\u001f" + candidate.Registration.AgentName,
+                StringComparer.OrdinalIgnoreCase)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.First().Registration.AgentName)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (duplicates.Count > 0)
+            throw new InvalidOperationException(
+                "Multiple selected runner folders use the same GitHub target and runner name: " +
+                string.Join(", ", duplicates) +
+                ". Resolve the duplicate before bulk preparation.");
+
+        var ineligible = candidates.FirstOrDefault(candidate => !candidate.CanPrepare);
+        if (ineligible is not null)
+            throw new InvalidOperationException(
+                $"Runner '{ineligible.DisplayName}' is not eligible for portable preparation.");
+    }
+
+    private static bool IsSupportedTarget(string gitHubUrl)
+    {
+        try
+        {
+            GitHubRunnerRegistrationClient.ParseTarget(gitHubUrl);
+            return true;
+        }
+        catch { return false; }
+    }
+
+    private static void EnsureRunnerBinary(string folder)
+    {
+        var executable = Path.Combine(folder, "bin", "Runner.Listener.exe");
+        if (!File.Exists(executable))
+            throw new FileNotFoundException("Runner.Listener.exe was not found.", executable);
+    }
+
     private void EnsureStoppedInteractive(string folder)
     {
         if (File.Exists(Path.Combine(folder, ".service")))
@@ -298,8 +400,6 @@ public sealed class PortableRunnerPreparationService
         CancellationToken cancellationToken)
     {
         var executable = Path.Combine(runnerFolder, "bin", "Runner.Listener.exe");
-        if (!File.Exists(executable))
-            throw new FileNotFoundException("Runner.Listener.exe was not found.", executable);
 
         var start = new ProcessStartInfo
         {
