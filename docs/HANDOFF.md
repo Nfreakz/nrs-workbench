@@ -87,7 +87,9 @@ Scope:
 - a pending manifest record is written before local removal so a failed migration can be retried;
 - the complete selected batch is prevalidated against GitHub before any local configuration is removed;
 - duplicate GitHub target/name identities, missing Runner.Listener binaries, unsupported targets and unsafe/non-relative work folders are blocked before preparation;
-- GitHub runners still reported online or busy are blocked before replacement;
+- GitHub runners still reported online or busy are blocked during batch preflight and revalidated again immediately before local removal;
+- interrupted migrations resolve the remote runner by stable target + name when the original numeric runner ID is no longer reliable;
+- a fresh short-lived registration token is requested immediately before each local replacement so large batches do not depend on older preflight tokens;
 - registration tokens that are expired or too close to expiry are rejected before local configuration removal;
 - Smart Queue must be disabled before preparation so automatic queue actions cannot race with re-registration;
 - a runner is only considered ready on the current machine when both the manifest association and expected local credential files are present;
