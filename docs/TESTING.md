@@ -205,6 +205,8 @@ Manual checks:
 13. Remove either `.credentials` or `.credentials_rsaparams` from a disposable prepared runner and verify Portable Workspace no longer reports it as ready for this PC.
 14. Simulate an expired/nearly expired registration token and verify preparation stops before `remove --local` is executed.
 15. With Smart Queue enabled in saved Settings, Portable Workspace must refuse preparation before GitHub preflight or local runner changes begin. Disable/save Smart Queue and retry.
+16. In a disposable copy, simulate an activation failure while writing portable manifest data and verify `NRSWorkbench.portable` is not created; the next launch must remain in normal mode.
+17. Activate portable mode with one runner missing `.credentials` or `.credentials_rsaparams`; it must not be recorded as already prepared for the current PC.
 
 
 ## v0.18.6 maintenance checks

@@ -25,10 +25,6 @@ public sealed class PortableWorkspaceService
             AppDataPaths.PortableVolumeRoot);
         portableSettings.Save(settings);
 
-        File.WriteAllText(
-            AppDataPaths.PortableMarkerPath,
-            "NRS Workbench portable workspace\r\nSchema=1\r\n");
-
         var store = new PortableWorkspaceManifestStore(
             AppDataPaths.PortableDataDirectory,
             AppDataPaths.PortableVolumeRoot);
@@ -39,10 +35,20 @@ public sealed class PortableWorkspaceService
             if (!IsOnPortableVolume(folder)) continue;
             if (File.Exists(Path.Combine(folder, ".service"))) continue;
             var registration = PortableRunnerMetadataReader.Read(folder);
-            if (registration is null) continue;
+            if (registration is null ||
+                !PortableRunnerPreparationService.HasExpectedLocalCredentials(folder))
+                continue;
+
             store.RecordPrepared(folder, registration.GitHubUrl, registration.AgentName);
             recorded++;
         }
+
+        // The marker is the activation commit point. Write it only after settings
+        // and manifest data are safely prepared so a partial activation cannot make
+        // the next launch enter portable mode unexpectedly.
+        File.WriteAllText(
+            AppDataPaths.PortableMarkerPath,
+            "NRS Workbench portable workspace\r\nSchema=1\r\n");
 
         return new PortableWorkspaceActivationResult(
             AppDataPaths.PortableDataDirectory,
