@@ -46,6 +46,27 @@ Release-candidate status:
 - version metadata and release documentation are being finalized for v0.18.5;
 - v0.19.0 work starts only after v0.18.5 is tagged and its Windows package is verified.
 
+## v0.18.6
+
+Maintenance and storage hygiene.
+
+- Maintenance Center with measured/reclaimable storage categories.
+- Automatic NRS Workbench log rotation.
+- Safe cleanup of Workbench and PREVIEW logs.
+- Reviewed cleanup of old runner `_diag` logs.
+- BUSY runners are never cleaned.
+- Runner `_work` is inventory-only; no automatic deletion.
+
+## v0.18.7
+
+Portable Workspace and runner migration.
+
+- True portable Workbench profile with relative paths on removable storage.
+- Detect when a runner folder was configured on another Windows machine.
+- Session-only GitHub authorization for bulk runner preparation.
+- Re-register interactive runners in bulk without storing the GitHub PAT.
+- Explicit confirmation and per-runner progress; no automatic migration on disk insertion.
+
 ## v0.19.0
 
 GitHub Actions control.

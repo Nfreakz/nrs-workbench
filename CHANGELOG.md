@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [0.18.6] - Unreleased
+
+### Added
+- Adds a **Maintenance Center** that inventories NRS Workbench logs, runner `_diag` history and runner `_work` usage before deleting anything.
+- Adds reviewed cleanup for Workbench/PREVIEW logs and old runner diagnostics, with BUSY-runner protection and an explicit warning when cleanup reduces statistics/progress history.
+
+### Improved
+- Rotates the local NRS Workbench application log at 5 MB and keeps at most five archives so the log cannot grow indefinitely.
+- Keeps runner `_work` directories inventory-only in the first maintenance release; NRS Workbench reports their size but never deletes them automatically.
+
+
 ## [0.18.5] - 2026-10-03
 
 ### Fixed

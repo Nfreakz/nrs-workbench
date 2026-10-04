@@ -99,3 +99,19 @@ The normal checkout remains on `main` and is the day-to-day NRS Workbench copy.
 - Preview uses `%LOCALAPPDATA%\NRSWorkbenchPreview`. Before launch, its `settings.json` is refreshed from the normal profile so real runner/repository registrations can be tested without persisting preview changes into the normal profile. The queue recovery journal is not copied.
 - `qa-preview` is only a movable test pointer. It is not a release branch and never replaces the feature branch/PR as source of truth.
 - automatic CI ignores pushes to `qa-preview`; the source feature branch/PR remains the validated commit, while `workflow_dispatch` stays available if a manual preview-channel run is ever needed.
+
+
+## v0.18.6 development state
+
+Branch: `feat/v0.18.6-maintenance`.
+
+Scope:
+- application version is 0.18.6 on the feature branch;
+- Maintenance Center scans storage before cleanup;
+- NRS Workbench logs rotate at 5 MB with five retained archives;
+- Workbench/PREVIEW log cleanup is low-risk and selected by default;
+- old runner `_diag` cleanup is opt-in because Worker logs feed statistics and progress estimation;
+- newest Runner/Worker logs are always preserved and BUSY runners are blocked from diagnostic cleanup;
+- runner `_work` is measured but intentionally not deleted automatically.
+
+This work is separate from the planned v0.18.7 Portable Workspace. Do not publish v0.18.6 until CI and manual preview checks pass.

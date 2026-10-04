@@ -370,5 +370,22 @@
   "Selecciona un runner": "Selecciona un runner",
   "Runner Doctor no inicia, detiene ni reconfigura runners. Las acciones de esta ventana son de consulta.": "Runner Doctor no inicia, atura ni reconfigura runners. Les accions d'aquesta finestra són de consulta.",
   "Abrir _diag": "Obrir _diag",
-  "Copiar resumen": "Copiar resum"
+  "Copiar resumen": "Copiar resum",
+  "Mantenimiento": "Manteniment",
+  "Mantenimiento · NRS Workbench": "Manteniment · NRS Workbench",
+  "Centro de mantenimiento": "Centre de manteniment",
+  "Mide primero. Limpia solo elementos clasificados y revisables.": "Mesura primer. Neteja només elements classificats i revisables.",
+  "Logs anteriores a": "Logs anteriors a",
+  "Escanear": "Escanejar",
+  "Sin escanear": "Sense escanejar",
+  "ESPACIO MEDIDO": "ESPAI MESURAT",
+  "RECUPERABLE": "RECUPERABLE",
+  "CATEGORÍA": "CATEGORIA",
+  "RIESGO": "RISC",
+  "ARCHIVOS": "FITXERS",
+  "TAMAÑO": "MIDA",
+  "DETALLE": "DETALL",
+  "_work se inventaría pero nunca se borra automáticamente. Los logs _diag antiguos pueden afectar estadísticas y estimaciones.": "_work s'inventaria però no s'esborra mai automàticament. Els logs _diag antics poden afectar estadístiques i estimacions.",
+  "Abrir ubicación": "Obrir ubicació",
+  "Limpiar selección": "Netejar selecció"
 }
