@@ -36,6 +36,7 @@
 - Revalidates runner activity immediately before historical `_diag` cleanup so a runner that became active after the scan is skipped rather than cleaned.
 - Re-evaluates the newest Runner/Worker diagnostic files at cleanup time and refuses cleanable `_diag` locations that are reparse points or leave the reviewed directory.
 - Refuses to traverse absolute, escaping or reparse-point runner `workFolder` locations while measuring `_work`; unsafe locations remain unmeasured and never become cleanable.
+- Rejects reparse points anywhere along runner → `_diag` and runner → workFolder directory chains, so Maintenance does not even inventory a tree that escapes through an intermediate junction.
 
 
 ## [0.18.5] - 2026-10-03

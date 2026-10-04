@@ -12,11 +12,11 @@
 - Latest published release: [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5).
 - Published Windows asset: `NRSWorkbench-v0.18.5-win-x64.zip`, 71,433,124 bytes, SHA256 `7831f858b9a35de1624465a6ee8b5481220a42a3411bb19cdf41f3dc08cb0a2e`.
 - v0.18.5 release source is the tag created from the release-prepared main line; the release workflow published the prerelease successfully on 2026-10-04 local time.
-- Current `main`: `caf6d8ffa85a857efe7d77308ffd39a70aa08ba4`; v0.18.6 Maintenance Center plus final workFolder inventory hardening are integrated on `main` but not published.
+- Current `main`: `0c0202d0036bc23f23015b1d49b887e1cbbb1726`; v0.18.6 Maintenance Center plus reparse-chain hardening are integrated on `main` but not published.
 - v0.18.5 includes runner discovery by real installation markers, explicit Smart Queue pools, Feedback & Diagnostics, long-session runtime hardening and Runner Doctor.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
-- PR #40 (v0.18.6 Maintenance Center) and PR #44 (safe workFolder inventory hardening) are merged. Active development is PR #41 / `feat/v0.18.7-portable-workspace`, synchronized with current `main`.
+- v0.18.6 PRs #40, #42, #43, #44 and #45 are merged. Active development is PR #41 / `feat/v0.18.7-portable-workspace`, synchronized with current `main`.
 
 ## v0.18.5 published scope
 
@@ -66,6 +66,7 @@ Scope:
 - newest Runner/Worker logs are always preserved and BUSY runners are blocked from diagnostic cleanup;
 - runner `_work` is measured but intentionally not deleted automatically;
 - absolute, escaping or reparse-point `workFolder` roots are not traversed or measured;
+- reparse points anywhere along runner → `_diag` or runner → workFolder directory chains block measurement and cleanup, including intermediate junctions;
 - cleanup results count only files actually cleaned and bytes actually reclaimed.
 
 v0.18.6 is integrated but not published.

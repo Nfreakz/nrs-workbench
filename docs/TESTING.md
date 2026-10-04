@@ -224,4 +224,5 @@ Manual checks:
 5. Candidate files outside the exact reviewed directory must never be deleted.
 6. Verify the application log rotates at 5 MB and keeps at most five archives.
 7. Configure a disposable runner with an absolute or `..`-escaping workFolder, or a workFolder root that is a reparse point. Maintenance must not traverse it and must report zero measured/reclaimable bytes.
+8. On a disposable runner, place a Windows junction/reparse point in an intermediate path segment leading to `_diag` or the configured workFolder. Maintenance must report zero measured/reclaimable bytes for that location and must not enumerate through the junction.
 
