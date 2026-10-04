@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using NRS.Workbench.App.Services;
 using NRS.Workbench.Core.Models;
 
@@ -6,10 +5,7 @@ namespace NRS.Workbench.SmokeTests;
 
 internal static class MaintenanceSmoke
 {
-    [ModuleInitializer]
-    internal static void Run() => RunAsync().GetAwaiter().GetResult();
-
-    private static async Task RunAsync()
+    internal static async Task RunAsync()
     {
         var root = Path.Combine(Path.GetTempPath(), "nrs-maintenance-" + Guid.NewGuid().ToString("N"));
         var settings = Path.Combine(root, "settings");
