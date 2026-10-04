@@ -146,6 +146,7 @@ internal static class PortableWorkspaceSmoke
             var client = new GitHubRunnerRegistrationClient(new HttpClient(handler));
             const string sessionPat = "session-pat-never-write";
             var remote = await client.GetRunnerAsync("https://github.com/acme/project", 42, sessionPat);
+            var remoteByName = await client.GetRunnerByNameAsync("https://github.com/acme/project", "portable-one", sessionPat);
             var token = await client.CreateRegistrationTokenAsync("https://github.com/acme/project", sessionPat);
 
             PortableRunnerPreparationService.ValidateRemoteIdentity(registration, remote);
@@ -197,11 +198,13 @@ internal static class PortableWorkspaceSmoke
 
 
             Assert(token.Token == "temporary-registration-token" &&
-                   handler.Calls.Count == 2 &&
+                   remoteByName.Name == "portable-one" &&
+                   handler.Calls.Count == 3 &&
                    handler.Calls.All(x => x.Authorization == "Bearer " + sessionPat) &&
                    handler.Calls[0].Url.EndsWith("/repos/acme/project/actions/runners/42", StringComparison.Ordinal) &&
-                   handler.Calls[1].Url.EndsWith("/repos/acme/project/actions/runners/registration-token", StringComparison.Ordinal),
-                "GitHub client uses the session PAT only for authenticated metadata/token requests");
+                   handler.Calls[1].Url.Contains("/repos/acme/project/actions/runners?name=portable-one", StringComparison.Ordinal) &&
+                   handler.Calls[2].Url.EndsWith("/repos/acme/project/actions/runners/registration-token", StringComparison.Ordinal),
+                "GitHub client supports stable name lookup and uses the session PAT only for authenticated metadata/token requests");
 
             var diskText = string.Join("\n",
                 Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories)
@@ -241,10 +244,14 @@ internal static class PortableWorkspaceSmoke
 
             if (request.Method == HttpMethod.Get)
             {
+                const string runnerJson =
+                    "{\"id\":42,\"name\":\"portable-one\",\"status\":\"offline\",\"busy\":false,\"labels\":[{\"name\":\"self-hosted\",\"type\":\"read-only\"},{\"name\":\"Windows\",\"type\":\"read-only\"},{\"name\":\"X64\",\"type\":\"read-only\"},{\"name\":\"gpu\",\"type\":\"custom\"},{\"name\":\"build\",\"type\":\"custom\"}]}";
+                var isList = request.RequestUri?.Query.Contains("name=", StringComparison.OrdinalIgnoreCase) == true;
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent(
-                        "{\"id\":42,\"name\":\"portable-one\",\"status\":\"offline\",\"busy\":false,\"labels\":[{\"name\":\"self-hosted\",\"type\":\"read-only\"},{\"name\":\"Windows\",\"type\":\"read-only\"},{\"name\":\"X64\",\"type\":\"read-only\"},{\"name\":\"gpu\",\"type\":\"custom\"},{\"name\":\"build\",\"type\":\"custom\"}]}")
+                    Content = new StringContent(isList
+                        ? "{\"total_count\":1,\"runners\":[" + runnerJson + "]}"
+                        : runnerJson)
                 });
             }
 
