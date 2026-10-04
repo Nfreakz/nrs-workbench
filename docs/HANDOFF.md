@@ -29,12 +29,14 @@
 
 ## Release documentation
 
-README and the GitHub Wiki describe the published ZIP. The preview image uses fictional runner, repository, path and log data. Before the next version, read `docs/WRITING_STYLE.md`, review affected documentation and the real GitHub Wiki, and distinguish released features from work on `main`.
+README now reflects the published v0.18.5 ZIP. The preview image uses fictional runner, repository, path and log data. The live GitHub Wiki still requires an explicit review in a Wiki-capable session before it can be claimed current. Before each release, read `docs/WRITING_STYLE.md`, review affected documentation and distinguish released features from development work.
 
 ## Future roadmap
 
-- v0.18.5: Runner control, discovery, Feedback & Diagnostics.
-- v0.19.0: GitHub Actions Control.
+- v0.18.5: published Public Preview baseline.
+- v0.18.6: Maintenance Center and storage hygiene, active in PR #40.
+- v0.18.7: Portable Workspace and reviewed bulk preparation for interactive runners, stacked after v0.18.6.
+- v0.19.0: GitHub Actions Control after the 0.18.x maintenance/portability line is closed.
 - Product website/SEO remains a separate web project or explicitly approved repository.
 - GitLab support only if real demand appears.
 
