@@ -403,5 +403,6 @@
   "Preparar seleccionados": "Preparar seleccionats",
   "El token de acceso de GitHub se usa solo durante esta operación y no se guarda en settings, Data ni el manifiesto portable.": "El token d'accés de GitHub s'utilitza només durant aquesta operació i no es desa a settings, Data ni al manifest portable.",
   "Token de acceso de GitHub para esta sesión": "Token d'accés de GitHub per a aquesta sessió",
-  "Para repositorios necesita Administration: write; para organizaciones, Self-hosted runners: write.": "Per a repositoris cal Administration: write; per a organitzacions, Self-hosted runners: write."
+  "Para repositorios necesita Administration: write; para organizaciones, Self-hosted runners: write.": "Per a repositoris cal Administration: write; per a organitzacions, Self-hosted runners: write.",
+  "Crear token en GitHub": "Crear token a GitHub"
 }
