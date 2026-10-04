@@ -60,8 +60,7 @@ public sealed record PortableRunnerPreparationResult(bool Success, string Messag
 
 public sealed record PortableRunnerPreflight(
     PortableRunnerRegistration Registration,
-    GitHubRunnerRemoteMetadata RemoteMetadata,
-    GitHubRunnerRegistrationToken RegistrationToken);
+    GitHubRunnerRemoteMetadata RemoteMetadata);
 
 public sealed class PortableRunnerPreparationService
 {
@@ -114,6 +113,7 @@ public sealed class PortableRunnerPreparationService
         ValidateSmartQueueDisabled(_settings.Load());
 
         var result = new Dictionary<string, PortableRunnerPreflight>(StringComparer.OrdinalIgnoreCase);
+        var registrationPermissionChecked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var candidate in candidates)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -154,15 +154,22 @@ public sealed class PortableRunnerPreparationService
                 ValidateRemoteIdentity(registration, remote);
                 ValidateRemoteAvailability(remote);
 
-                var registrationToken = await _github.CreateRegistrationTokenAsync(
-                    registration.GitHubUrl,
-                    personalAccessToken,
-                    cancellationToken);
+                var targetKey = registration.GitHubUrl.TrimEnd('/');
+                if (registrationPermissionChecked.Add(targetKey))
+                {
+                    // Creating one short-lived token proves write permission for
+                    // this GitHub target. The token is deliberately discarded:
+                    // each runner gets a fresh token immediately before mutation.
+                    var permissionToken = await _github.CreateRegistrationTokenAsync(
+                        registration.GitHubUrl,
+                        personalAccessToken,
+                        cancellationToken);
+                    ValidateRegistrationTokenFreshness(permissionToken);
+                }
 
                 result[candidate.FolderPath] = new PortableRunnerPreflight(
                     registration,
-                    remote,
-                    registrationToken);
+                    remote);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
