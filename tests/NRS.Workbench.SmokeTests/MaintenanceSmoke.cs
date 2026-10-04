@@ -35,7 +35,18 @@ internal static class MaintenanceSmoke
                 settings,
                 () => new DateTimeOffset(2026, 10, 4, 0, 0, 0, TimeSpan.Zero),
                 _ => runnerActive);
-            var snapshot = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Stopped, Mode = RunnerMode.Interactive }], 30);
+            var progressiveSnapshots = new List<MaintenanceScanResult>();
+            var progress = new InlineProgress<MaintenanceScanResult>(progressiveSnapshots.Add);
+            var snapshot = await service.ScanAsync(
+                [new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Stopped, Mode = RunnerMode.Interactive }],
+                30,
+                default,
+                progress);
+            Assert(
+                progressiveSnapshots.Count >= 2 &&
+                progressiveSnapshots[0].Entries.Any(x => x.Id == "workbench-logs") &&
+                progressiveSnapshots[^1].Entries.Count == snapshot.Entries.Count,
+                "maintenance publishes usable partial results before the full scan completes");
             var diagEntry = snapshot.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));
             var workEntry = snapshot.Entries.Single(x => x.Id.StartsWith("work:", StringComparison.Ordinal));
 
@@ -88,6 +99,11 @@ internal static class MaintenanceSmoke
                 "maintenance refuses to traverse workFolder paths that escape the runner directory");
         }
         finally { try { Directory.Delete(root, true); } catch { } }
+    }
+
+    private sealed class InlineProgress<T>(Action<T> report) : IProgress<T>
+    {
+        public void Report(T value) => report(value);
     }
 
     private static void Assert(bool condition, string name)
