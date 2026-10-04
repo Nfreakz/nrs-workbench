@@ -124,26 +124,27 @@ public sealed class MaintenanceService
     private void AddRunnerDiagnostics(List<MaintenanceEntry> entries, RunnerInfo runner, int olderThanDays)
     {
         var folder = Path.Combine(runner.FolderPath, "_diag");
-        var files = SafeFiles(folder, "*.log");
-        if (files.Count == 0) return;
-        var total = files.Sum(SafeLength);
 
-        if (!IsSafeCleanupDirectory(folder))
+        if (!IsSafeCleanupDirectory(folder, runner.FolderPath))
         {
             entries.Add(new MaintenanceEntry
             {
                 Id = "diag:" + runner.FolderPath,
                 Category = UiLanguage.Choose($"Diagnósticos · {runner.Alias}", $"Diagnostics · {runner.Alias}", $"Diagnòstics · {runner.Alias}"),
                 Detail = UiLanguage.Choose(
-                    "La carpeta _diag es un enlace/reparse point o no se puede validar con seguridad. Solo se muestra el inventario.",
-                    "The _diag folder is a link/reparse point or cannot be validated safely. Inventory only.",
-                    "La carpeta _diag és un enllaç/reparse point o no es pot validar amb seguretat. Només es mostra l'inventari."),
-                Location = folder, FileCount = files.Count, TotalBytes = total, ReclaimableBytes = 0,
+                    "La ruta _diag atraviesa un enlace/reparse point o no se puede validar con seguridad. No se mide ni se elimina.",
+                    "The _diag path traverses a link/reparse point or cannot be validated safely. It is not measured or deleted.",
+                    "La ruta _diag travessa un enllaç/reparse point o no es pot validar amb seguretat. No es mesura ni s'elimina."),
+                Location = folder, FileCount = 0, TotalBytes = 0, ReclaimableBytes = 0,
                 Risk = MaintenanceRisk.Inventory, RiskLabel = UiLanguage.Choose("Solo inventario", "Inventory only", "Només inventari"),
                 IsCleanable = false, IsSelected = false, RunnerFolderPath = runner.FolderPath
             });
             return;
         }
+
+        var files = SafeFiles(folder, "*.log");
+        if (files.Count == 0) return;
+        var total = files.Sum(SafeLength);
 
         var cutoff = _now().AddDays(-olderThanDays).UtcDateTime;
         var protectedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -230,8 +231,7 @@ public sealed class MaintenanceService
                 Path.IsPathRooted(relative))
                 return false;
 
-            if (Directory.Exists(candidate) &&
-                (File.GetAttributes(candidate) & FileAttributes.ReparsePoint) != 0)
+            if (ContainsReparsePoint(root, candidate))
                 return false;
 
             resolved = candidate;
@@ -263,7 +263,7 @@ public sealed class MaintenanceService
                     continue;
                 }
 
-                if (!IsSafeCleanupDirectory(entry.Location))
+                if (!IsSafeCleanupDirectory(entry.Location, entry.RunnerFolderPath))
                 {
                     skipped++;
                     continue;
@@ -328,14 +328,64 @@ public sealed class MaintenanceService
         return entry.CandidateFiles.Where(path => !protectedPaths.Contains(path)).ToList();
     }
 
-    private static bool IsSafeCleanupDirectory(string folder)
+    private static bool IsSafeCleanupDirectory(string folder, string runnerFolder)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder)) return false;
-            return (File.GetAttributes(folder) & FileAttributes.ReparsePoint) == 0;
+            if (string.IsNullOrWhiteSpace(folder) ||
+                string.IsNullOrWhiteSpace(runnerFolder) ||
+                !Directory.Exists(folder) ||
+                !Directory.Exists(runnerFolder))
+                return false;
+
+            var root = Path.GetFullPath(runnerFolder)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var target = Path.GetFullPath(folder);
+            var relative = Path.GetRelativePath(root, target);
+
+            if (relative == ".." ||
+                relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal) ||
+                Path.IsPathRooted(relative))
+                return false;
+
+            return !ContainsReparsePoint(root, target);
         }
         catch { return false; }
+    }
+
+    private static bool ContainsReparsePoint(string root, string target)
+    {
+        try
+        {
+            var normalizedRoot = Path.GetFullPath(root)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var normalizedTarget = Path.GetFullPath(target);
+            var relative = Path.GetRelativePath(normalizedRoot, normalizedTarget);
+
+            var current = normalizedRoot;
+            if (IsExistingReparsePoint(current)) return true;
+            if (relative == ".") return false;
+
+            foreach (var part in relative.Split(
+                         [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+                         StringSplitOptions.RemoveEmptyEntries))
+            {
+                current = Path.Combine(current, part);
+                if (IsExistingReparsePoint(current)) return true;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return true;
+        }
+    }
+
+    private static bool IsExistingReparsePoint(string path)
+    {
+        if (!File.Exists(path) && !Directory.Exists(path)) return false;
+        return (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0;
     }
 
     private static bool IsDirectChildOf(string path, string folder)
