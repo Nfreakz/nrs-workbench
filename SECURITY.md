@@ -4,7 +4,7 @@ NRS Workbench must never log, display, export or commit GitHub Actions runner cr
 
 Files such as `.credentials`, `.credentials_rsaparams`, tokens, private keys and future GitHub API secrets are out of scope for display and diagnostics.
 
-If GitHub authentication is added later, secrets should be stored using Windows-native protected credential storage rather than plain-text configuration files.
+Portable Workspace uses GitHub authentication only for an explicit preparation operation and does not persist that access token. NRS Workbench still has no persistent GitHub login. If persistent authentication is added later, secrets must use Windows-native protected credential storage rather than plain-text configuration files.
 
 
 ## Repository write operations
