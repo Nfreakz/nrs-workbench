@@ -30,7 +30,11 @@ internal static class MaintenanceSmoke
             foreach (var name in new[] { "Worker_old.log", "Runner_old.log" }) File.SetLastWriteTimeUtc(Path.Combine(diag, name), old);
             foreach (var name in new[] { "Worker_new.log", "Runner_new.log" }) File.SetLastWriteTimeUtc(Path.Combine(diag, name), recent);
 
-            var service = new MaintenanceService(settings, () => new DateTimeOffset(2026, 10, 4, 0, 0, 0, TimeSpan.Zero));
+            var runnerActive = false;
+            var service = new MaintenanceService(
+                settings,
+                () => new DateTimeOffset(2026, 10, 4, 0, 0, 0, TimeSpan.Zero),
+                _ => runnerActive);
             var snapshot = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Stopped, Mode = RunnerMode.Interactive }], 30);
             var diagEntry = snapshot.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));
             var workEntry = snapshot.Entries.Single(x => x.Id.StartsWith("work:", StringComparison.Ordinal));
@@ -41,6 +45,28 @@ internal static class MaintenanceSmoke
             diagEntry.IsSelected = true;
             var cleaned = await service.CleanupAsync([diagEntry]);
             Assert(cleaned.CleanedFiles == 2 && File.Exists(Path.Combine(diag, "Worker_new.log")) && File.Exists(Path.Combine(diag, "Runner_new.log")) && !File.Exists(Path.Combine(diag, "Worker_old.log")), "maintenance deletes only reviewed diagnostic candidates");
+
+            File.WriteAllText(Path.Combine(diag, "Worker_old_again.log"), new string('a', 120));
+            File.SetLastWriteTimeUtc(Path.Combine(diag, "Worker_old_again.log"), old);
+            var staleScan = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Stopped, Mode = RunnerMode.Interactive }], 30);
+            var staleEntry = staleScan.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));
+            staleEntry.IsSelected = true;
+            runnerActive = true;
+            var skipped = await service.CleanupAsync([staleEntry]);
+            Assert(skipped.SkippedEntries == 1 && File.Exists(Path.Combine(diag, "Worker_old_again.log")),
+                "maintenance revalidates runner activity immediately before deleting diagnostics");
+            runnerActive = false;
+
+            File.WriteAllText(Path.Combine(diag, "Worker_candidate.log"), new string('c', 130));
+            File.SetLastWriteTimeUtc(Path.Combine(diag, "Worker_candidate.log"), old);
+            var newestGuardScan = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Stopped, Mode = RunnerMode.Interactive }], 30);
+            var newestGuardEntry = newestGuardScan.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));
+            newestGuardEntry.IsSelected = true;
+            File.Delete(Path.Combine(diag, "Worker_new.log"));
+            File.SetLastWriteTimeUtc(Path.Combine(diag, "Worker_candidate.log"), recent);
+            var newestGuardResult = await service.CleanupAsync([newestGuardEntry]);
+            Assert(File.Exists(Path.Combine(diag, "Worker_candidate.log")) && newestGuardResult.FailedFiles == 0,
+                "maintenance preserves the newest Worker log again at cleanup time");
 
             var busy = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Busy, Mode = RunnerMode.Interactive }], 7);
             var busyDiag = busy.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));

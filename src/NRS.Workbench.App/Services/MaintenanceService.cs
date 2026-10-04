@@ -19,6 +19,7 @@ public sealed class MaintenanceEntry : INotifyPropertyChanged
     public required MaintenanceRisk Risk { get; init; }
     public required string RiskLabel { get; init; }
     public bool IsCleanable { get; init; }
+    public string RunnerFolderPath { get; init; } = string.Empty;
     public IReadOnlyList<string> CandidateFiles { get; init; } = [];
     public bool IsSelected
     {
@@ -41,17 +42,22 @@ public sealed record MaintenanceScanResult(IReadOnlyList<MaintenanceEntry> Entri
     public string ReclaimableDisplay => MaintenanceService.FormatBytes(ReclaimableBytes);
 }
 
-public sealed record MaintenanceCleanupResult(int CleanedFiles, long ReclaimedBytes, int FailedFiles);
+public sealed record MaintenanceCleanupResult(int CleanedFiles, long ReclaimedBytes, int FailedFiles, int SkippedEntries);
 
 public sealed class MaintenanceService
 {
     private readonly string _settingsDirectory;
     private readonly Func<DateTimeOffset> _now;
+    private readonly Func<string, bool> _isRunnerActive;
 
-    public MaintenanceService(string settingsDirectory, Func<DateTimeOffset>? now = null)
+    public MaintenanceService(
+        string settingsDirectory,
+        Func<DateTimeOffset>? now = null,
+        Func<string, bool>? isRunnerActive = null)
     {
         _settingsDirectory = settingsDirectory;
         _now = now ?? (() => DateTimeOffset.Now);
+        _isRunnerActive = isRunnerActive ?? IsRunnerActive;
     }
 
     public Task<MaintenanceScanResult> ScanAsync(IReadOnlyList<RunnerInfo> runners, int olderThanDays, CancellationToken cancellationToken = default) =>
@@ -121,6 +127,24 @@ public sealed class MaintenanceService
         var files = SafeFiles(folder, "*.log");
         if (files.Count == 0) return;
         var total = files.Sum(SafeLength);
+
+        if (!IsSafeCleanupDirectory(folder))
+        {
+            entries.Add(new MaintenanceEntry
+            {
+                Id = "diag:" + runner.FolderPath,
+                Category = UiLanguage.Choose($"Diagnósticos · {runner.Alias}", $"Diagnostics · {runner.Alias}", $"Diagnòstics · {runner.Alias}"),
+                Detail = UiLanguage.Choose(
+                    "La carpeta _diag es un enlace/reparse point o no se puede validar con seguridad. Solo se muestra el inventario.",
+                    "The _diag folder is a link/reparse point or cannot be validated safely. Inventory only.",
+                    "La carpeta _diag és un enllaç/reparse point o no es pot validar amb seguretat. Només es mostra l'inventari."),
+                Location = folder, FileCount = files.Count, TotalBytes = total, ReclaimableBytes = 0,
+                Risk = MaintenanceRisk.Inventory, RiskLabel = UiLanguage.Choose("Solo inventario", "Inventory only", "Només inventari"),
+                IsCleanable = false, IsSelected = false, RunnerFolderPath = runner.FolderPath
+            });
+            return;
+        }
+
         var cutoff = _now().AddDays(-olderThanDays).UtcDateTime;
         var protectedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -145,7 +169,8 @@ public sealed class MaintenanceService
                     $"Logs de més de {olderThanDays} dies. Sempre es conserven els Runner/Worker més recents. Netejar Worker antics redueix estadístiques i referències d'estimació."),
             Location = folder, FileCount = files.Count, TotalBytes = total, ReclaimableBytes = candidates.Sum(SafeLength),
             Risk = MaintenanceRisk.History, RiskLabel = UiLanguage.Choose("Afecta historial", "Affects history", "Afecta l'historial"),
-            IsCleanable = candidates.Count > 0, IsSelected = false, CandidateFiles = candidates
+            IsCleanable = candidates.Count > 0, IsSelected = false,
+            RunnerFolderPath = runner.FolderPath, CandidateFiles = candidates
         });
     }
 
@@ -171,10 +196,31 @@ public sealed class MaintenanceService
 
     private MaintenanceCleanupResult Cleanup(IReadOnlyList<MaintenanceEntry> entries, CancellationToken cancellationToken)
     {
-        var deleted = 0; var failed = 0; long reclaimed = 0;
+        var deleted = 0;
+        var failed = 0;
+        var skipped = 0;
+        long reclaimed = 0;
+
         foreach (var entry in entries.Where(x => x.IsSelected && x.IsCleanable))
         {
             cancellationToken.ThrowIfCancellationRequested();
+
+            if (entry.Risk == MaintenanceRisk.History &&
+                !string.IsNullOrWhiteSpace(entry.RunnerFolderPath))
+            {
+                if (_isRunnerActive(entry.RunnerFolderPath))
+                {
+                    skipped++;
+                    continue;
+                }
+
+                if (!IsSafeCleanupDirectory(entry.Location))
+                {
+                    skipped++;
+                    continue;
+                }
+            }
+
             if (entry.Id == "workbench-logs" &&
                 string.Equals(Path.GetFullPath(_settingsDirectory), Path.GetFullPath(AppDataPaths.SettingsDirectory), StringComparison.OrdinalIgnoreCase))
             {
@@ -184,11 +230,22 @@ public sealed class MaintenanceService
                 failed += appLogs.FailedFiles;
                 continue;
             }
-            foreach (var path in entry.CandidateFiles)
+
+            var candidates = entry.Risk == MaintenanceRisk.History
+                ? ProtectNewestDiagnosticsAtCleanup(entry)
+                : entry.CandidateFiles;
+
+            foreach (var path in candidates)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
+                    if (!IsDirectChildOf(path, entry.Location))
+                    {
+                        failed++;
+                        continue;
+                    }
+
                     var length = SafeLength(path);
                     if (!File.Exists(path)) continue;
                     File.Delete(path);
@@ -198,7 +255,66 @@ public sealed class MaintenanceService
                 catch { failed++; }
             }
         }
-        return new MaintenanceCleanupResult(deleted, reclaimed, failed);
+
+        return new MaintenanceCleanupResult(deleted, reclaimed, failed, skipped);
+    }
+
+    private static IReadOnlyList<string> ProtectNewestDiagnosticsAtCleanup(MaintenanceEntry entry)
+    {
+        var protectedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var currentFiles = SafeFiles(entry.Location, "*.log");
+
+        var newestWorker = currentFiles
+            .Where(path => Path.GetFileName(path).StartsWith("Worker_", StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(SafeLastWriteUtc)
+            .FirstOrDefault();
+        var newestRunner = currentFiles
+            .Where(path => Path.GetFileName(path).StartsWith("Runner_", StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(SafeLastWriteUtc)
+            .FirstOrDefault();
+
+        if (newestWorker is not null) protectedPaths.Add(newestWorker);
+        if (newestRunner is not null) protectedPaths.Add(newestRunner);
+
+        return entry.CandidateFiles.Where(path => !protectedPaths.Contains(path)).ToList();
+    }
+
+    private static bool IsSafeCleanupDirectory(string folder)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder)) return false;
+            return (File.GetAttributes(folder) & FileAttributes.ReparsePoint) == 0;
+        }
+        catch { return false; }
+    }
+
+    private static bool IsDirectChildOf(string path, string folder)
+    {
+        try
+        {
+            var fullPath = Path.GetFullPath(path);
+            var fullFolder = Path.GetFullPath(folder)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var parent = Path.GetDirectoryName(fullPath);
+            return parent is not null &&
+                   string.Equals(
+                       parent.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                       fullFolder,
+                       StringComparison.OrdinalIgnoreCase);
+        }
+        catch { return false; }
+    }
+
+    private static bool IsRunnerActive(string runnerFolder)
+    {
+        var snapshot = new RunnerProcessService().GetSnapshot(runnerFolder);
+        try { return snapshot.HasListener || snapshot.HasWorker; }
+        finally
+        {
+            snapshot.Listener?.Dispose();
+            foreach (var worker in snapshot.Workers) worker.Dispose();
+        }
     }
 
     private static List<string> SafeFiles(string folder, string pattern)
