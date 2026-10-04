@@ -83,6 +83,9 @@ Scope:
 - bulk preparation is limited to stopped interactive GitHub.com runners;
 - the GitHub access token exists only in the window/session; Workbench requests a short-lived registration token and passes only that token to the runner process via `ACTIONS_RUNNER_INPUT_TOKEN`;
 - runner migration uses local removal plus unattended configure/replace while preserving name, URL, work folder, runner group, custom labels, default-label behavior, ephemeral mode and disable-update mode;
-- a pending manifest record is written before local removal so a failed migration can be retried.
+- a pending manifest record is written before local removal so a failed migration can be retried;
+- the complete selected batch is prevalidated against GitHub before any local configuration is removed;
+- duplicate GitHub target/name identities, missing Runner.Listener binaries, unsupported targets and unsafe/non-relative work folders are blocked before preparation;
+- the Portable Workspace grid and refresh action are locked while a preflight/preparation operation is active.
 
 Manual preview cannot turn the disposable PREVIEW worktree itself into portable mode. Activation must be checked on an extracted test copy. Do not publish v0.18.7 until its exact-head CI passes and portable migration is manually validated on disposable/test runners.

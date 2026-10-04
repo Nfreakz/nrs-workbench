@@ -186,3 +186,18 @@ Manual checks:
 10. Interrupt/fail a disposable migration after local removal and verify the runner appears as **Migration pending · retry**. Retry with a fresh GitHub token and confirm the stored non-secret metadata is sufficient to complete registration.
 11. Close the Portable Workspace window after entering a PAT without running migration, reopen it and verify the password box is empty.
 12. Confirm no migration starts merely because the external drive was inserted or because Workbench detected another machine.
+
+
+## v0.18.7 Portable Workspace checks
+
+1. On an extracted test copy, activate **Portable Workspace** while the runners on the same external volume are registered and working on the current PC. Restart and verify data is read from the adjacent `Data` directory.
+2. Change the removable-drive letter and verify same-volume runner roots, repository paths, manual runner order and Smart Queue pool paths resolve correctly without editing settings.
+3. Verify PREVIEW still uses `%LOCALAPPDATA%\NRSWorkbenchPreview` and does not activate portable mode from the disposable preview worktree.
+4. Move the portable workspace to another test PC. Stopped interactive runners should show **Needs preparation**; service-installed or running runners must not be selectable.
+5. Enter a GitHub access token with insufficient permissions and select several runners. The bulk preflight must fail before any `.runner` file is removed.
+6. With valid permissions, prepare multiple disposable/test runners. Verify the runner name, target, runner group, work folder, custom labels and default-label behavior are preserved.
+7. Verify two selected folders with the same GitHub target and runner name are blocked before migration starts.
+8. Verify a missing `bin\Runner.Listener.exe`, a non-github.com target, an absolute workFolder or a workFolder escaping the runner directory is not eligible for preparation.
+9. Interrupt a migration after local removal in a disposable test runner, reopen Workbench and verify the pending non-secret manifest allows retry with a fresh GitHub token.
+10. Inspect `Data\settings.json`, `portable-workspace.json`, local logs and queue/runtime state. They must not contain the GitHub access token, runner registration token, `.credentials` contents, raw MachineGuid or raw machine name.
+11. During preflight/preparation, Refresh and runner selection are disabled; closing the window cancels the active operation and clears the password field.

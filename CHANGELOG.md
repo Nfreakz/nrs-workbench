@@ -8,6 +8,8 @@
 - Adds **Portable Workspace** mode: a marker beside the executable moves NRS Workbench data into a local `Data` folder and stores same-volume runner/repository paths relatively so removable-drive letter changes do not break them.
 - Adds a portable runner inventory that identifies interactive runners already prepared for the current PC, runners needing preparation, and interrupted migrations that can be retried.
 - Adds bulk preparation for stopped interactive GitHub.com runners. NRS Workbench preserves runner name, target, work folder, runner group and custom/default-label behavior while replacing the machine-bound registration.
+- Prevalidates the complete selected batch against GitHub before removing any local runner configuration, so a missing permission or inaccessible target fails before migration starts.
+- Refuses duplicate target/name identities, incomplete runner installations, unsupported non-github.com targets and work folders that are absolute or escape the runner directory.
 
 ### Security
 - GitHub personal access tokens are session-only and are never written to settings, the portable manifest, logs or runner configuration.

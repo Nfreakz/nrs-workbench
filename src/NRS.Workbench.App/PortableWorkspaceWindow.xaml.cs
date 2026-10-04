@@ -218,6 +218,8 @@ public partial class PortableWorkspaceWindow : Window
     private void SetWorking(bool working)
     {
         PrepareButton.IsEnabled = !working;
+        RefreshButton.IsEnabled = !working;
         TokenBox.IsEnabled = !working;
+        RunnerGrid.IsEnabled = !working;
     }
 }
