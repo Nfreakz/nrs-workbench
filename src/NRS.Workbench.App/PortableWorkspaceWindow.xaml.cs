@@ -229,6 +229,31 @@ public partial class PortableWorkspaceWindow : Window
         await RefreshCandidatesAsync();
     }
 
+    private void OpenGitHubToken_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "https://github.com/settings/personal-access-tokens/new",
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Could not open GitHub token creation page", ex);
+            MessageBox.Show(
+                this,
+                UiLanguage.Choose(
+                    "No se pudo abrir la página de creación de tokens de GitHub.",
+                    "Could not open the GitHub token creation page.",
+                    "No s'ha pogut obrir la pàgina de creació de tokens de GitHub."),
+                "NRS Workbench",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
+    }
+
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
 
     private void SetWorking(bool working)
