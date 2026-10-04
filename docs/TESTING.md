@@ -201,3 +201,14 @@ Manual checks:
 9. Interrupt a migration after local removal in a disposable test runner, reopen Workbench and verify the pending non-secret manifest allows retry with a fresh GitHub token.
 10. Inspect `Data\settings.json`, `portable-workspace.json`, local logs and queue/runtime state. They must not contain the GitHub access token, runner registration token, `.credentials` contents, raw MachineGuid or raw machine name.
 11. During preflight/preparation, Refresh and runner selection are disabled; closing the window cancels the active operation and clears the password field.
+
+
+## v0.18.6 maintenance checks
+
+1. Open **Maintenance** and scan with stopped runners. Confirm Workbench/PREVIEW logs are low-risk, old runner `_diag` is opt-in and `_work` is inventory-only.
+2. Start a runner after the scan but before pressing **Clean selection**. Historical diagnostic cleanup for that runner must be skipped and reported separately from failures.
+3. With a stopped test runner, create old/new `Runner_*.log` and `Worker_*.log` files. After scanning, change which Worker file is newest; cleanup must preserve the newest Runner and Worker again at deletion time.
+4. A `_diag` location that is a Windows reparse point must remain inventory-only and never become cleanable.
+5. Candidate files outside the exact reviewed directory must never be deleted.
+6. Verify the application log rotates at 5 MB and keeps at most five archives.
+
