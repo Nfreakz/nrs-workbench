@@ -31,18 +31,23 @@ expected Windows ZIP asset before announcing availability.
 
 ## Tag release (only after explicit approval)
 
-First merge the reviewed branch into `main`, verify HEAD and the approved version, and confirm that the tag does not already exist. Replace `<approved-version>` with the explicitly approved version. Never move or reuse an existing release tag.
+Tag the **exact reviewed release commit**, not merely whatever commit happens to be at `main` when the tag is created. Normally the approved commit is current `main`, but a deliberately staged sequence may publish an earlier validated candidate after later-version work has already landed. In that case, keep the later work untouched and point the earlier version tag explicitly at its approved commit.
+
+Before tagging, verify the approved commit, version and CI result, and confirm the tag does not already exist. Replace `<approved-version>` and `<approved-commit>` with the explicitly approved values. Never move or reuse an existing release tag.
 
 ```powershell
-git switch main
-git pull --ff-only origin main
+git fetch --prune origin
 git status --short
-git log -1 --oneline
+git show --no-patch --oneline <approved-commit>
+git show <approved-commit>:Directory.Build.props | Select-String '<Version>|<AssemblyVersion>|<FileVersion>'
 git ls-remote --tags origin refs/tags/v<approved-version>
-# Stop if the tag already exists or HEAD is not the approved release commit.
-git tag -a v<approved-version> -m "NRS Workbench v<approved-version> Public Preview"
+# Stop if the tag already exists, the commit is not the approved candidate,
+# or Directory.Build.props at that commit does not declare the approved version.
+git tag -a v<approved-version> <approved-commit> -m "NRS Workbench v<approved-version> Public Preview"
 git push origin v<approved-version>
 ```
+
+For the current 0.18.x close-out, the documented candidates are intentionally separate: v0.18.6 is validated from its last pure maintenance commit, while v0.18.7 is validated from the Portable Workspace product baseline. Do not tag v0.18.6 from a later `main` that already contains v0.18.7.
 
 The `Release` workflow runs on the repository-scoped local self-hosted Windows x64 runner. It builds the solution, executes the Git and portable-settings smoke tests, runs the public source audit, publishes the self-contained `win-x64` application, creates the ZIP and uploads it to a GitHub prerelease using the workflow token.
 
