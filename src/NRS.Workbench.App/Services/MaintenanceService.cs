@@ -41,7 +41,7 @@ public sealed record MaintenanceScanResult(IReadOnlyList<MaintenanceEntry> Entri
     public string ReclaimableDisplay => MaintenanceService.FormatBytes(ReclaimableBytes);
 }
 
-public sealed record MaintenanceCleanupResult(int DeletedFiles, long ReclaimedBytes, int FailedFiles);
+public sealed record MaintenanceCleanupResult(int CleanedFiles, long ReclaimedBytes, int FailedFiles);
 
 public sealed class MaintenanceService
 {
@@ -178,8 +178,10 @@ public sealed class MaintenanceService
             if (entry.Id == "workbench-logs" &&
                 string.Equals(Path.GetFullPath(_settingsDirectory), Path.GetFullPath(AppDataPaths.SettingsDirectory), StringComparison.OrdinalIgnoreCase))
             {
-                reclaimed += AppLogger.ClearHistory();
-                deleted += entry.FileCount;
+                var appLogs = AppLogger.ClearHistory();
+                reclaimed += appLogs.ReclaimedBytes;
+                deleted += appLogs.CleanedFiles;
+                failed += appLogs.FailedFiles;
                 continue;
             }
             foreach (var path in entry.CandidateFiles)

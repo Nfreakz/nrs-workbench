@@ -79,7 +79,7 @@ public partial class MaintenanceWindow : Window
         {
             var result = await _service.CleanupAsync(selected);
             MessageBox.Show(this,
-                UiLanguage.Choose($"Limpieza completada.\n\nArchivos eliminados: {result.DeletedFiles}\nEspacio liberado: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nFallos: {result.FailedFiles}", $"Cleanup completed.\n\nFiles deleted: {result.DeletedFiles}\nSpace reclaimed: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nFailures: {result.FailedFiles}", $"Neteja completada.\n\nFitxers eliminats: {result.DeletedFiles}\nEspai alliberat: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nErrors: {result.FailedFiles}"),
+                UiLanguage.Choose($"Limpieza completada.\n\nArchivos limpiados: {result.CleanedFiles}\nEspacio liberado: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nFallos: {result.FailedFiles}", $"Cleanup completed.\n\nFiles cleaned: {result.CleanedFiles}\nSpace reclaimed: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nFailures: {result.FailedFiles}", $"Neteja completada.\n\nFitxers netejats: {result.CleanedFiles}\nEspai alliberat: {MaintenanceService.FormatBytes(result.ReclaimedBytes)}\nErrors: {result.FailedFiles}"),
                 UiLanguage.Text("Mantenimiento"), MessageBoxButton.OK, result.FailedFiles == 0 ? MessageBoxImage.Information : MessageBoxImage.Warning);
             await RefreshAsync();
         }

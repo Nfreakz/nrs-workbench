@@ -2,6 +2,8 @@ using System.Text;
 
 namespace NRS.Workbench.App.Services;
 
+public sealed record AppLogCleanupResult(int CleanedFiles, long ReclaimedBytes, int FailedFiles);
+
 public static class AppLogger
 {
     private const long MaxLogBytes = 5L * 1024 * 1024;
@@ -21,28 +23,39 @@ public static class AppLogger
     public static void Info(string message) => Write("INFO", message, null);
     public static void Error(string message, Exception? exception = null) => Write("ERROR", message, exception);
 
-    public static long ClearHistory()
+    public static AppLogCleanupResult ClearHistory()
     {
         lock (Gate)
         {
-            if (_logFile is null) return 0;
+            if (_logFile is null) return new AppLogCleanupResult(0, 0, 0);
             var folder = Path.GetDirectoryName(_logFile);
-            if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder)) return 0;
+            if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
+                return new AppLogCleanupResult(0, 0, 0);
 
-            long bytes = 0;
+            var cleaned = 0;
+            var failed = 0;
+            long reclaimed = 0;
+
             foreach (var file in Directory.EnumerateFiles(folder, "nrs-workbench*.log", SearchOption.TopDirectoryOnly))
             {
                 try
                 {
-                    bytes += new FileInfo(file).Length;
+                    var length = new FileInfo(file).Length;
                     if (string.Equals(file, _logFile, StringComparison.OrdinalIgnoreCase))
                         File.WriteAllText(file, string.Empty, new UTF8Encoding(false));
                     else
                         File.Delete(file);
+
+                    reclaimed += length;
+                    cleaned++;
                 }
-                catch { }
+                catch
+                {
+                    failed++;
+                }
             }
-            return bytes;
+
+            return new AppLogCleanupResult(cleaned, reclaimed, failed);
         }
     }
 

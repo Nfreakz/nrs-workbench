@@ -44,7 +44,7 @@ internal static class MaintenanceSmoke
 
             diagEntry.IsSelected = true;
             var cleaned = await service.CleanupAsync([diagEntry]);
-            Assert(cleaned.DeletedFiles == 2 && File.Exists(Path.Combine(diag, "Worker_new.log")) && File.Exists(Path.Combine(diag, "Runner_new.log")) && !File.Exists(Path.Combine(diag, "Worker_old.log")), "maintenance deletes only reviewed diagnostic candidates");
+            Assert(cleaned.CleanedFiles == 2 && File.Exists(Path.Combine(diag, "Worker_new.log")) && File.Exists(Path.Combine(diag, "Runner_new.log")) && !File.Exists(Path.Combine(diag, "Worker_old.log")), "maintenance deletes only reviewed diagnostic candidates");
 
             var busy = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Busy, Mode = RunnerMode.Interactive }], 7);
             var busyDiag = busy.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));
