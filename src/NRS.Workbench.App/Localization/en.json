@@ -283,5 +283,6 @@
   "Preparar seleccionados": "Prepare selected",
   "El token de acceso de GitHub se usa solo durante esta operación y no se guarda en settings, Data ni el manifiesto portable.": "The GitHub access token is used only for this operation and is not stored in settings, Data or the portable manifest.",
   "Token de acceso de GitHub para esta sesión": "GitHub access token for this session",
-  "Para repositorios necesita Administration: write; para organizaciones, Self-hosted runners: write.": "Repositories need Administration: write; organizations need Self-hosted runners: write."
+  "Para repositorios necesita Administration: write; para organizaciones, Self-hosted runners: write.": "Repositories need Administration: write; organizations need Self-hosted runners: write.",
+  "Crear token en GitHub": "Create token on GitHub"
 }
