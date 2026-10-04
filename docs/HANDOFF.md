@@ -12,11 +12,11 @@
 - Latest published release: [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5).
 - Published Windows asset: `NRSWorkbench-v0.18.5-win-x64.zip`, 71,433,124 bytes, SHA256 `7831f858b9a35de1624465a6ee8b5481220a42a3411bb19cdf41f3dc08cb0a2e`.
 - v0.18.5 release source is the tag created from the release-prepared main line; the release workflow published the prerelease successfully on 2026-10-04 local time.
-- Current `main`: `79192ccb2b0ea957b76ee1c14a1502a571a443e3`; post-merge CI #461 SUCCESS.
+- Current `main`: `caf6d8ffa85a857efe7d77308ffd39a70aa08ba4`; CI #512 SUCCESS.
 - v0.18.5 includes runner discovery by real installation markers, explicit Smart Queue pools, Feedback & Diagnostics, long-session runtime hardening and Runner Doctor.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
-- Active development: PR #40 / `feat/v0.18.6-maintenance`; v0.18.7 is stacked separately on top of v0.18.6.
+- v0.18.6 Maintenance Center is integrated through PR #40 plus safety follow-ups #42, #43 and #44. Active development is PR #41 / `feat/v0.18.7-portable-workspace`.
 
 ## v0.18.5 published scope
 
@@ -34,8 +34,8 @@ README now reflects the published v0.18.5 ZIP. The preview image uses fictional 
 ## Future roadmap
 
 - v0.18.5: published Public Preview baseline.
-- v0.18.6: Maintenance Center and storage hygiene, active in PR #40.
-- v0.18.7: Portable Workspace and reviewed bulk preparation for interactive runners, stacked after v0.18.6.
+- v0.18.6: Maintenance Center and storage hygiene integrated on `main`, unreleased.
+- v0.18.7: Portable Workspace and reviewed bulk preparation for interactive runners, active in PR #41.
 - v0.19.0: GitHub Actions Control after the 0.18.x maintenance/portability line is closed.
 - Product website/SEO remains a separate web project or explicitly approved repository.
 - GitLab support only if real demand appears.
@@ -53,17 +53,19 @@ The normal checkout remains on `main` and is the day-to-day NRS Workbench copy.
 - automatic CI ignores pushes to `qa-preview`; the source feature branch/PR remains the validated commit, while `workflow_dispatch` stays available if a manual preview-channel run is ever needed.
 
 
-## v0.18.6 development state
+## v0.18.6 integrated state
 
-Branch: `feat/v0.18.6-maintenance`.
+Maintenance Center is integrated on `main` and remains unpublished.
 
 Scope:
-- application version is 0.18.6 on the feature branch;
+- application version on `main` is 0.18.6;
 - Maintenance Center scans storage before cleanup;
 - NRS Workbench logs rotate at 5 MB with five retained archives;
 - Workbench/PREVIEW log cleanup is low-risk and selected by default;
 - old runner `_diag` cleanup is opt-in because Worker logs feed statistics and progress estimation;
-- newest Runner/Worker logs are always preserved and BUSY runners are blocked from diagnostic cleanup;
-- runner `_work` is measured but intentionally not deleted automatically.
+- newest Runner/Worker logs are always preserved and active runners are rechecked immediately before diagnostic cleanup;
+- runner `_work` is measured but intentionally not deleted automatically;
+- absolute, escaping or reparse-point workFolder paths are not traversed;
+- reparse points anywhere along runner → `_diag` or runner → workFolder directory chains block measurement/cleanup, preventing traversal through intermediate junctions.
 
-This work is separate from the planned v0.18.7 Portable Workspace. Do not publish v0.18.6 until CI and manual preview checks pass.
+Do not publish v0.18.6 until the release-facing documentation and manual Maintenance preview checks are completed.
