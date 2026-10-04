@@ -60,12 +60,15 @@ public sealed class PortableWorkspaceManifestStore
                 throw new InvalidDataException("Unsupported portable workspace manifest.");
             manifest.PreparedRunners ??= [];
             manifest.PendingRunners ??= [];
+            ValidatePortablePaths(manifest);
             return manifest;
         }
         catch (Exception ex)
         {
             AppLogger.Error("Could not read portable workspace manifest", ex);
-            return new PortableWorkspaceManifest();
+            throw new InvalidDataException(
+                "The portable workspace manifest could not be read safely. Runner preparation is blocked until the manifest is repaired or restored.",
+                ex);
         }
     }
 
@@ -135,7 +138,26 @@ public sealed class PortableWorkspaceManifestStore
         return result;
     }
 
-    private string EncodePath(string path) => PortablePathCodec.Encode(path, _portableRoot);
+    private string EncodePath(string path)
+    {
+        var encoded = PortablePathCodec.Encode(path, _portableRoot);
+        if (!PortablePathCodec.IsPortableToken(encoded))
+            throw new InvalidOperationException(
+                "Portable runner state can only reference folders inside the portable volume.");
+        return encoded;
+    }
+
+    private static void ValidatePortablePaths(PortableWorkspaceManifest manifest)
+    {
+        var unsafePrepared = manifest.PreparedRunners.FirstOrDefault(x =>
+            !PortablePathCodec.IsPortableToken(x.Path));
+        var unsafePending = manifest.PendingRunners.FirstOrDefault(x =>
+            !PortablePathCodec.IsPortableToken(x.Path));
+
+        if (unsafePrepared is not null || unsafePending is not null)
+            throw new InvalidDataException(
+                "Portable workspace manifest contains a runner path outside the portable volume.");
+    }
 
     private void Save(PortableWorkspaceManifest manifest)
     {
