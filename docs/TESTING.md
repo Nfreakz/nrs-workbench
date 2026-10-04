@@ -180,3 +180,4 @@ Manual checks:
 4. A `_diag` location that is a Windows reparse point must remain inventory-only and never become cleanable.
 5. Candidate files outside the exact reviewed directory must never be deleted.
 6. Verify the application log rotates at 5 MB and keeps at most five archives.
+7. Configure a disposable runner with an absolute or `..`-escaping workFolder, or a workFolder root that is a reparse point. Maintenance must not traverse it and must report zero measured/reclaimable bytes.
