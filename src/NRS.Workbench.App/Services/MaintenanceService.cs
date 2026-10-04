@@ -177,7 +177,23 @@ public sealed class MaintenanceService
     private static void AddRunnerWorkInventory(List<MaintenanceEntry> entries, RunnerInfo runner, CancellationToken cancellationToken)
     {
         var workName = ReadWorkFolder(runner.FolderPath);
-        var folder = Path.IsPathRooted(workName) ? workName : Path.Combine(runner.FolderPath, workName);
+        if (!TryResolveSafeWorkFolder(runner.FolderPath, workName, out var folder))
+        {
+            entries.Add(new MaintenanceEntry
+            {
+                Id = "work:" + runner.FolderPath,
+                Category = UiLanguage.Choose($"Trabajo · {runner.Alias}", $"Work directory · {runner.Alias}", $"Treball · {runner.Alias}"),
+                Detail = UiLanguage.Choose(
+                    "El workFolder es absoluto, sale de la carpeta del runner o apunta a un enlace/reparse point. No se mide ni se elimina.",
+                    "The workFolder is absolute, escapes the runner folder, or points to a link/reparse point. It is not measured or deleted.",
+                    "El workFolder és absolut, surt de la carpeta del runner o apunta a un enllaç/reparse point. No es mesura ni s'elimina."),
+                Location = workName, FileCount = 0, TotalBytes = 0, ReclaimableBytes = 0,
+                Risk = MaintenanceRisk.Inventory, RiskLabel = UiLanguage.Choose("Solo inventario", "Inventory only", "Només inventari"),
+                IsCleanable = false, IsSelected = false
+            });
+            return;
+        }
+
         if (!Directory.Exists(folder)) return;
         var measured = MeasureTree(folder, cancellationToken);
         entries.Add(new MaintenanceEntry
@@ -192,6 +208,39 @@ public sealed class MaintenanceService
             Risk = MaintenanceRisk.Inventory, RiskLabel = UiLanguage.Choose("Solo inventario", "Inventory only", "Només inventari"),
             IsCleanable = false, IsSelected = false
         });
+    }
+
+    private static bool TryResolveSafeWorkFolder(string runnerFolder, string workFolder, out string resolved)
+    {
+        resolved = string.Empty;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(runnerFolder) || string.IsNullOrWhiteSpace(workFolder))
+                return false;
+            if (Path.IsPathFullyQualified(workFolder))
+                return false;
+
+            var root = Path.GetFullPath(runnerFolder)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var candidate = Path.GetFullPath(Path.Combine(root, workFolder));
+            var relative = Path.GetRelativePath(root, candidate);
+
+            if (relative == ".." ||
+                relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal) ||
+                Path.IsPathRooted(relative))
+                return false;
+
+            if (Directory.Exists(candidate) &&
+                (File.GetAttributes(candidate) & FileAttributes.ReparsePoint) != 0)
+                return false;
+
+            resolved = candidate;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private MaintenanceCleanupResult Cleanup(IReadOnlyList<MaintenanceEntry> entries, CancellationToken cancellationToken)

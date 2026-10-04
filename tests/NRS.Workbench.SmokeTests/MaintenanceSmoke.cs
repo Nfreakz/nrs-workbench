@@ -71,6 +71,21 @@ internal static class MaintenanceSmoke
             var busy = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Busy, Mode = RunnerMode.Interactive }], 7);
             var busyDiag = busy.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));
             Assert(!busyDiag.IsCleanable && busyDiag.ReclaimableBytes == 0, "maintenance blocks diagnostic cleanup while runner is BUSY");
+
+            var unsafeRunner = Path.Combine(root, "runner-unsafe-work");
+            var outsideWork = Path.Combine(root, "outside-work");
+            Directory.CreateDirectory(unsafeRunner);
+            Directory.CreateDirectory(outsideWork);
+            File.WriteAllText(Path.Combine(outsideWork, "sensitive.tmp"), new string('s', 512));
+            File.WriteAllText(
+                Path.Combine(unsafeRunner, ".runner"),
+                "{\"workFolder\":\"..\\\\outside-work\"}");
+            var unsafeScan = await service.ScanAsync(
+                [new RunnerInfo { Alias = "unsafe-work", FolderPath = unsafeRunner, State = RunnerState.Stopped, Mode = RunnerMode.Interactive }],
+                30);
+            var unsafeWork = unsafeScan.Entries.Single(x => x.Id.StartsWith("work:", StringComparison.Ordinal));
+            Assert(unsafeWork.TotalBytes == 0 && unsafeWork.ReclaimableBytes == 0 && !unsafeWork.IsCleanable,
+                "maintenance refuses to traverse workFolder paths that escape the runner directory");
         }
         finally { try { Directory.Delete(root, true); } catch { } }
     }
