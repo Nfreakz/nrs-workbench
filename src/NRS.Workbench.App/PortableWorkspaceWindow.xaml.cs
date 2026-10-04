@@ -126,6 +126,21 @@ public partial class PortableWorkspaceWindow : Window
             return;
         }
 
+        var persistedSettings = _settingsService.Load();
+        if (persistedSettings.RunnerQueueEnabled)
+        {
+            MessageBox.Show(
+                this,
+                UiLanguage.Choose(
+                    "Desactiva Smart Queue y guarda la configuración antes de preparar runners. Así la cola no podrá iniciar uno mientras se sustituye su registro local.",
+                    "Disable Smart Queue and save Settings before preparing runners. This prevents the queue from starting one while its local registration is being replaced.",
+                    "Desactiva Smart Queue i desa la configuració abans de preparar runners. Així la cua no podrà iniciar-ne cap mentre se substitueix el registre local."),
+                UiLanguage.Choose("Preparar runners", "Prepare runners", "Preparar runners"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
         var pat = TokenBox.Password;
         if (string.IsNullOrWhiteSpace(pat))
         {

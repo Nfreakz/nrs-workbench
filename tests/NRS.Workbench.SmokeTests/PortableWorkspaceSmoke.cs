@@ -96,6 +96,26 @@ internal static class PortableWorkspaceSmoke
                 !PortableRunnerPreparationService.IsSafeWorkFolder(runner, @"..\outside"),
                 "portable runner preparation accepts only work folders contained by the runner directory");
 
+            File.WriteAllText(Path.Combine(runner, ".credentials"), "synthetic");
+            File.WriteAllText(Path.Combine(runner, ".credentials_rsaparams"), "synthetic");
+            Assert(PortableRunnerPreparationService.HasExpectedLocalCredentials(runner),
+                "portable readiness requires both expected local runner credential files");
+            File.Delete(Path.Combine(runner, ".credentials_rsaparams"));
+            Assert(!PortableRunnerPreparationService.HasExpectedLocalCredentials(runner),
+                "portable readiness becomes false when local credential material is incomplete");
+            File.Delete(Path.Combine(runner, ".credentials"));
+
+            PortableRunnerPreparationService.ValidateSmartQueueDisabled(new RunnerSettings());
+            var queueBlocked = false;
+            try
+            {
+                PortableRunnerPreparationService.ValidateSmartQueueDisabled(
+                    new RunnerSettings { RunnerQueueEnabled = true });
+            }
+            catch (InvalidOperationException) { queueBlocked = true; }
+            Assert(queueBlocked,
+                "portable preparation refuses to run while Smart Queue is enabled");
+
             var duplicateRegistration = new PortableRunnerRegistration(
                 1, "duplicate-name", "https://github.com/acme/project", "_work", "Default", false, false);
             var duplicateA = new PortableRunnerCandidate

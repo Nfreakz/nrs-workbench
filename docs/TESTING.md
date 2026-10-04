@@ -204,6 +204,7 @@ Manual checks:
 12. If GitHub reports a selected runner as `online` or `busy`, preflight must stop before local configuration is removed; stop the old host and retry after GitHub reports it offline.
 13. Remove either `.credentials` or `.credentials_rsaparams` from a disposable prepared runner and verify Portable Workspace no longer reports it as ready for this PC.
 14. Simulate an expired/nearly expired registration token and verify preparation stops before `remove --local` is executed.
+15. With Smart Queue enabled in saved Settings, Portable Workspace must refuse preparation before GitHub preflight or local runner changes begin. Disable/save Smart Queue and retry.
 
 
 ## v0.18.6 maintenance checks

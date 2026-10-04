@@ -111,6 +111,7 @@ public sealed class PortableRunnerPreparationService
             throw new ArgumentException("GitHub token is required.", nameof(personalAccessToken));
 
         ValidateSelection(candidates);
+        ValidateSmartQueueDisabled(_settings.Load());
 
         var result = new Dictionary<string, PortableRunnerPreflight>(StringComparer.OrdinalIgnoreCase);
         foreach (var candidate in candidates)
@@ -179,6 +180,7 @@ public sealed class PortableRunnerPreparationService
         if (!candidate.CanPrepare)
             return new PortableRunnerPreparationResult(false, "Runner is not eligible for portable preparation.");
 
+        ValidateSmartQueueDisabled(_settings.Load());
         EnsureStoppedInteractive(candidate.FolderPath);
         EnsureRunnerBinary(candidate.FolderPath);
 
@@ -297,9 +299,7 @@ public sealed class PortableRunnerPreparationService
             var runnerBinaryAvailable = File.Exists(Path.Combine(folder, "bin", "Runner.Listener.exe"));
             var supportedTarget = IsSupportedTarget(registration.GitHubUrl);
             var safeWorkFolder = IsSafeWorkFolder(folder, registration.WorkFolder);
-            var credentialsPresent =
-                File.Exists(Path.Combine(folder, ".credentials")) &&
-                File.Exists(Path.Combine(folder, ".credentials_rsaparams"));
+            var credentialsPresent = HasExpectedLocalCredentials(folder);
             var prepared = _manifest.FindPrepared(folder);
             var preparedHere = prepared is not null &&
                                string.Equals(
@@ -404,6 +404,21 @@ public sealed class PortableRunnerPreparationService
             throw new InvalidOperationException(
                 $"GitHub runner identity mismatch. Local runner '{registration.AgentName}' does not match remote runner '{remote.Name}'.");
         }
+    }
+
+    public static void ValidateSmartQueueDisabled(RunnerSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        if (settings.RunnerQueueEnabled)
+            throw new InvalidOperationException(
+                "Disable Smart Queue before portable runner preparation so it cannot start a runner while its local registration is being replaced.");
+    }
+
+    public static bool HasExpectedLocalCredentials(string runnerFolder)
+    {
+        if (string.IsNullOrWhiteSpace(runnerFolder)) return false;
+        return File.Exists(Path.Combine(runnerFolder, ".credentials")) &&
+               File.Exists(Path.Combine(runnerFolder, ".credentials_rsaparams"));
     }
 
     public static void ValidateRemoteAvailability(GitHubRunnerRemoteMetadata remote)
