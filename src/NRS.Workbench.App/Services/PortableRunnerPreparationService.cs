@@ -98,7 +98,7 @@ public sealed class PortableRunnerPreparationService
     {
         var preflight = (await PreflightAsync([candidate], personalAccessToken, cancellationToken))
             [candidate.FolderPath];
-        return await PrepareAsync(candidate, preflight, cancellationToken);
+        return await PrepareAsync(candidate, preflight, personalAccessToken, cancellationToken);
     }
 
     public async Task<IReadOnlyDictionary<string, PortableRunnerPreflight>> PreflightAsync(
@@ -133,10 +133,14 @@ public sealed class PortableRunnerPreparationService
                 GitHubRunnerRemoteMetadata remote;
                 if (pending is not null && localRegistration is null)
                 {
-                    remote = new GitHubRunnerRemoteMetadata(
-                        pending.Registration.AgentName,
-                        pending.CustomLabels,
-                        pending.HasDefaultLabels);
+                    // A previous migration may already have replaced the remote
+                    // runner and changed its numeric ID. Resolve by stable target
+                    // + runner name so retries still verify the current remote state.
+                    remote = await _github.GetRunnerByNameAsync(
+                        registration.GitHubUrl,
+                        registration.AgentName,
+                        personalAccessToken,
+                        cancellationToken);
                 }
                 else
                 {
@@ -145,9 +149,10 @@ public sealed class PortableRunnerPreparationService
                         registration.AgentId,
                         personalAccessToken,
                         cancellationToken);
-                    ValidateRemoteIdentity(registration, remote);
-                    ValidateRemoteAvailability(remote);
                 }
+
+                ValidateRemoteIdentity(registration, remote);
+                ValidateRemoteAvailability(remote);
 
                 var registrationToken = await _github.CreateRegistrationTokenAsync(
                     registration.GitHubUrl,
@@ -173,6 +178,7 @@ public sealed class PortableRunnerPreparationService
     public async Task<PortableRunnerPreparationResult> PrepareAsync(
         PortableRunnerCandidate candidate,
         PortableRunnerPreflight preflight,
+        string personalAccessToken,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(candidate);
@@ -184,9 +190,29 @@ public sealed class PortableRunnerPreparationService
         EnsureStoppedInteractive(candidate.FolderPath);
         EnsureRunnerBinary(candidate.FolderPath);
 
+        if (string.IsNullOrWhiteSpace(personalAccessToken))
+            throw new ArgumentException("GitHub token is required.", nameof(personalAccessToken));
+
         var registration = preflight.Registration;
-        var remote = preflight.RemoteMetadata;
-        var registrationToken = preflight.RegistrationToken;
+
+        // Revalidate immediately before any local registration is removed. A
+        // runner can become online/busy after the batch preflight while earlier
+        // runners are being prepared.
+        var remote = await _github.GetRunnerByNameAsync(
+            registration.GitHubUrl,
+            registration.AgentName,
+            personalAccessToken,
+            cancellationToken);
+        ValidateRemoteIdentity(registration, remote);
+        ValidateRemoteAvailability(remote);
+
+        // Batch preflight already verified that registration-token creation is
+        // permitted. Request a fresh short-lived token here so large batches do
+        // not depend on tokens minted several runners/minutes earlier.
+        var registrationToken = await _github.CreateRegistrationTokenAsync(
+            registration.GitHubUrl,
+            personalAccessToken,
+            cancellationToken);
         ValidateRegistrationTokenFreshness(registrationToken);
 
         _manifest.RecordPending(
