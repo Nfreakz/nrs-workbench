@@ -250,5 +250,22 @@
   "Selecciona un runner": "Select a runner",
   "Runner Doctor no inicia, detiene ni reconfigura runners. Las acciones de esta ventana son de consulta.": "Runner Doctor does not start, stop or reconfigure runners. Actions in this window are read-only.",
   "Abrir _diag": "Open _diag",
-  "Copiar resumen": "Copy summary"
+  "Copiar resumen": "Copy summary",
+  "Mantenimiento": "Maintenance",
+  "Mantenimiento · NRS Workbench": "Maintenance · NRS Workbench",
+  "Centro de mantenimiento": "Maintenance center",
+  "Mide primero. Limpia solo elementos clasificados y revisables.": "Measure first. Clean only classified, reviewable items.",
+  "Logs anteriores a": "Logs older than",
+  "Escanear": "Scan",
+  "Sin escanear": "Not scanned",
+  "ESPACIO MEDIDO": "MEASURED SPACE",
+  "RECUPERABLE": "RECLAIMABLE",
+  "CATEGORÍA": "CATEGORY",
+  "RIESGO": "RISK",
+  "ARCHIVOS": "FILES",
+  "TAMAÑO": "SIZE",
+  "DETALLE": "DETAIL",
+  "_work se inventaría pero nunca se borra automáticamente. Los logs _diag antiguos pueden afectar estadísticas y estimaciones.": "_work is inventoried but never deleted automatically. Old _diag logs can affect statistics and estimates.",
+  "Abrir ubicación": "Open location",
+  "Limpiar selección": "Clean selection"
 }

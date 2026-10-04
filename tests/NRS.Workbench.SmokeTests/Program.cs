@@ -14,6 +14,8 @@ internal static class Program
         Console.WriteLine("NRS Workbench public-readiness smoke tests");
         Console.WriteLine("=====================================================");
 
+        await MaintenanceSmoke.RunAsync();
+
         if (!GitAvailable())
         {
             Console.Error.WriteLine("Git is not available in PATH.");

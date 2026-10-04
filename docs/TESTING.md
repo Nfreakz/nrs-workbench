@@ -158,3 +158,15 @@ Manual checks:
 9. Verify **Open folder** and **Open _diag** target only the selected runner. Missing `_diag` must show an informational message rather than failing.
 10. Use **Copy summary** and verify the copied text contains the selected runner diagnosis but passes through the existing sensitive-data redactor.
 11. Press **Refresh diagnosis** while runner states change and verify the list updates without starting, stopping, registering or reconfiguring any runner.
+
+
+## v0.18.6 Maintenance Center manual checks
+
+1. Open **Maintenance** from the main toolbar and verify scanning does not block the main UI.
+2. Confirm Workbench logs and PREVIEW logs show measured and reclaimable sizes separately.
+3. Confirm each runner `_diag` row preserves its newest Runner and Worker log regardless of age.
+4. With a BUSY runner, confirm its diagnostic row is inventory-only and reports zero reclaimable bytes.
+5. With a stopped runner and synthetic logs older than the selected cutoff, select its diagnostic cleanup and verify the confirmation warns that statistics/progress history will shrink.
+6. Run cleanup and confirm only the reviewed files are deleted; runner credentials, `.runner`, repositories and `_work` remain untouched.
+7. Verify `_work` sizes appear as **Inventory only** and cannot be selected for deletion.
+8. Grow the local Workbench log past 5 MB in a test profile and verify rotation creates numbered archives while retaining no more than five.

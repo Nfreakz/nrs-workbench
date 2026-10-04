@@ -296,6 +296,17 @@ public partial class MainWindow : Window
         window.ShowDialog();
     }
 
+    private void Maintenance_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new MaintenanceWindow(
+            new MaintenanceService(_settings.SettingsDirectory),
+            () => _viewModel.AllRunners.ToList())
+        {
+            Owner = this
+        };
+        window.ShowDialog();
+    }
+
     private async void Settings_Click(object sender, RoutedEventArgs e)
     {
         if (_viewModel.EditSettings(this))

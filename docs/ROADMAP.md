@@ -27,24 +27,35 @@ PR #25's runner discovery and Smart Queue selection work is separate from this r
 
 ## v0.18.5
 
-Release candidate prepared. Runner control, discovery, feedback and diagnostics.
+Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5).
 
-- Detect runner installations from their real files rather than folder-name prefixes.
-- Let users choose which detected runners participate in Smart Queue; excluded runners are not started, stopped or counted toward the queue limit.
-- In-app **Report an Issue**.
-- In-app **Suggest Feature**.
-- Reviewable, sanitized diagnostics bundle.
-- Better unexpected-error/crash-report flow.
-- No automatic upload of logs and no embedded private webhook credentials.
-- Anonymous diagnostics submission only if a future backend is justified and explicit user consent is implemented.
-- **Runner Doctor** with local, explainable health checks for installation, registration, process/service state, version and `_diag` activity. The first iteration remains read-only and does not auto-repair or update runners.
+- Runner discovery based on real installation markers.
+- Explicit Smart Queue runner pool selection.
+- Feedback & Diagnostics with review-before-share local export.
+- Long-running refresh/error hardening and runtime-session heartbeat.
+- Runner Doctor with local, explainable, read-only health checks.
+- Published asset: `NRSWorkbench-v0.18.5-win-x64.zip`.
 
-Release-candidate status:
-- runner discovery and explicit Smart Queue pool selection are merged to `main`;
-- Feedback & Diagnostics plus long-running runtime hardening are merged to `main`;
-- Runner Doctor is merged to `main` and manually validated on Windows;
-- version metadata and release documentation are being finalized for v0.18.5;
-- v0.19.0 work starts only after v0.18.5 is tagged and its Windows package is verified.
+## v0.18.6
+
+Maintenance and storage hygiene.
+
+- Maintenance Center with measured/reclaimable storage categories.
+- Automatic NRS Workbench log rotation.
+- Safe cleanup of Workbench and PREVIEW logs.
+- Reviewed cleanup of old runner `_diag` logs.
+- BUSY runners are never cleaned.
+- Runner `_work` is inventory-only; no automatic deletion.
+
+## v0.18.7
+
+Portable Workspace and runner migration.
+
+- True portable Workbench profile with relative paths on removable storage.
+- Detect when a runner folder was configured on another Windows machine.
+- Session-only GitHub authorization for bulk runner preparation.
+- Re-register interactive runners in bulk without storing the GitHub PAT.
+- Explicit confirmation and per-runner progress; no automatic migration on disk insertion.
 
 ## v0.19.0
 
