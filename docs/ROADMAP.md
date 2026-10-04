@@ -38,7 +38,7 @@ Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfrea
 
 ## v0.18.6
 
-Maintenance and storage hygiene.
+Integrated on `main`, not yet published. Maintenance and storage hygiene.
 
 - Maintenance Center with measured/reclaimable storage categories.
 - Automatic NRS Workbench log rotation.
@@ -49,7 +49,7 @@ Maintenance and storage hygiene.
 
 ## v0.18.7
 
-Portable Workspace and runner migration.
+Active in PR #41. Portable Workspace and runner migration.
 
 - True portable Workbench profile with relative paths on removable storage.
 - Detect when a runner folder was configured on another Windows machine.
