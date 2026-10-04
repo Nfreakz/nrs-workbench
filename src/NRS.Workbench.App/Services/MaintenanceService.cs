@@ -34,6 +34,13 @@ public sealed class MaintenanceEntry : INotifyPropertyChanged
     }
     public string TotalDisplay => MaintenanceService.FormatBytes(TotalBytes);
     public string ReclaimableDisplay => ReclaimableBytes <= 0 ? "—" : MaintenanceService.FormatBytes(ReclaimableBytes);
+    public string DeletionLabel => !IsCleanable
+        ? UiLanguage.Choose("No se puede borrar", "Cannot delete", "No es pot esborrar")
+        : Risk == MaintenanceRisk.Safe
+            ? UiLanguage.Choose("Seguro para borrar", "Safe to delete", "Segur per esborrar")
+            : Risk == MaintenanceRisk.History
+                ? UiLanguage.Choose("Borrar con precaución", "Delete with caution", "Esborra amb precaució")
+                : UiLanguage.Choose("No se borra", "Not deleted", "No s'esborra");
     public event PropertyChangedEventHandler? PropertyChanged;
 }
 
