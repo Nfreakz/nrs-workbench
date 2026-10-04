@@ -12,11 +12,11 @@
 - Latest published release: [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5).
 - Published Windows asset: `NRSWorkbench-v0.18.5-win-x64.zip`, 71,433,124 bytes, SHA256 `7831f858b9a35de1624465a6ee8b5481220a42a3411bb19cdf41f3dc08cb0a2e`.
 - v0.18.5 release source is the tag created from the release-prepared main line; the release workflow published the prerelease successfully on 2026-10-04 local time.
-- Current `main`: `c3d86a1035bc29957cd2838f96f3ff8b49196a67`; v0.18.6 Maintenance Center is integrated on `main` but not published.
+- Current `main`: `caf6d8ffa85a857efe7d77308ffd39a70aa08ba4`; v0.18.6 Maintenance Center plus final workFolder inventory hardening are integrated on `main` but not published.
 - v0.18.5 includes runner discovery by real installation markers, explicit Smart Queue pools, Feedback & Diagnostics, long-session runtime hardening and Runner Doctor.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
-- PR #40 (v0.18.6 Maintenance Center) is merged. Active development is PR #41 / `feat/v0.18.7-portable-workspace`, rebased cleanly on current `main`.
+- PR #40 (v0.18.6 Maintenance Center) and PR #44 (safe workFolder inventory hardening) are merged. Active development is PR #41 / `feat/v0.18.7-portable-workspace`, synchronized with current `main`.
 
 ## v0.18.5 published scope
 
@@ -65,6 +65,7 @@ Scope:
 - old runner `_diag` cleanup is opt-in because Worker logs feed statistics and progress estimation;
 - newest Runner/Worker logs are always preserved and BUSY runners are blocked from diagnostic cleanup;
 - runner `_work` is measured but intentionally not deleted automatically;
+- absolute, escaping or reparse-point `workFolder` roots are not traversed or measured;
 - cleanup results count only files actually cleaned and bytes actually reclaimed.
 
 v0.18.6 is integrated but not published.
@@ -86,6 +87,11 @@ Scope:
 - a pending manifest record is written before local removal so a failed migration can be retried;
 - the complete selected batch is prevalidated against GitHub before any local configuration is removed;
 - duplicate GitHub target/name identities, missing Runner.Listener binaries, unsupported targets and unsafe/non-relative work folders are blocked before preparation;
+- GitHub runners still reported online or busy are blocked before replacement;
+- registration tokens that are expired or too close to expiry are rejected before local configuration removal;
+- Smart Queue must be disabled before preparation so automatic queue actions cannot race with re-registration;
+- a runner is only considered ready on the current machine when both the manifest association and expected local credential files are present;
+- portable activation writes the marker only after settings/manifest preparation succeeds, so partial activation cannot silently switch the next launch into portable mode;
 - the Portable Workspace grid and refresh action are locked while a preflight/preparation operation is active.
 
 Manual preview cannot turn the disposable PREVIEW worktree itself into portable mode. Activation must be checked on an extracted test copy. Do not publish v0.18.7 until its exact-head CI passes and portable migration is manually validated on disposable/test runners.
