@@ -15,6 +15,7 @@ internal static class Program
         Console.WriteLine("=====================================================");
 
         await MaintenanceSmoke.RunAsync();
+        await PortableWorkspaceSmoke.RunAsync();
 
         if (!GitAvailable())
         {

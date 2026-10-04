@@ -67,3 +67,21 @@ Scope:
 - runner `_work` is measured but intentionally not deleted automatically.
 
 This work is separate from the planned v0.18.7 Portable Workspace. Do not publish v0.18.6 until CI and manual preview checks pass.
+
+## v0.18.7 development state
+
+Branch: `feat/v0.18.7-portable-workspace`, based on the full v0.18.6 feature branch. It must not merge before v0.18.6.
+
+Scope:
+- application version is 0.18.7 on this branch;
+- `NRSWorkbench.portable` beside the executable activates the portable profile on the next launch;
+- portable data is stored under `Data` beside the executable;
+- same-volume runner roots, repository paths, manual runner order and Smart Queue pool paths are persisted as `@portable/` relative tokens and resolved against the current volume root;
+- portable Smart Queue recovery state is tied to a hashed machine fingerprint and ignored on another PC;
+- portable manifest records prepared/pending runners without credentials, PATs or temporary registration tokens;
+- bulk preparation is limited to stopped interactive GitHub.com runners;
+- the GitHub PAT exists only in the window/session; Workbench requests a short-lived registration token and passes only that token to the runner process via `ACTIONS_RUNNER_INPUT_TOKEN`;
+- runner migration uses local removal plus unattended configure/replace while preserving name, URL, work folder, runner group, custom labels, default-label behavior, ephemeral mode and disable-update mode;
+- a pending manifest record is written before local removal so a failed migration can be retried.
+
+Manual preview cannot turn the disposable PREVIEW worktree itself into portable mode. Activation must be checked on an extracted test copy. Do not publish v0.18.7 before v0.18.6 is merged and the portable migration is manually validated on disposable/test runners.

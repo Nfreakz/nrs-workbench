@@ -170,3 +170,19 @@ Manual checks:
 6. Run cleanup and confirm only the reviewed files are deleted; runner credentials, `.runner`, repositories and `_work` remain untouched.
 7. Verify `_work` sizes appear as **Inventory only** and cannot be selected for deletion.
 8. Grow the local Workbench log past 5 MB in a test profile and verify rotation creates numbered archives while retaining no more than five.
+
+
+## v0.18.7 Portable Workspace manual checks
+
+1. On a disposable extracted copy, open **Settings → Portable workspace** and activate portable mode. Verify `NRSWorkbench.portable` and `Data/settings.json` appear beside the executable, then restart.
+2. Confirm portable mode uses `Data` instead of `%LOCALAPPDATA%\\NRSWorkbench`.
+3. Put configured runner roots/repositories on the same removable volume, change its Windows drive letter, reopen Workbench and confirm the paths resolve correctly without manual edits.
+4. Inspect `Data/settings.json`, `portable-workspace.json` and `runner-queue-state.json`: same-volume paths may use `@portable/`, but none may contain PATs, runner registration tokens, `.credentials` contents or the raw Windows machine name/MachineGuid.
+5. Move the workspace to a second PC and verify a Smart Queue journal from the first PC is ignored rather than offering automatic runner recovery.
+6. Verify already prepared runners for the current PC show **Ready on this PC** and are not selected for migration.
+7. Verify a running interactive runner cannot be prepared until it is stopped. Verify service-installed runners show unsupported/not portable and cannot be selected.
+8. Using a disposable test runner, provide a PAT only in the Portable Workspace window and prepare it. Verify the runner keeps its name, GitHub target, work folder and custom labels and can start normally afterwards.
+9. After preparation, search the portable `Data` directory and application logs for the PAT and temporary registration token; neither may be present.
+10. Interrupt/fail a disposable migration after local removal and verify the runner appears as **Migration pending · retry**. Retry with a fresh GitHub token and confirm the stored non-secret metadata is sufficient to complete registration.
+11. Close the Portable Workspace window after entering a PAT without running migration, reopen it and verify the password box is empty.
+12. Confirm no migration starts merely because the external drive was inserted or because Workbench detected another machine.

@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+## [0.18.7] - Unreleased
+
+### Added
+- Adds **Portable Workspace** mode: a marker beside the executable moves NRS Workbench data into a local `Data` folder and stores same-volume runner/repository paths relatively so removable-drive letter changes do not break them.
+- Adds a portable runner inventory that identifies interactive runners already prepared for the current PC, runners needing preparation, and interrupted migrations that can be retried.
+- Adds bulk preparation for stopped interactive GitHub.com runners. NRS Workbench preserves runner name, target, work folder, runner group and custom/default-label behavior while replacing the machine-bound registration.
+
+### Security
+- GitHub personal access tokens are session-only and are never written to settings, the portable manifest, logs or runner configuration.
+- NRS Workbench exchanges the PAT for GitHub's short-lived runner registration token and passes only that temporary token to `Runner.Listener.exe` through an environment variable.
+- Portable manifests contain no runner credential files or tokens. Machine association is stored only as a one-way hash fingerprint.
+- Smart Queue recovery journals are machine-bound in portable mode, preventing a different PC from automatically restoring runners stopped by the previous host.
+- Service-installed runners are excluded from portable preparation in this release.
+
 ## [0.18.6] - Unreleased
 
 ### Added

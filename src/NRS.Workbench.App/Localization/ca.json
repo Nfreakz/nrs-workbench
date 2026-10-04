@@ -387,5 +387,21 @@
   "DETALLE": "DETALL",
   "_work se inventaría pero nunca se borra automáticamente. Los logs _diag antiguos pueden afectar estadísticas y estimaciones.": "_work s'inventaria però no s'esborra mai automàticament. Els logs _diag antics poden afectar estadístiques i estimacions.",
   "Abrir ubicación": "Obrir ubicació",
-  "Limpiar selección": "Netejar selecció"
+  "Limpiar selección": "Netejar selecció",
+  "Espacio portable...": "Espai portable...",
+  "Espacio portable · NRS Workbench": "Espai portable · NRS Workbench",
+  "Espacio portable": "Espai portable",
+  "Lleva configuración y runners interactivos en una unidad externa sin depender de la letra del disco.": "Porta la configuració i els runners interactius en una unitat externa sense dependre de la lletra del disc.",
+  "Activar modo portable en esta copia": "Activar el mode portable en aquesta còpia",
+  "NRS Workbench creará un marcador junto al ejecutable y guardará sus datos en la carpeta Data. Las rutas de esta unidad se almacenarán de forma relativa para sobrevivir a cambios de letra.": "NRS Workbench crearà un marcador al costat de l'executable i desarà les dades a la carpeta Data. Les rutes d'aquesta unitat es desaran de manera relativa per sobreviure als canvis de lletra.",
+  "No copia ni exporta credenciales de los runners.": "No copia ni exporta credencials dels runners.",
+  "Después de activar el modo portable hay que reiniciar NRS Workbench. Los runners interactivos existentes de esta unidad quedarán registrados como preparados para el PC actual.": "Després d'activar el mode portable cal reiniciar NRS Workbench. Els runners interactius existents d'aquesta unitat quedaran registrats com a preparats per al PC actual.",
+  "Activar modo portable": "Activar mode portable",
+  "Actualizar runners": "Actualitzar runners",
+  "GITHUB": "GITHUB",
+  "Necesita permisos para administrar self-hosted runners en los repositorios u organizaciones seleccionados.": "Necessita permisos per administrar self-hosted runners als repositoris o organitzacions seleccionats.",
+  "Preparar seleccionados": "Preparar seleccionats",
+  "El token de acceso de GitHub se usa solo durante esta operación y no se guarda en settings, Data ni el manifiesto portable.": "El token d'accés de GitHub s'utilitza només durant aquesta operació i no es desa a settings, Data ni al manifest portable.",
+  "Token de acceso de GitHub para esta sesión": "Token d'accés de GitHub per a aquesta sessió",
+  "Para repositorios necesita Administration: write; para organizaciones, Self-hosted runners: write.": "Per a repositoris cal Administration: write; per a organitzacions, Self-hosted runners: write."
 }
