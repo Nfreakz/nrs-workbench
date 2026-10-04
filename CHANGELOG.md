@@ -21,6 +21,8 @@
 - A runner is only shown as ready for the current PC when the portable machine association and the expected local credential files are both present.
 - Smart Queue must be disabled before portable preparation, preventing automatic queue actions from racing with local runner re-registration.
 - Portable activation writes its marker only after portable settings/manifest preparation succeeds, and initial machine association is recorded only for runners with complete local credential files.
+- Revalidates each runner immediately before local removal and refreshes short-lived registration tokens for long bulk operations.
+- Retries interrupted portable migrations by stable GitHub target + runner name when the previous numeric runner ID is stale.
 
 ## [0.18.6] - Unreleased
 
