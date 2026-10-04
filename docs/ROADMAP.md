@@ -38,7 +38,7 @@ Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfrea
 
 ## v0.18.6
 
-Integrated on `main`, not yet published. Maintenance and storage hygiene.
+Maintenance and storage hygiene.
 
 - Maintenance Center with measured/reclaimable storage categories.
 - Automatic NRS Workbench log rotation.
@@ -49,13 +49,16 @@ Integrated on `main`, not yet published. Maintenance and storage hygiene.
 
 ## v0.18.7
 
-Active in PR #41. Portable Workspace and runner migration.
+Portable Workspace and runner migration.
 
-- True portable Workbench profile with relative paths on removable storage.
-- Detect when a runner folder was configured on another Windows machine.
+- True portable Workbench profile with a `Data` directory beside the executable and relative same-volume paths.
+- Detect current-machine preparation state from a credential-free portable manifest.
+- Machine-bound Smart Queue recovery journal so a moved workspace cannot auto-recover another PC's queue state.
 - Session-only GitHub authorization for bulk runner preparation.
-- Re-register interactive runners in bulk without storing the GitHub PAT.
-- Explicit confirmation and per-runner progress; no automatic migration on disk insertion.
+- Re-register stopped interactive GitHub.com runners in bulk without storing the GitHub PAT or temporary registration token.
+- Preserve runner name, target, work folder, group and labels where GitHub exposes them.
+- Explicit confirmation, per-runner progress and retryable pending migrations; no automatic migration on disk insertion.
+- Service-installed runners remain out of scope for portable migration.
 
 ## v0.19.0
 

@@ -13,12 +13,17 @@ public sealed class SettingsService
         PropertyNameCaseInsensitive = true
     };
 
+    private readonly string? _portableRoot;
+
     public string SettingsDirectory { get; }
     public string SettingsPath { get; }
+    public bool UsesPortableStorage => !string.IsNullOrWhiteSpace(_portableRoot);
 
-    public SettingsService()
+    public SettingsService(string? settingsDirectory = null, string? portableRoot = null)
     {
-        SettingsDirectory = AppDataPaths.SettingsDirectory;
+        SettingsDirectory = settingsDirectory ?? AppDataPaths.SettingsDirectory;
+        _portableRoot = portableRoot ??
+            (settingsDirectory is null && AppDataPaths.IsPortable ? AppDataPaths.PortableVolumeRoot : null);
         SettingsPath = Path.Combine(SettingsDirectory, "settings.json");
     }
 
@@ -37,6 +42,7 @@ public sealed class SettingsService
 
             var json = File.ReadAllText(SettingsPath);
             var settings = JsonSerializer.Deserialize<RunnerSettings>(json, JsonOptions) ?? CreateDefaults();
+            DecodeWorkspacePaths(settings);
             Normalize(settings);
 
             // v0.4.0-v0.4.4 could persist the build-output directory as the only
@@ -66,7 +72,13 @@ public sealed class SettingsService
     {
         Normalize(settings);
         Directory.CreateDirectory(SettingsDirectory);
-        File.WriteAllText(SettingsPath, JsonSerializer.Serialize(settings, JsonOptions));
+
+        var persisted = JsonSerializer.Deserialize<RunnerSettings>(
+            JsonSerializer.Serialize(settings, JsonOptions),
+            JsonOptions) ?? throw new InvalidOperationException("Could not prepare settings for persistence.");
+        EncodeWorkspacePaths(persisted);
+
+        File.WriteAllText(SettingsPath, JsonSerializer.Serialize(persisted, JsonOptions));
     }
 
     public void ExportPortableSettings(RunnerSettings settings, string destinationPath)
@@ -118,7 +130,7 @@ public sealed class SettingsService
 
     private void TryMigrateLegacySettings()
     {
-        if (File.Exists(SettingsPath) || AppDataPaths.IsPreview) return;
+        if (File.Exists(SettingsPath) || AppDataPaths.IsPreview || UsesPortableStorage) return;
 
         try
         {
@@ -209,19 +221,51 @@ public sealed class SettingsService
         };
     }
 
-    private static string FindFallbackRoot()
+    private string FindFallbackRoot()
     {
+        if (UsesPortableStorage) return Path.GetFullPath(_portableRoot!);
+
         var current = new DirectoryInfo(AppContext.BaseDirectory);
         while (current.Parent is not null) current = current.Parent;
         return current.FullName;
     }
+
+    private void DecodeWorkspacePaths(RunnerSettings settings)
+    {
+        if (!UsesPortableStorage) return;
+        settings.RunnerRoots = DecodePaths(settings.RunnerRoots);
+        settings.RepositoryPaths = DecodePaths(settings.RepositoryPaths);
+        settings.RunnerDisplayOrder = DecodePaths(settings.RunnerDisplayOrder);
+        settings.RunnerQueueIncludedPaths = DecodePaths(settings.RunnerQueueIncludedPaths);
+    }
+
+    private void EncodeWorkspacePaths(RunnerSettings settings)
+    {
+        if (!UsesPortableStorage) return;
+        settings.RunnerRoots = EncodePaths(settings.RunnerRoots);
+        settings.RepositoryPaths = EncodePaths(settings.RepositoryPaths);
+        settings.RunnerDisplayOrder = EncodePaths(settings.RunnerDisplayOrder);
+        settings.RunnerQueueIncludedPaths = EncodePaths(settings.RunnerQueueIncludedPaths);
+    }
+
+    private List<string> DecodePaths(IEnumerable<string>? paths) =>
+        (paths ?? [])
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Select(path => PortablePathCodec.Decode(path, _portableRoot!))
+            .ToList();
+
+    private List<string> EncodePaths(IEnumerable<string>? paths) =>
+        (paths ?? [])
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Select(path => PortablePathCodec.Encode(path, _portableRoot!))
+            .ToList();
 
     private static bool AnyConfiguredRootContainsRunner(RunnerSettings settings)
     {
         return settings.RunnerRoots.Any(RunnerFolderDiscovery.ContainsRunnerFolder);
     }
 
-    private static void Normalize(RunnerSettings settings)
+    private void Normalize(RunnerSettings settings)
     {
         settings.RunnerRoots ??= [];
         settings.RepositoryPaths ??= [];

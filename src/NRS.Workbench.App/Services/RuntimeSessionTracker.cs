@@ -7,18 +7,26 @@ public sealed record RuntimeSessionSnapshot(
     int ProcessId,
     DateTimeOffset StartedAt,
     DateTimeOffset LastHeartbeatAt,
-    bool Preview);
+    bool Preview,
+    string MachineFingerprint);
 
 public sealed class RuntimeSessionTracker
 {
     private static readonly TimeSpan HeartbeatInterval = TimeSpan.FromMinutes(1);
     private readonly string _statePath;
+    private readonly string _machineFingerprint;
+    private readonly bool _portableMode;
     private RuntimeSessionSnapshot? _current;
     private DateTimeOffset _lastPersistedHeartbeat;
 
-    public RuntimeSessionTracker(string settingsDirectory)
+    public RuntimeSessionTracker(
+        string settingsDirectory,
+        string? machineFingerprint = null,
+        bool? portableMode = null)
     {
         _statePath = Path.Combine(settingsDirectory, "runtime-session.json");
+        _machineFingerprint = machineFingerprint ?? MachineIdentityService.GetFingerprint();
+        _portableMode = portableMode ?? AppDataPaths.IsPortable;
     }
 
     public RuntimeSessionSnapshot? BeginSession(bool preview)
@@ -30,6 +38,15 @@ public sealed class RuntimeSessionTracker
             {
                 var json = File.ReadAllText(_statePath);
                 previous = JsonSerializer.Deserialize<RuntimeSessionSnapshot>(json);
+
+                if (_portableMode &&
+                    (previous is null ||
+                     string.IsNullOrWhiteSpace(previous.MachineFingerprint) ||
+                     !string.Equals(previous.MachineFingerprint, _machineFingerprint, StringComparison.Ordinal)))
+                {
+                    AppLogger.Info("Portable runtime-session marker belongs to another machine and was ignored.");
+                    previous = null;
+                }
             }
         }
         catch (Exception ex)
@@ -43,7 +60,8 @@ public sealed class RuntimeSessionTracker
             Environment.ProcessId,
             now,
             now,
-            preview);
+            preview,
+            _machineFingerprint);
         _lastPersistedHeartbeat = now;
         Persist();
         return previous;

@@ -161,6 +161,17 @@ public partial class SettingsWindow : Window
         return true;
     }
 
+    private void PortableWorkspace_Click(object sender, RoutedEventArgs e)
+    {
+        if (!TryApplyFormToWorkingSettings()) return;
+
+        var dialog = new PortableWorkspaceWindow(_settingsService, _workingSettings)
+        {
+            Owner = this
+        };
+        dialog.ShowDialog();
+    }
+
     private void Feedback_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new FeedbackWindow(_settingsService) { Owner = this };

@@ -155,7 +155,8 @@
                                        Style="{StaticResource MutedLabel}" TextWrapping="Wrap" Margin="0,4,0,0"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button Content="{local:Tr Source='Exportar...'}" Style="{StaticResource ToolbarButton}" Padding="10,6" Click="Export_Click"/>
+                            <Button Content="{local:Tr Source='Espacio portable...'}" Style="{StaticResource ToolbarButton}" Padding="10,6" Click="PortableWorkspace_Click"/>
+                            <Button Content="{local:Tr Source='Exportar...'}" Style="{StaticResource ToolbarButton}" Padding="10,6" Margin="8,0,0,0" Click="Export_Click"/>
                             <Button Content="{local:Tr Source='Importar...'}" Style="{StaticResource ToolbarButton}" Padding="10,6" Margin="8,0,0,0" Click="Import_Click"/>
                         </StackPanel>
                     </Grid>

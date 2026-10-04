@@ -2,6 +2,28 @@
 
 ## [Unreleased]
 
+## [0.18.7] - Unreleased
+
+### Added
+- Adds **Portable Workspace** mode: a marker beside the executable moves NRS Workbench data into a local `Data` folder and stores same-volume runner/repository paths relatively so removable-drive letter changes do not break them.
+- Adds a portable runner inventory that identifies interactive runners already prepared for the current PC, runners needing preparation, and interrupted migrations that can be retried.
+- Adds bulk preparation for stopped interactive GitHub.com runners. NRS Workbench preserves runner name, target, work folder, runner group and custom/default-label behavior while replacing the machine-bound registration.
+- Prevalidates the complete selected batch against GitHub before removing any local runner configuration, so a missing permission or inaccessible target fails before migration starts.
+- Refuses duplicate target/name identities, incomplete runner installations, unsupported non-github.com targets and work folders that are absolute or escape the runner directory.
+
+### Security
+- GitHub personal access tokens are session-only and are never written to settings, the portable manifest, logs or runner configuration.
+- NRS Workbench exchanges the PAT for GitHub's short-lived runner registration token and passes only that temporary token to `Runner.Listener.exe` through an environment variable.
+- Portable manifests contain no runner credential files or tokens. Machine association is stored only as a one-way hash fingerprint.
+- Smart Queue recovery journals are machine-bound in portable mode, preventing a different PC from automatically restoring runners stopped by the previous host.
+- Service-installed runners are excluded from portable preparation in this release.
+- Remote runners that GitHub still reports online or busy are blocked before replacement, and an expired/nearly expired registration token is rejected before local configuration is removed.
+- A runner is only shown as ready for the current PC when the portable machine association and the expected local credential files are both present.
+- Smart Queue must be disabled before portable preparation, preventing automatic queue actions from racing with local runner re-registration.
+- Portable activation writes its marker only after portable settings/manifest preparation succeeds, and initial machine association is recorded only for runners with complete local credential files.
+- Revalidates each runner immediately before local removal and refreshes short-lived registration tokens for long bulk operations.
+- Retries interrupted portable migrations by stable GitHub target + runner name when the previous numeric runner ID is stale.
+
 ## [0.18.6] - Unreleased
 
 ### Added

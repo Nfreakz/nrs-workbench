@@ -172,6 +172,49 @@ Manual checks:
 8. Grow the local Workbench log past 5 MB in a test profile and verify rotation creates numbered archives while retaining no more than five.
 
 
+## v0.18.7 Portable Workspace manual checks
+
+1. On a disposable extracted copy, open **Settings → Portable workspace** and activate portable mode. Verify `NRSWorkbench.portable` and `Data/settings.json` appear beside the executable, then restart.
+2. Confirm portable mode uses `Data` instead of `%LOCALAPPDATA%\\NRSWorkbench`.
+3. Put configured runner roots/repositories on the same removable volume, change its Windows drive letter, reopen Workbench and confirm the paths resolve correctly without manual edits.
+4. Inspect `Data/settings.json`, `portable-workspace.json` and `runner-queue-state.json`: same-volume paths may use `@portable/`, but none may contain PATs, runner registration tokens, `.credentials` contents or the raw Windows machine name/MachineGuid.
+5. Move the workspace to a second PC and verify a Smart Queue journal from the first PC is ignored rather than offering automatic runner recovery.
+6. Verify already prepared runners for the current PC show **Ready on this PC** and are not selected for migration.
+7. Verify a running interactive runner cannot be prepared until it is stopped. Verify service-installed runners show unsupported/not portable and cannot be selected.
+8. Using a disposable test runner, provide a PAT only in the Portable Workspace window and prepare it. Verify the runner keeps its name, GitHub target, work folder and custom labels and can start normally afterwards.
+9. After preparation, search the portable `Data` directory and application logs for the PAT and temporary registration token; neither may be present.
+10. Interrupt/fail a disposable migration after local removal and verify the runner appears as **Migration pending · retry**. Retry with a fresh GitHub token and confirm the stored non-secret metadata is sufficient to complete registration.
+11. Close the Portable Workspace window after entering a PAT without running migration, reopen it and verify the password box is empty.
+12. Confirm no migration starts merely because the external drive was inserted or because Workbench detected another machine.
+
+
+## v0.18.7 Portable Workspace checks
+
+1. On an extracted test copy, activate **Portable Workspace** while the runners on the same external volume are registered and working on the current PC. Restart and verify data is read from the adjacent `Data` directory.
+2. Change the removable-drive letter and verify same-volume runner roots, repository paths, manual runner order and Smart Queue pool paths resolve correctly without editing settings.
+3. Verify PREVIEW still uses `%LOCALAPPDATA%\NRSWorkbenchPreview` and does not activate portable mode from the disposable preview worktree.
+4. Move the portable workspace to another test PC. Stopped interactive runners should show **Needs preparation**; service-installed or running runners must not be selectable.
+5. Enter a GitHub access token with insufficient permissions and select several runners. The bulk preflight must fail before any `.runner` file is removed.
+6. With valid permissions, prepare multiple disposable/test runners. Verify the runner name, target, runner group, work folder, custom labels and default-label behavior are preserved.
+7. Verify two selected folders with the same GitHub target and runner name are blocked before migration starts.
+8. Verify a missing `bin\Runner.Listener.exe`, a non-github.com target, an absolute workFolder or a workFolder escaping the runner directory is not eligible for preparation.
+9. Interrupt a migration after local removal in a disposable test runner, reopen Workbench and verify the pending non-secret manifest allows retry with a fresh GitHub token.
+10. Inspect `Data\settings.json`, `portable-workspace.json`, local logs and queue/runtime state. They must not contain the GitHub access token, runner registration token, `.credentials` contents, raw MachineGuid or raw machine name.
+11. During preflight/preparation, Refresh and runner selection are disabled; closing the window cancels the active operation and clears the password field.
+12. If GitHub reports a selected runner as `online` or `busy`, preflight must stop before local configuration is removed; stop the old host and retry after GitHub reports it offline.
+13. Remove either `.credentials` or `.credentials_rsaparams` from a disposable prepared runner and verify Portable Workspace no longer reports it as ready for this PC.
+14. Simulate an expired/nearly expired registration token and verify preparation stops before `remove --local` is executed.
+15. With Smart Queue enabled in saved Settings, Portable Workspace must refuse preparation before GitHub preflight or local runner changes begin. Disable/save Smart Queue and retry.
+16. In a disposable copy, simulate an activation failure while writing portable manifest data and verify `NRSWorkbench.portable` is not created; the next launch must remain in normal mode.
+17. Activate portable mode with one runner missing `.credentials` or `.credentials_rsaparams`; it must not be recorded as already prepared for the current PC.
+18. In a multi-runner disposable batch, let preflight complete while all runners are offline, then make a later runner appear online/busy before its turn. Its final pre-mutation revalidation must block it without removing its local `.runner`.
+19. Retry a pending migration whose original numeric runner ID is stale but whose target + runner name still identify the remote runner. Preflight must resolve it by name, recheck offline/busy state and continue only when the match is unique.
+20. Let an early batch runner take long enough that a token minted during batch preflight would be near expiry. The later runner must request a fresh registration token immediately before local replacement.
+21. Corrupt `Data\portable-workspace.json` in a disposable copy. Portable runner preparation must fail closed with a visible error instead of treating the manifest as empty or overwriting pending migration state.
+22. Inject an absolute/out-of-volume runner path into a disposable manifest and verify it is rejected. Runner state persisted by Portable Workspace must use `@portable/` paths only.
+23. Point a disposable runner folder, `bin`, `Runner.Listener.exe` or existing workFolder through a Windows reparse point. Portable preparation must refuse it before local configuration removal.
+
+
 ## v0.18.6 maintenance checks
 
 1. Open **Maintenance** and scan with stopped runners. Confirm Workbench/PREVIEW logs are low-risk, old runner `_diag` is opt-in and `_work` is inventory-only.
@@ -182,3 +225,4 @@ Manual checks:
 6. Verify the application log rotates at 5 MB and keeps at most five archives.
 7. Configure a disposable runner with an absolute or `..`-escaping workFolder, or a workFolder root that is a reparse point. Maintenance must not traverse it and must report zero measured/reclaimable bytes.
 8. On a disposable runner, place a Windows junction/reparse point in an intermediate path segment leading to `_diag` or the configured workFolder. Maintenance must report zero measured/reclaimable bytes for that location and must not enumerate through the junction.
+

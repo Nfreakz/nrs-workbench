@@ -12,11 +12,11 @@
 - Latest published release: [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5).
 - Published Windows asset: `NRSWorkbench-v0.18.5-win-x64.zip`, 71,433,124 bytes, SHA256 `7831f858b9a35de1624465a6ee8b5481220a42a3411bb19cdf41f3dc08cb0a2e`.
 - v0.18.5 release source is the tag created from the release-prepared main line; the release workflow published the prerelease successfully on 2026-10-04 local time.
-- Current `main`: `caf6d8ffa85a857efe7d77308ffd39a70aa08ba4`; CI #512 SUCCESS.
+- Current `main`: `0c0202d0036bc23f23015b1d49b887e1cbbb1726`; v0.18.6 Maintenance Center plus reparse-chain hardening are integrated on `main` but not published.
 - v0.18.5 includes runner discovery by real installation markers, explicit Smart Queue pools, Feedback & Diagnostics, long-session runtime hardening and Runner Doctor.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
-- v0.18.6 Maintenance Center is integrated through PR #40 plus safety follow-ups #42, #43 and #44. Active development is PR #41 / `feat/v0.18.7-portable-workspace`.
+- v0.18.6 PRs #40, #42, #43, #44 and #45 are merged. Active development is PR #41 / `feat/v0.18.7-portable-workspace`, synchronized with current `main`.
 
 ## v0.18.5 published scope
 
@@ -55,17 +55,49 @@ The normal checkout remains on `main` and is the day-to-day NRS Workbench copy.
 
 ## v0.18.6 integrated state
 
-Maintenance Center is integrated on `main` and remains unpublished.
+PR #40 is merged into `main`.
 
 Scope:
-- application version on `main` is 0.18.6;
+- application version on `main` is 0.18.6 until v0.18.7 merges;
 - Maintenance Center scans storage before cleanup;
 - NRS Workbench logs rotate at 5 MB with five retained archives;
 - Workbench/PREVIEW log cleanup is low-risk and selected by default;
 - old runner `_diag` cleanup is opt-in because Worker logs feed statistics and progress estimation;
-- newest Runner/Worker logs are always preserved and active runners are rechecked immediately before diagnostic cleanup;
+- newest Runner/Worker logs are always preserved and BUSY runners are blocked from diagnostic cleanup;
 - runner `_work` is measured but intentionally not deleted automatically;
-- absolute, escaping or reparse-point workFolder paths are not traversed;
-- reparse points anywhere along runner → `_diag` or runner → workFolder directory chains block measurement/cleanup, preventing traversal through intermediate junctions.
+- absolute, escaping or reparse-point `workFolder` roots are not traversed or measured;
+- reparse points anywhere along runner → `_diag` or runner → workFolder directory chains block measurement and cleanup, including intermediate junctions;
+- cleanup results count only files actually cleaned and bytes actually reclaimed.
 
-Do not publish v0.18.6 until the release-facing documentation and manual Maintenance preview checks are completed.
+v0.18.6 is integrated but not published.
+
+## v0.18.7 development state
+
+Branch: `feat/v0.18.7-portable-workspace`, rebased directly on current `main`.
+
+Scope:
+- application version is 0.18.7 on this branch;
+- `NRSWorkbench.portable` beside the executable activates the portable profile on the next launch;
+- portable data is stored under `Data` beside the executable;
+- same-volume runner roots, repository paths, manual runner order and Smart Queue pool paths are persisted as `@portable/` relative tokens and resolved against the current volume root;
+- portable Smart Queue recovery state is tied to a hashed machine fingerprint and ignored on another PC;
+- portable manifest records prepared/pending runners without credentials, access tokens or temporary registration tokens;
+- corrupt or unsafe portable manifests fail closed instead of silently hiding pending migrations, and manifest runner paths must stay inside the portable volume;
+- runner folders, workFolder paths and Runner.Listener paths that traverse Windows reparse points are rejected before portable preparation;
+- bulk preparation is limited to stopped interactive GitHub.com runners;
+- the GitHub access token exists only in the window/session; Workbench requests a short-lived registration token and passes only that token to the runner process via `ACTIONS_RUNNER_INPUT_TOKEN`;
+- runner migration uses local removal plus unattended configure/replace while preserving name, URL, work folder, runner group, custom labels, default-label behavior, ephemeral mode and disable-update mode;
+- a pending manifest record is written before local removal so a failed migration can be retried;
+- the complete selected batch is prevalidated against GitHub before any local configuration is removed;
+- duplicate GitHub target/name identities, missing Runner.Listener binaries, unsupported targets and unsafe/non-relative work folders are blocked before preparation;
+- GitHub runners still reported online or busy are blocked during batch preflight and revalidated again immediately before local removal;
+- interrupted migrations resolve the remote runner by stable target + name when the original numeric runner ID is no longer reliable;
+- batch preflight verifies registration-token permission once per distinct GitHub target rather than once per runner;
+- a fresh short-lived registration token is requested immediately before each local replacement so large batches do not depend on older preflight tokens;
+- registration tokens that are expired or too close to expiry are rejected before local configuration removal;
+- Smart Queue must be disabled before preparation so automatic queue actions cannot race with re-registration;
+- a runner is only considered ready on the current machine when both the manifest association and expected local credential files are present;
+- portable activation writes the marker only after settings/manifest preparation succeeds, so partial activation cannot silently switch the next launch into portable mode;
+- the Portable Workspace grid and refresh action are locked while a preflight/preparation operation is active.
+
+Manual preview cannot turn the disposable PREVIEW worktree itself into portable mode. Activation must be checked on an extracted test copy. Do not publish v0.18.7 until its exact-head CI passes and portable migration is manually validated on disposable/test runners.
