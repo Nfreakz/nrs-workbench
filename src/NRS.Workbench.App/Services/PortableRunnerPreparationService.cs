@@ -491,24 +491,68 @@ public sealed class PortableRunnerPreparationService
 
             return relative != ".." &&
                    !relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal) &&
-                   !Path.IsPathRooted(relative);
+                   !Path.IsPathRooted(relative) &&
+                   !ContainsReparsePoint(root, resolved);
         }
         catch { return false; }
     }
 
     private static void EnsureRunnerBinary(string folder)
     {
-        var executable = Path.Combine(folder, "bin", "Runner.Listener.exe");
+        var root = Path.GetFullPath(folder);
+        var executable = Path.Combine(root, "bin", "Runner.Listener.exe");
         if (!File.Exists(executable))
             throw new FileNotFoundException("Runner.Listener.exe was not found.", executable);
+        if (ContainsReparsePoint(root, executable))
+            throw new InvalidOperationException(
+                "Portable preparation refuses runner folders or binaries that traverse a reparse point.");
     }
 
     private void EnsureStoppedInteractive(string folder)
     {
+        var full = Path.GetFullPath(folder);
+        if (ContainsReparsePoint(full, full))
+            throw new InvalidOperationException(
+                "Portable preparation refuses a runner folder that is a reparse point.");
         if (File.Exists(Path.Combine(folder, ".service")))
             throw new InvalidOperationException("Portable preparation currently supports interactive runners only.");
         if (IsRunning(folder))
             throw new InvalidOperationException("Stop the runner before preparing it for another PC.");
+    }
+
+    private static bool ContainsReparsePoint(string root, string target)
+    {
+        try
+        {
+            var normalizedRoot = Path.GetFullPath(root)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var normalizedTarget = Path.GetFullPath(target);
+            var relative = Path.GetRelativePath(normalizedRoot, normalizedTarget);
+
+            var current = normalizedRoot;
+            if (IsExistingReparsePoint(current)) return true;
+            if (relative == ".") return false;
+
+            foreach (var part in relative.Split(
+                         [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+                         StringSplitOptions.RemoveEmptyEntries))
+            {
+                current = Path.Combine(current, part);
+                if (IsExistingReparsePoint(current)) return true;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return true;
+        }
+    }
+
+    private static bool IsExistingReparsePoint(string path)
+    {
+        if (!File.Exists(path) && !Directory.Exists(path)) return false;
+        return (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0;
     }
 
     private static async Task RunListenerAsync(
