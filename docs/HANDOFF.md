@@ -7,79 +7,29 @@
 - Do not use this repository's paths, credentials, runner registrations, deployment decisions or release tags for any other Neo RS application.
 - Default branch: `main`. Review its live HEAD, PRs, CI and Releases before modifying anything.
 
-## Current verified state · 2026-10-03
+## Current verified state · 2026-10-04
 
-- Latest published release: [v0.18.4 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.4), built from tag `v0.18.4` at `e8c786e689d7ebbfb53f17d61e704e9a2a73aff9`.
-- Published Windows asset: `NRSWorkbench-v0.18.4-win-x64.zip`. GitHub reports SHA256 `8f1f427dec4a04becc393faecf11a37ea31c98c67c6cc33d40cb16498635cc1a`.
-- The tag predates later release automation and image repairs on `main`. Those later commits are not part of the tagged source or ZIP.
-- Manual Windows validation of Repositories, Settings and compact runner details passed before tagging.
+- Latest published release: [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5).
+- Published Windows asset: `NRSWorkbench-v0.18.5-win-x64.zip`, 71,433,124 bytes, SHA256 `7831f858b9a35de1624465a6ee8b5481220a42a3411bb19cdf41f3dc08cb0a2e`.
+- v0.18.5 release source is the tag created from the release-prepared main line; the release workflow published the prerelease successfully on 2026-10-04 local time.
+- Current `main`: `79192ccb2b0ea957b76ee1c14a1502a571a443e3`; post-merge CI #461 SUCCESS.
+- v0.18.5 includes runner discovery by real installation markers, explicit Smart Queue pools, Feedback & Diagnostics, long-session runtime hardening and Runner Doctor.
 - `main` is protected by repository rules requiring pull requests and blocking deletion/force-push.
-- PR #25 (runner discovery and Smart Queue selection) is merged to `main`; it remains outside the tagged v0.18.4 release.
 - `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
+- Active development: PR #40 / `feat/v0.18.6-maintenance`; v0.18.7 is stacked separately on top of v0.18.6.
 
-## v0.18.4 scope
+## v0.18.5 published scope
 
-- Contextual safe-action guidance for the selected repository.
-- Session-only in-memory history for Fetch, Pull, Push, Commit and local branch switches.
-- Visible AHEAD/BEHIND and local-change summary.
-- Repository state re-inspected immediately before Pull/Push; stale state blocks write actions.
-- Git inspection timeout.
-- Compact runner-details layout fix.
-- Optional Buy Me a Coffee link in Settings, opened only on click.
+- Runner discovery validates real runner installation markers instead of relying on folder names.
+- Smart Queue can use all detected runners or an explicit selected pool; excluded runners are not controlled or counted.
+- Feedback & Diagnostics provides review-before-share local diagnostic export and GitHub issue/feature entry points without automatic upload.
+- Automatic refresh is single-flight, recurring failures are contained/throttled, tray churn is reduced and runtime-session heartbeat records hard/unclean exits.
+- Runner Doctor provides read-only, explainable local health checks for installation, registration, processes/services, version and `_diag` activity.
+- Runner Doctor does not read credentials, auto-repair, re-register or update runner binaries.
 
 ## Release documentation
 
 README and the GitHub Wiki describe the published ZIP. The preview image uses fictional runner, repository, path and log data. Before the next version, read `docs/WRITING_STYLE.md`, review affected documentation and the real GitHub Wiki, and distinguish released features from work on `main`.
-
-## v0.18.5 release-candidate state
-
-Runner discovery / Smart Queue pool work was manually validated on Windows and merged through PR #25. Preview-worktree infrastructure was merged through PR #36. Feedback, diagnostics and long-running runtime hardening were manually validated and merged through PR #35. Runner Doctor was manually validated and merged through PR #37. Current verified pre-release baseline: `main` at `de4eb2ebb868a9d4b9cd29d0229ff47a1d4b7e7f` with post-merge CI #454 SUCCESS.
-
-Current release-preparation branch: `release/v0.18.5`.
-
-The release candidate changes version metadata to 0.18.5 and closes the changelog section for 2026-10-03. The latest published binary remains v0.18.4 until an immutable v0.18.5 tag exists and the Release workflow uploads `NRSWorkbench-v0.18.5-win-x64.zip`.
-
-Runtime-resilience follow-up after a real long-running-session failure:
-- automatic runner/queue refresh is now single-flight; a slow cycle causes later timer ticks to be skipped instead of queued;
-- periodic runner/resource faults are caught and rate-limited in the local log instead of surfacing a modal dialog every tick;
-- the last-resort UI exception dialog is throttled to one report per minute during an error burst;
-- unobserved task exceptions are recorded and marked observed;
-- the tray menu is no longer rebuilt every few seconds when nothing changed; old WinForms menu items are disposed when a rebuild is actually required;
-- the exact historical exception still requires the local pre-fix application log for confirmation.
-- the uploaded pre-fix log for the 2026-10-03 incident contains no current managed exception after the 2026-10-01 startup, so a local runtime-session marker/heartbeat is added to detect future hard/unclean exits that bypass WPF exception handlers.
-
-Feedback & Diagnostics development scope:
-- open the repository's bug and feature-request templates from the app;
-- generate an exact local preview before export;
-- export only generated diagnostic text plus a README in a user-selected ZIP;
-- sanitize configured paths, local user/machine identity, HTTP(S) user-info and GitHub token-shaped strings;
-- never upload diagnostics automatically;
-- improve the unexpected-UI-error path so the user can review/export diagnostics.
-
-Current scope:
-- runner discovery validates real runner installation markers instead of relying on the folder name;
-- automatic discovery remains shallow and can find common parent folders one level below a drive root;
-- Settings can use all detected runners or an explicit Smart Queue pool;
-- runners outside the selected pool are not started, stopped, rotated or counted against the Smart Queue limit;
-- runner rows, context menus and Details/Log layout have received a compact graphite UI pass;
-- portable settings and smoke tests cover the queue-pool selection.
-
-All intended v0.18.5 product work is merged and manually exercised. The code remains unreleased until the v0.18.5 release tag/package is created and verified.
-
-
-## Runner Doctor v0.18.5 scope
-
-Runner Doctor is a local, read-only health view for detected runners.
-
-- classifies each runner as OK, Attention or Problem from explainable local checks;
-- verifies runner folder availability, essential installation markers, local registration marker, current state, listener/worker processes, service presence/state, runner version and local `_diag` history;
-- treats STOPPED as a valid state rather than an automatic fault;
-- flags BUSY runners whose latest Worker log has not changed for more than 30 minutes as Attention, not as a definitive failure;
-- never reads `.credentials` or `.credentials_rsaparams`;
-- does not start, stop, re-register, repair or update runners;
-- offers only read-oriented actions: refresh diagnosis, open runner folder, open `_diag` and copy a redacted summary.
-
-Runner Doctor is part of the v0.18.5 release candidate and was manually validated on the real Windows runner set.
 
 ## Future roadmap
 
