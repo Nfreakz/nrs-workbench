@@ -207,6 +207,9 @@ Manual checks:
 15. With Smart Queue enabled in saved Settings, Portable Workspace must refuse preparation before GitHub preflight or local runner changes begin. Disable/save Smart Queue and retry.
 16. In a disposable copy, simulate an activation failure while writing portable manifest data and verify `NRSWorkbench.portable` is not created; the next launch must remain in normal mode.
 17. Activate portable mode with one runner missing `.credentials` or `.credentials_rsaparams`; it must not be recorded as already prepared for the current PC.
+18. In a multi-runner disposable batch, let preflight complete while all runners are offline, then make a later runner appear online/busy before its turn. Its final pre-mutation revalidation must block it without removing its local `.runner`.
+19. Retry a pending migration whose original numeric runner ID is stale but whose target + runner name still identify the remote runner. Preflight must resolve it by name, recheck offline/busy state and continue only when the match is unique.
+20. Let an early batch runner take long enough that a token minted during batch preflight would be near expiry. The later runner must request a fresh registration token immediately before local replacement.
 
 
 ## v0.18.6 maintenance checks
