@@ -144,6 +144,7 @@ public sealed class PortableRunnerPreparationService
                         registration.AgentId,
                         personalAccessToken,
                         cancellationToken);
+                    ValidateRemoteIdentity(registration, remote);
                 }
 
                 var registrationToken = await _github.CreateRegistrationTokenAsync(
@@ -380,6 +381,21 @@ public sealed class PortableRunnerPreparationService
             return true;
         }
         catch { return false; }
+    }
+
+    public static void ValidateRemoteIdentity(
+        PortableRunnerRegistration registration,
+        GitHubRunnerRemoteMetadata remote)
+    {
+        ArgumentNullException.ThrowIfNull(registration);
+        ArgumentNullException.ThrowIfNull(remote);
+
+        if (string.IsNullOrWhiteSpace(remote.Name) ||
+            !string.Equals(remote.Name.Trim(), registration.AgentName.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                $"GitHub runner identity mismatch. Local runner '{registration.AgentName}' does not match remote runner '{remote.Name}'.");
+        }
     }
 
     public static bool IsSafeWorkFolder(string runnerFolder, string workFolder)

@@ -128,6 +128,18 @@ internal static class PortableWorkspaceSmoke
             var remote = await client.GetRunnerAsync("https://github.com/acme/project", 42, sessionPat);
             var token = await client.CreateRegistrationTokenAsync("https://github.com/acme/project", sessionPat);
 
+            PortableRunnerPreparationService.ValidateRemoteIdentity(registration, remote);
+            var mismatchBlocked = false;
+            try
+            {
+                PortableRunnerPreparationService.ValidateRemoteIdentity(
+                    registration,
+                    remote with { Name = "different-runner" });
+            }
+            catch (InvalidOperationException) { mismatchBlocked = true; }
+            Assert(mismatchBlocked,
+                "portable preflight blocks a GitHub runner identity that no longer matches the local registration");
+
             Assert(remote.CustomLabels.SequenceEqual(["gpu", "build"]) && remote.HasDefaultLabels,
                 "GitHub runner metadata preserves custom labels and detects default labels");
             Assert(token.Token == "temporary-registration-token" &&
