@@ -289,6 +289,9 @@
                 <Button Style="{StaticResource MainToolbarButton}" Click="RunnerDoctor_Click">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource MainIconGlyph}" Text="&#xE9D9;"/><TextBlock Text="{local:Tr Source='Runner Doctor'}"/></StackPanel>
                 </Button>
+                <Button Style="{StaticResource MainToolbarButton}" Click="Maintenance_Click">
+                    <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource MainIconGlyph}" Text="&#xE74D;"/><TextBlock Text="{local:Tr Source='Mantenimiento'}"/></StackPanel>
+                </Button>
                 <Button Style="{StaticResource MainToolbarButton}" Margin="0" Click="Settings_Click">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource MainIconGlyph}" Text="&#xE713;"/><TextBlock Text="{local:Tr Source='Configuración'}"/></StackPanel>
                 </Button>
