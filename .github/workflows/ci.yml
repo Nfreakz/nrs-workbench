@@ -43,6 +43,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Enforce local runners
+        shell: powershell
+        run: ./scripts/check-local-runners.ps1
+
       - name: Verify local toolchain
         run: |
           dotnet --info
