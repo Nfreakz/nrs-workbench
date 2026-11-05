@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [0.18.7] - Unreleased
+## [0.18.7] - 2026-11-05
 
 ### Added
 - Adds **Portable Workspace** mode: a marker beside the executable moves NRS Workbench data into a local `Data` folder and stores same-volume runner/repository paths relatively so removable-drive letter changes do not break them.
@@ -32,6 +32,9 @@
 - Adds a two-minute limit and non-interactive authentication handling for Git Fetch, Pull and Push.
 - Redacts embedded authorization credentials and avoids passing terminal paths through an unsafe shell command.
 - Keeps selected runner logs up to date without unnecessarily resetting the view; improves statistics cache behavior.
+
+### Release note
+- Portable runner re-registration across physical Windows PCs remains unverified in an independent manual test. Use disposable stopped interactive runners until this release gate is completed.
 
 ## [0.18.6] - 2026-11-05
 
