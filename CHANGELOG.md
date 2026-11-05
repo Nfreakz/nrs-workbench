@@ -33,7 +33,7 @@
 - Redacts embedded authorization credentials and avoids passing terminal paths through an unsafe shell command.
 - Keeps selected runner logs up to date without unnecessarily resetting the view; improves statistics cache behavior.
 
-## [0.18.6] - Unreleased
+## [0.18.6] - 2026-11-05
 
 ### Added
 - Adds a **Maintenance Center** that inventories NRS Workbench logs, runner `_diag` history and runner `_work` usage before deleting anything.

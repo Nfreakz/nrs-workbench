@@ -6,15 +6,15 @@
 
 **A local Windows dashboard for Git repositories and GitHub Actions self-hosted runners.**
 
-**Latest published release: [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5)** · [What's new](CHANGELOG.md)
+**Latest published release: [v0.18.6 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.6)** · [What's new](CHANGELOG.md)
 
 <p align="center"><a href="docs/images/nrs-workbench-project-preview-v0.18.4.png"><img src="docs/images/nrs-workbench-project-preview-v0.18.4.png" alt="NRS Workbench project preview with representative runner data" width="720"></a></p>
 
 Project preview based on the v0.18.4 main interface. Runner names, repositories, paths and logs are fictional. v0.18.5 adds Runner Doctor and Feedback & Diagnostics views that are not shown in this image.
 
-**New in v0.18.5:** runner discovery uses real installation markers instead of folder naming; Smart Queue can target an explicit runner pool; Runner Doctor explains local runner health; Feedback & Diagnostics provides review-before-share diagnostic export; and long-running refresh/error handling is more resilient.
+**New in v0.18.6:** Maintenance Center measures Workbench logs, old runner diagnostics and runner work-folder storage before cleanup. Old `_diag` cleanup is opt-in; `_work` remains inventory-only. Partial scan results appear while inspection continues, and deletion guidance distinguishes low-risk files from history-affecting or blocked data.
 
-**After v0.18.5:** the v0.18.6 Maintenance Center is integrated on `main`; v0.18.7 adds Portable Workspace and reviewed bulk preparation for stopped interactive runners. Neither version is published yet.
+**After v0.18.6:** v0.18.7 Portable Workspace is implemented on `main`, but is not published. Migrating runner registrations across PCs requires real disposable-runner testing before the release.
 
 NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.5**, check runner status and current jobs, inspect locally retained job history, review Runner Doctor checks, export sanitized diagnostics after previewing them, see host CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
 
@@ -22,9 +22,9 @@ NRS Workbench brings your local runners and Git working trees into one desktop a
 
 **Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-**En español:** La versión v0.18.5 añade Runner Doctor, diagnósticos revisables, selección explícita de runners para Smart Queue y mejoras de estabilidad en sesiones largas.
+**En español:** La versión v0.18.6 incorpora mantenimiento de logs y diagnósticos, escaneo progresivo y avisos claros sobre qué datos se pueden eliminar.
 
-**En català:** La versió v0.18.5 afegeix Runner Doctor, diagnòstics revisables, selecció explícita de runners per a Smart Queue i millores d'estabilitat en sessions llargues.
+**En català:** La versió v0.18.6 incorpora manteniment de registres i diagnòstics, escaneig progressiu i avisos clars sobre quines dades es poden esborrar.
 
 ## Who is NRS Workbench for?
 
@@ -32,9 +32,9 @@ NRS Workbench brings your local runners and Git working trees into one desktop a
 - **People managing several local Git repositories:** inspect working-tree state and use guarded Fetch, Pull, Push, Commit and local branch switching without jumping between folders.
 - **Small homelab and development setups:** keep host CPU, memory and disk usage visible next to runner activity, with an optional one- or two-runner queue to limit simultaneous listeners.
 
-The published **v0.18.5 ZIP** includes Runner Doctor, Feedback & Diagnostics, explicit Smart Queue runner pools and the long-session resilience changes described above.
+The published **v0.18.6 ZIP** includes Maintenance Center plus the Runner Doctor, Feedback & Diagnostics and Smart Queue features from previous releases. Portable Workspace is **not** included in this download.
 
-**Try it:** [Download the published v0.18.5 Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.5/NRSWorkbench-v0.18.5-win-x64.zip) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
+**Try it:** [Download the published v0.18.6 Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.6/NRSWorkbench-v0.18.6-win-x64.zip) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
 
 ## Public preview readiness
 
