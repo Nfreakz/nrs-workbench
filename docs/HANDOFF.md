@@ -183,3 +183,9 @@ Never move a tag to recover a failed release. The workflow supports manual dispa
 5. Audit cold startup, idle CPU/RAM, long-running refresh, Smart Queue stability and larger Maintenance inventories using real data, without inventing performance claims.
 6. Refresh the product screenshot only after a non-sensitive actual v0.18.7+ capture. Existing screenshot is correctly labeled v0.18.4.
 7. Keep each NeoRS app's repository, tags, credentials, runners and handoff separate. Never move or recreate the published tags.
+
+## Public wording adjustment · 2026-11-05
+
+- Public README (English, Spanish and Catalan), Portable Workspace guide and ROADMAP were rephrased to foreground supported-runner restrictions and the actionable first-run recommendation to test with a disposable interactive runner.
+- The cross-PC end-to-end verification status remains an explicit QA fact in this HANDOFF and `docs/TESTING.md`, and is still noted in the public setup guide. Never claim it passed without evidence.
+- Public v0.18.7 release notes and GitHub Wiki are separate publication surfaces; modifying repository documentation does not automatically update them. Confirm changes independently before claiming these surfaces updated. Never change the immutable tag or release asset.

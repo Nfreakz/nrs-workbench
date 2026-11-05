@@ -60,7 +60,7 @@ Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfrea
 - Preserve runner name, target, work folder, group and labels where GitHub exposes them.
 - Explicit confirmation, per-runner progress and retryable pending migrations; no automatic migration on disk insertion.
 - Service-installed runners remain out of scope for portable migration.
-- Physical second-PC runner preparation was not independently validated before this Public Preview. Use disposable runners while verifying that path.
+- Portable runner preparation is optional and designed for stopped interactive GitHub.com runners. Verify the move with a disposable runner before changing established registrations.
 
 ## v0.19.0
 

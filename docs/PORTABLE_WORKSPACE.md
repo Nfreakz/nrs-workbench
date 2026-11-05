@@ -2,7 +2,7 @@
 
 This guide applies only to NRS Workbench in `Nfreakz/nrs-workbench` and its Windows x64 Public Preview. It does not apply to other NeoRS apps or their runners.
 
-> **Validation limit:** runner re-registration after moving a physical external disk to a different Windows PC has not yet been independently confirmed using a disposable test runner. Treat this as a Public Preview feature and do not use production runners for the first cross-PC trial.
+> **Before moving runners:** keep a backup of existing registrations, stop the runner, and test the procedure with a disposable interactive GitHub.com runner. Cross-PC runner re-registration is still awaiting a full independent physical test.
 
 ## What portable means
 
