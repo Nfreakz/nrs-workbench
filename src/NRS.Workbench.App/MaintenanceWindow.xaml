@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:NRS.Workbench.App.Services"
         Title="{local:Tr Source='Mantenimiento · NRS Workbench'}" Icon="/Assets/NRSWorkbench.ico"
-        Width="1080" Height="720" MinWidth="900" MinHeight="620"
+        Width="1240" Height="760" MinWidth="980" MinHeight="640"
         WindowStartupLocation="CenterOwner" Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
     <Grid Margin="24">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -28,21 +28,27 @@
             <Border Grid.Column="2" Style="{StaticResource PanelCard}" Padding="14" Margin="12,0,0,0"><StackPanel><TextBlock Text="{local:Tr Source='RECUPERABLE'}" FontSize="11" Foreground="{StaticResource MutedBrush}"/><TextBlock x:Name="ReclaimableText" Text="—" FontSize="19" FontWeight="Bold" Foreground="#67AF87" Margin="0,3,0,0"/></StackPanel></Border>
         </Grid>
         <Border Grid.Row="2" Style="{StaticResource PanelCard}" Padding="8">
-            <DataGrid x:Name="MaintenanceGrid" AutoGenerateColumns="False" IsReadOnly="False" CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single" HeadersVisibility="Column" GridLinesVisibility="Horizontal">
+            <DataGrid x:Name="MaintenanceGrid" AutoGenerateColumns="False" IsReadOnly="False" CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single" HeadersVisibility="Column" GridLinesVisibility="Horizontal" RowHeight="Auto" MinRowHeight="40">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Width="46"><DataGridTemplateColumn.CellTemplate><DataTemplate><CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding IsCleanable}" HorizontalAlignment="Center" VerticalAlignment="Center"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
                     <DataGridTextColumn Header="{local:Tr Source='CATEGORÍA'}" Binding="{Binding Category}" Width="190" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="{local:Tr Source='RIESGO'}" Binding="{Binding RiskLabel}" Width="130" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="{local:Tr Source='BORRADO'}" Binding="{Binding DeletionLabel}" Width="165" IsReadOnly="True"/>
                     <DataGridTextColumn Header="{local:Tr Source='ARCHIVOS'}" Binding="{Binding FileCount}" Width="82" IsReadOnly="True"/>
                     <DataGridTextColumn Header="{local:Tr Source='TAMAÑO'}" Binding="{Binding TotalDisplay}" Width="100" IsReadOnly="True"/>
                     <DataGridTextColumn Header="{local:Tr Source='RECUPERABLE'}" Binding="{Binding ReclaimableDisplay}" Width="110" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="{local:Tr Source='DETALLE'}" Binding="{Binding Detail}" Width="*" IsReadOnly="True"/>
+                    <DataGridTemplateColumn Header="{local:Tr Source='DETALLE'}" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Detail}" TextWrapping="Wrap" Margin="6,5" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
         <Grid Grid.Row="3" Margin="0,16,0,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <TextBlock Text="{local:Tr Source='_work se inventaría pero nunca se borra automáticamente. Los logs _diag antiguos pueden afectar estadísticas y estimaciones.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,20,0"/>
+            <TextBlock Text="{local:Tr Source='Borrado: Seguro para borrar = datos de bajo riesgo. Borrar con precaución = reduce historial. No se puede borrar = solo inventario o runner protegido. _work nunca se borra automáticamente.'}" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,20,0"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Button Content="{local:Tr Source='Abrir ubicación'}" Style="{StaticResource ToolbarButton}" Padding="12,7" Click="OpenLocation_Click"/>
                 <Button x:Name="CleanButton" Content="{local:Tr Source='Limpiar selección'}" Style="{StaticResource PrimaryToolbarButton}" Padding="14,7" Margin="8,0,0,0" Click="Clean_Click"/>
