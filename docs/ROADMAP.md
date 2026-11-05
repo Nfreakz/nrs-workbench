@@ -50,7 +50,7 @@ Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfrea
 
 ## v0.18.7
 
-Integrated and CI-green, not yet published. Portable Workspace and runner migration.
+Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.7). Portable Workspace and optional runner migration.
 
 - True portable Workbench profile with a `Data` directory beside the executable and relative same-volume paths.
 - Detect current-machine preparation state from a credential-free portable manifest.
@@ -60,6 +60,7 @@ Integrated and CI-green, not yet published. Portable Workspace and runner migrat
 - Preserve runner name, target, work folder, group and labels where GitHub exposes them.
 - Explicit confirmation, per-runner progress and retryable pending migrations; no automatic migration on disk insertion.
 - Service-installed runners remain out of scope for portable migration.
+- Physical second-PC runner preparation was not independently validated before this Public Preview. Use disposable runners while verifying that path.
 
 ## v0.19.0
 
