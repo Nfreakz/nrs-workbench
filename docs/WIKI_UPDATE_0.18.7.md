@@ -1,6 +1,6 @@
 # GitHub Wiki update checklist · v0.18.7
 
-**This repository file is the prepared source for a Wiki update, not evidence that the live Wiki was edited.** The connected GitHub interface does not provide Wiki read/write actions. After the release ZIP is verified, an authorized GitHub Wiki editor must compare the live pages and apply the updates below.
+**Published Wiki update: 2026-11-05.** The repository-scoped self-hosted Windows workflow [Publish v0.18.7 Wiki #2](https://github.com/Nfreakz/nrs-workbench/actions/runs/42007741452) completed successfully and verified the remote Wiki HEAD `39e75bdc30b4cc14eadc96781bf9ff506343588c`. It cloned and preserved the existing Wiki, updated Home, created versioned Portable Workspace and Maintenance Center pages, and updated `_Sidebar.md`. A separate browser-level render/link check is still pending.
 
 ## Wiki Home
 
@@ -44,10 +44,12 @@ Carry forward the v0.18.6 documentation:
 - Keep the Public Preview designation. Do not claim a successful physical migration that has not been tested.
 - Cross-reference [Privacy](PRIVACY.md) and the repository [Security Policy](../SECURITY.md).
 
-## Final Wiki checklist
+## Final Wiki publication checks
 
-- [ ] Open and review the live Home page and any existing Portable Workspace or Maintenance pages.
-- [ ] Replace stale v0.18.5/v0.18.6 latest-version links with v0.18.7, without rewriting historical version pages.
-- [ ] Add/revise portable-mode guide with the safety notice above.
-- [ ] Verify live Wiki links and release ZIP are accessible.
-- [ ] Record completion in `docs/HANDOFF.md`. Until then, mark the Wiki update **pending**, not completed.
+- [x] Clone the existing Wiki without replacing its history or unrelated pages.
+- [x] Add the v0.18.7 latest-release banner on Home, with Windows x64 ZIP and clear Public Preview caution.
+- [x] Add versioned Portable Workspace and Maintenance Center pages and sidebar links.
+- [x] Push with the short-lived `GITHUB_TOKEN` from the self-hosted Windows runner, without force or stored PAT.
+- [x] Confirm Wiki #2 `SUCCESS` and verify remote Wiki HEAD matches the pushed commit.
+- [x] Record publication details in `docs/HANDOFF.md`.
+- [ ] Independently open the **rendered** live Wiki pages in a browser, confirm that old latest-version references are not misleading, and test all links. The available GitHub connector cannot read the rendered Wiki directly.

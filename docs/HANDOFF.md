@@ -18,7 +18,7 @@
 - PRs #47–#49 (CI policy, security fixes, Maintenance UI), #51 (PowerShell UTF-8 release JSON), #52 (release docs), #53 (handoff) and #54/#56 (temporary publisher and retirement) are merged.
 - Last observed `main` before this docs closure: `54ffe298e3cb07bd61744ed1d38f1701eecb9320`; a docs merge will advance it. Verify live HEAD and CI when continuing work.
 - **Physical cross-PC portable runner preparation is still unverified in an independently observed manual test.** The release description and README explicitly warn users to test only with disposable stopped interactive runners. Do not reinterpret successful smoke tests as proof of physical migration.
-- GitHub Wiki **was not updated live** from this connection. `docs/WIKI_UPDATE_0.18.7.md` provides the prepared Wiki changes; a Wiki-capable GitHub session must apply and verify them. Latest published README and checked-in guide are prepared in docs PR #55.
+- The [GitHub Wiki](https://github.com/Nfreakz/nrs-workbench/wiki) was updated on 2026-11-05 through one-time self-hosted Windows workflow [Wiki #2](https://github.com/Nfreakz/nrs-workbench/actions/runs/42007741452), **SUCCESS**. Remote Wiki HEAD `39e75bdc30b4cc14eadc96781bf9ff506343588c` was verified after the push. Home received the v0.18.7 latest-release block, with versioned Portable Workspace and Maintenance Center pages and sidebar links. A rendered browser click-through remains independently unverified.
 - No new code changes are needed to consider 0.18.7 published. Any later user-reported migration bug should be fixed in a new, properly versioned release instead of silently modifying the published tag.
 
 ## Publication evidence and outstanding follow-up · 2026-11-05
@@ -28,7 +28,7 @@
 - Release workflow: https://github.com/Nfreakz/nrs-workbench/actions/runs/42000544874 (SUCCESS).
 - Annotated tag object `4d7375814f8d2876a85061112ccb3db9d59558ee` targets commit `70229481c01d4de469f9007ecd9938fa0be92c48`.
 - The ZIP was created and uploaded successfully; downloaded startup on a separate Windows PC is not yet independently verified.
-- Next independent tasks: physical portable migration QA with disposable runner, live GitHub Wiki update, and v0.19.0 design.
+- Next independent tasks: physical portable migration QA with a disposable runner, visual Wiki click-through review when browser access is available, and v0.19.0 design.
 
 ## Release policy and constraints
 
@@ -171,15 +171,15 @@ Never move a tag to recover a failed release. The workflow supports manual dispa
 ## Documentation
 
 - Docs PR #55 updates README, CHANGELOG, ROADMAP, HANDOFF and adds `docs/PORTABLE_WORKSPACE.md` for v0.18.7. Verify it has merged before beginning a new task.
-- `docs/WIKI_UPDATE_0.18.7.md` contains copy-ready Wiki content. **The live GitHub Wiki has NOT been verified or updated from this tool session.**
+- `docs/WIKI_UPDATE_0.18.7.md` records the completed automated Wiki update (Wiki #2 SUCCESS and remote SHA verification), with rendered-link visual inspection still open.
 - Future changes must preserve `docs/WRITING_STYLE.md`, `docs/RELEASING.md` and `docs/TESTING.md` guidance.
 
 ## Next action after v0.18.7
 
-1. Confirm docs PR #55 was merged and verify latest public README links, versioned changelog and Portable Workspace guide.
-2. Review and edit the **live GitHub Wiki** through a Wiki-capable GitHub session using `docs/WIKI_UPDATE_0.18.7.md`. Do not claim it is updated until verified.
-3. Validate cross-PC migration independently on a **disposable stopped interactive test runner**: activation, `Data`, drive-letter changes, explicit preparation, preserved target/name/group/labels, retry/recovery and absence of persisted PAT/registration tokens. Keep production runners untouched.
-4. **v0.19.0 GitHub Actions Control**: design and implement a read-only overview of workflows/runs first, followed by least-privilege explicit workflow dispatch, rerun/cancel actions with confirmation, logging and safety checks. Do not switch to GitHub-hosted runners.
-5. Measure idle CPU/RAM, startup and long-session refresh behavior with multiple runners. Revisit Smart Queue / Maintenance only for reproducible issues.
-6. Refresh the main dashboard screenshot only from an actual non-sensitive app capture. Existing image is explicitly identified as v0.18.4 and must not be relabeled as 0.18.7.
-7. Do not move/reuse existing tags or copy credentials, runners, files and decisions between other NeoRS apps.
+1. **Publication closed:** immutable v0.18.7 tag, Public Preview, Windows x64 ZIP and released documentation are verified. The live GitHub Wiki update ran on the repository-scoped self-hosted Windows runner: Wiki #2 SUCCESS; remote SHA `39e75bdc30b4cc14eadc96781bf9ff506343588c`. No temporary publisher should remain after the retirement PR.
+2. **Manual QA not yet witnessed:** test Portable Workspace on an independent second Windows PC, with a disposable *stopped interactive* GitHub.com runner. Validate drive-letter changes, runner registration metadata, recovery, busy/service exclusions and absence of PAT/token persistence. Do not use production runners for the first migration trial.
+3. **Visual documentation check:** open the live GitHub Wiki Home, Portable Workspace and Maintenance Center pages in a real browser to confirm rendering and links. The update workflow verified the remote Git commit but did not inspect the rendered UI.
+4. **v0.19.0 GitHub Actions Control:** start with read-only workflows/runs and least-privilege auth design. Add explicit, confirmed dispatch/rerun/cancel only after safety and permission gates; use self-hosted Windows X64 only.
+5. Audit cold startup, idle CPU/RAM, long-running refresh, Smart Queue stability and larger Maintenance inventories using real data, without inventing performance claims.
+6. Refresh the product screenshot only after a non-sensitive actual v0.18.7+ capture. Existing screenshot is correctly labeled v0.18.4.
+7. Keep each NeoRS app's repository, tags, credentials, runners and handoff separate. Never move or recreate the published tags.
