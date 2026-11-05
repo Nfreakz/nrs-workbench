@@ -142,11 +142,20 @@ jobs:
               prerelease = $true
             } | ConvertTo-Json
 
+            # Windows PowerShell 5.1 can send non-ASCII JSON with an ANSI
+            # encoding when the request body is passed as a string.
+            # Send explicit UTF-8 bytes so GitHub receives valid JSON.
+            $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($body)
+            $roundTrip = [System.Text.Encoding]::UTF8.GetString($jsonBytes) | ConvertFrom-Json
+            if ($roundTrip.body -cne $releaseNotes) {
+              throw "Release notes JSON did not survive UTF-8 encoding."
+            }
+
             $release = Invoke-RestMethod -Method Post `
               -Uri "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases" `
               -Headers $headers `
-              -ContentType 'application/json' `
-              -Body $body
+              -ContentType 'application/json; charset=utf-8' `
+              -Body $jsonBytes
           }
 
           $existingAsset = @($release.assets | Where-Object { $_.name -eq $env:PACKAGE })
