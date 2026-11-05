@@ -24,6 +24,15 @@
 - Revalidates each runner immediately before local removal and refreshes short-lived registration tokens for long bulk operations.
 - Retries interrupted portable migrations by stable GitHub target + runner name when the previous numeric runner ID is stale.
 
+### Fixed
+- Writes settings changes and portable settings exports atomically; preserves a backup when an existing settings file cannot be read.
+- Avoids clearing configured runner roots when a drive is temporarily disconnected.
+- Rejects unsafe runner-service control targets and treats unreadable Worker processes conservatively.
+- Prevents duplicate Smart Queue starts while a runner is pending startup and avoids reconciliation after a skipped refresh.
+- Adds a two-minute limit and non-interactive authentication handling for Git Fetch, Pull and Push.
+- Redacts embedded authorization credentials and avoids passing terminal paths through an unsafe shell command.
+- Keeps selected runner logs up to date without unnecessarily resetting the view; improves statistics cache behavior.
+
 ## [0.18.6] - Unreleased
 
 ### Added
@@ -37,6 +46,8 @@
 - Re-evaluates the newest Runner/Worker diagnostic files at cleanup time and refuses cleanable `_diag` locations that are reparse points or leave the reviewed directory.
 - Refuses to traverse absolute, escaping or reparse-point runner `workFolder` locations while measuring `_work`; unsafe locations remain unmeasured and never become cleanable.
 - Rejects reparse points anywhere along runner → `_diag` and runner → workFolder directory chains, so Maintenance does not even inventory a tree that escapes through an intermediate junction.
+- Shows Maintenance scan results progressively; caps `_work` inventory time and file enumeration per runner and labels partial measurements rather than keeping the table empty.
+- Wraps complete detail text in the Maintenance table and states whether deletion is safe, affects job-history data, or is blocked.
 
 
 ## [0.18.5] - 2026-10-03
