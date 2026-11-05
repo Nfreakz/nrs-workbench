@@ -1,0 +1,56 @@
+name: Publish v0.18.7 Wiki (one-time)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/wiki-v0187-publish.yml'
+      - 'scripts/publish-wiki-v0187.ps1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: powershell
+
+jobs:
+  update-wiki:
+    runs-on: [self-hosted, Windows, X64]
+    permissions:
+      contents: write
+    timeout-minutes: 12
+    steps:
+      - name: Ensure Git available locally
+        run: |
+          if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+            $cmd = 'C:\Program Files\Git\cmd'
+            if (-not (Test-Path (Join-Path $cmd 'git.exe'))) { throw 'Git not found on the self-hosted runner.' }
+            $env:PATH = "$cmd;$env:PATH"
+          }
+          git --version
+
+      - name: Checkout reviewed main branch
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: Validate Wiki publisher PowerShell syntax
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path '.\scripts\publish-wiki-v0187.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host "::error::$($_.Message)" }
+            throw 'Wiki publisher contains PowerShell syntax errors.'
+          }
+
+      - name: Update only NRS Workbench Wiki pages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: .\scripts\publish-wiki-v0187.ps1
