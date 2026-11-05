@@ -10,15 +10,16 @@
 ## Current verified state · 2026-11-05
 
 - Repository: `Nfreakz/nrs-workbench`; default branch `main`.
-- `main` product-code baseline after PR #49: `77445785a8ddd32d43d22c5c21c54a7ca64873df`, app version `0.18.7`.
+- `main` product-code baseline after PR #49: `77445785a8ddd32d43d22c5c21c54a7ca64873df`; the currently CI-validated v0.18.7 code plus release tooling is `9c32e0837e96a4f3535ef7956fdb6583bd95ffb8` (CI #572 SUCCESS), app version `0.18.7`.
 - PR #47 (CI self-hosted policy), PR #48 (runner safety, Git/settings/logging fixes), and PR #49 (Maintenance scanning/UX) are merged.
 - CI #561: SUCCESS on PR #48 merge commit `85380478abeb39e98e173f1519d695bcff48b812`.
-- CI #562 was in progress when this handoff was prepared; verify the final conclusion on `77445785...` before choosing any v0.18.7 release candidate. Documentation-only commits may advance `main`.
+- CI #562 SUCCESS on `77445785...` and CI #572 SUCCESS on `9c32e083...`. A later docs-only main commit may be used after verifying its CI and exact version.
 - v0.18.6 fixed release candidate: `317226dc3e1702341927455435f2675284ea2175`; `Directory.Build.props` reports `0.18.6`; CI #556 SUCCESS.
 - Earlier pure v0.18.6 commit `0c0202d0036bc23f23015b1d49b887e1cbbb1726` is superseded by the fixed candidate. Do not tag the old commit.
 - v0.18.7 earlier baseline `0e7688ab49276134a00018c27b60281cc7eb0b01` is superseded by later bug/security fixes and Maintenance integration. Do not tag the old commit.
 - `qa-preview` still points to the original `0c0202d...` candidate; it is **not** the current fixed release payload.
-- Last published release remains [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5). No v0.18.6 or v0.18.7 tag/release existed when checked on 2026-11-05.
+- Latest published release: [v0.18.6 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.6), with `NRSWorkbench-v0.18.6-win-x64.zip`; recovery Release #21 SUCCESS on 2026-11-05.
+- v0.18.7 remains unpublished and has no release tag as of this check.
 - The live GitHub Wiki has not been verified during this update. Do not claim it is current.
 
 ## Release policy and constraints
@@ -77,15 +78,15 @@ Publication gate still open:
 6. Verify 5 MB rotation and five-archive cap.
 7. Verify escaped workFolder and intermediate reparse/junction paths are blocked.
 
-Do not create tag `v0.18.6` until all remaining manual checks pass. When approved, the tag must point to `317226dc3e1702341927455435f2675284ea2175`, not the superseded original candidate. The reported manual preview confirms the initially empty Maintenance table now populates; the destructive safety checks were not independently confirmed in this session.
+The immutable `v0.18.6` tag points to `317226dc3e1702341927455435f2675284ea2175`, and Release #21 SUCCESS published the win-x64 ZIP on 2026-11-05. Historical manual safety checks beyond the incremental scan behavior were not independently witnessed in this session; do not retroactively claim them verified.
 
 ## v0.18.7 · Portable Workspace
 
 PR #41 is MERGED. Portable Workspace is now integrated in `main`.
 
-Current product-code candidate (recheck CI #562 before approval):
+Current CI-verified candidate including the UTF-8 release-tooling repair (CI #572 SUCCESS):
 
-`77445785a8ddd32d43d22c5c21c54a7ca64873df`
+`9c32e0837e96a4f3535ef7956fdb6583bd95ffb8`
 
 This candidate includes the original Portable Workspace changes plus PR #48 safety fixes and PR #49 Maintenance fixes. The previous `0e7688ab...` baseline is no longer the recommended release payload. If later code fixes merge, establish a new candidate and revalidate it.
 
@@ -161,18 +162,15 @@ Never move a tag to recover a failed release. The workflow supports manual dispa
 
 ## Documentation
 
-- README correctly states v0.18.5 is published and v0.18.6/v0.18.7 are integrated but unpublished.
+- README is updated to state v0.18.6 is published and v0.18.7 remains unreleased.
 - Live GitHub Wiki has not been reverified in this handoff.
 - Before release, review `CHANGELOG.md`, `docs/TESTING.md`, `docs/RELEASING.md`, `docs/WRITING_STYLE.md` and affected user-facing documentation.
 
 ## Next action
 
-Close the 0.18.x line without reverting the November fixes:
-
-1. Verify CI #562 (and any later main CI) is green on the chosen v0.18.7 commit.
-2. Complete the remaining v0.18.6 Windows safety checks against `317226dc...`. User feedback already confirmed the incremental Maintenance scan displays results; other manual cleanup checks remain unconfirmed.
-3. If fully validated, create immutable tag `v0.18.6` on `317226dc3e1702341927455435f2675284ea2175` and verify the Windows ZIP prerelease asset.
-4. Complete a disposable-runner migration/second-PC test for v0.18.7; CI smoke tests do not replace a real GitHub runner preparation/retry check.
-5. If validated, create immutable tag `v0.18.7` on the approved current product-code commit (initial candidate `77445785a8ddd32d43d22c5c21c54a7ca64873df`) and verify the win-x64 prerelease ZIP.
-6. Update README, CHANGELOG release dates, HANDOFF and live Wiki after publication. Never claim a release exists merely because a tag or successful CI run exists.
-7. Keep GitHub-hosted runners disabled; only repository-scoped self-hosted Windows X64 jobs are allowed.
+1. Keep the published `v0.18.6` tag and ZIP unchanged; the workflow is repaired for UTF-8 release metadata.
+2. Before publishing `v0.18.7`, perform the real Portable Workspace second-PC and disposable interactive runner migration checks above. Do not use production runners to establish this gate.
+3. Verify latest CI on the approved product+release-tooling commit (initial candidate `9c32e0837e96a4f3535ef7956fdb6583bd95ffb8`; update for a newer documentation-only main commit if needed).
+4. If the real migration gate passes, create the immutable `v0.18.7` annotated tag on the exact approved 0.18.7 commit. Verify it does not already exist.
+5. Confirm GitHub Release workflow SUCCESS and the published `NRSWorkbench-v0.18.7-win-x64.zip` prerelease asset. Run only on repository-scoped self-hosted Windows X64.
+6. Update release date, README and GitHub Wiki to reflect v0.18.7 actually being downloadable; the live Wiki was not yet independently verified.
