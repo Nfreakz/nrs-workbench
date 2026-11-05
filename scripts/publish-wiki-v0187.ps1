@@ -47,7 +47,7 @@ $homePath = Join-Path $wikiDir 'Home.md'
 if (-not (Test-Path -LiteralPath $homePath -PathType Leaf)) {
     throw 'Wiki Home.md does not exist; will not initialize or replace the Wiki.'
 }
-$home = Get-Content -LiteralPath $homePath -Raw -Encoding UTF8
+$wikiHomeText = Get-Content -LiteralPath $homePath -Raw -Encoding UTF8
 $startMarker = '<!-- neors-v0187-release-start -->'
 $endMarker = '<!-- neors-v0187-release-end -->'
 $latest = @'
@@ -63,20 +63,20 @@ v0.18.7 adds Portable Workspace: an adjacent Data directory, removable-drive-rel
 Documentation: [Portable Workspace v0.18.7](Portable-Workspace-v0.18.7) | [Maintenance Center v0.18.6](Maintenance-Center-v0.18.6) | [Repository](https://github.com/Nfreakz/nrs-workbench).
 <!-- neors-v0187-release-end -->
 '@
-if ($home.Contains($startMarker)) {
-    $start = $home.IndexOf($startMarker, [StringComparison]::Ordinal)
-    $end = $home.IndexOf($endMarker, $start, [StringComparison]::Ordinal)
+if ($wikiHomeText.Contains($startMarker)) {
+    $start = $wikiHomeText.IndexOf($startMarker, [StringComparison]::Ordinal)
+    $end = $wikiHomeText.IndexOf($endMarker, $start, [StringComparison]::Ordinal)
     if ($end -lt 0) { throw 'Wiki Home release markers are not balanced.' }
-    $home = $home.Substring(0, $start) + $latest + $home.Substring($end + $endMarker.Length)
+    $wikiHomeText = $wikiHomeText.Substring(0, $start) + $latest + $wikiHomeText.Substring($end + $endMarker.Length)
 }
-elseif ($home -match '\A(#[^\r\n]+\r?\n)') {
+elseif ($wikiHomeText -match '\A(#[^\r\n]+\r?\n)') {
     $titleLine = $Matches[1]
-    $home = $titleLine + $nl + $latest + $nl + $nl + $home.Substring($titleLine.Length)
+    $wikiHomeText = $titleLine + $nl + $latest + $nl + $nl + $wikiHomeText.Substring($titleLine.Length)
 }
 else {
-    $home = $latest + $nl + $nl + $home
+    $wikiHomeText = $latest + $nl + $nl + $wikiHomeText
 }
-Write-Utf8NoBom -Path $homePath -Content $home
+Write-Utf8NoBom -Path $homePath -Content $wikiHomeText
 
 $guide = Get-Content -LiteralPath $guidePath -Raw -Encoding UTF8
 $portablePage = '# Portable Workspace v0.18.7' + $nl + $nl +
