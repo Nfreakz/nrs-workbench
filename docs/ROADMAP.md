@@ -38,7 +38,7 @@ Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfrea
 
 ## v0.18.6
 
-Integrated and CI-green, not yet published. Maintenance and storage hygiene.
+Published Public Preview. [Release and Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.6). Maintenance and storage hygiene.
 
 - Maintenance Center with measured/reclaimable storage categories.
 - Automatic NRS Workbench log rotation.
@@ -46,6 +46,7 @@ Integrated and CI-green, not yet published. Maintenance and storage hygiene.
 - Reviewed cleanup of old runner `_diag` logs.
 - BUSY runners are never cleaned.
 - Runner `_work` is inventory-only; no automatic deletion.
+- Progressive scan results, bounded `_work` inventory and clearer deletion guidance.
 
 ## v0.18.7
 
