@@ -12,7 +12,7 @@ if (-not (Test-Path -LiteralPath $ChangelogPath -PathType Leaf)) {
     throw "Changelog not found: $ChangelogPath"
 }
 
-$changelog = Get-Content -LiteralPath $ChangelogPath -Raw
+$changelog = Get-Content -LiteralPath $ChangelogPath -Raw -Encoding UTF8
 $escapedVersion = [regex]::Escape($Version)
 $pattern = '(?ms)^## \[' + $escapedVersion + '\][^\r\n]*\r?\n(?<body>.*?)(?=^## \[|\z)'
 $match = [regex]::Match($changelog, $pattern)
