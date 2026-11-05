@@ -71,6 +71,7 @@ public sealed class RunnerProgressService : IRunnerProgressService
         @"\b(?:ActionManager|ActionManifestManager|ActionManagerLegacy)\]",
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
+    private readonly ConcurrentDictionary<string, CurrentCache> _currentCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, HistoryCache> _historyCache = new(StringComparer.OrdinalIgnoreCase);
 
     public RunnerProgress GetProgress(string runnerFolder, RunnerState state)
@@ -91,7 +92,15 @@ public sealed class RunnerProgressService : IRunnerProgressService
             if (files.Count == 0) return ActiveWithoutEstimate("Preparando job");
 
             var currentFile = files[0];
-            var current = ParseRun(currentFile, assumeComplete: false);
+            var currentKey = $"{currentFile.FullName}:{currentFile.Length}:{currentFile.LastWriteTimeUtc.Ticks}";
+            ParsedRun? current;
+            if (_currentCache.TryGetValue(diag, out var cachedCurrent) && cachedCurrent.Fingerprint == currentKey)
+                current = cachedCurrent.Run;
+            else
+            {
+                current = ParseRun(currentFile, assumeComplete: false);
+                if (current is not null) _currentCache[diag] = new CurrentCache(currentKey, current);
+            }
             if (current is null) return ActiveWithoutEstimate("Ejecutando job");
 
             var historyFiles = files.Skip(1).Take(MaxHistoricalFiles).ToList();
@@ -602,6 +611,7 @@ public sealed class RunnerProgressService : IRunnerProgressService
         return text.Length > 140 ? text[..140] + "…" : text;
     }
 
+    private sealed record CurrentCache(string Fingerprint, ParsedRun? Run);
     private sealed record HistoryCache(string Fingerprint, IReadOnlyList<ParsedRun> Runs);
 
     private sealed class ParsedRun

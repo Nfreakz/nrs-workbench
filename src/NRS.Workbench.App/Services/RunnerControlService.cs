@@ -30,7 +30,7 @@ public sealed class RunnerControlService : IRunnerControlService
             var snapshot = _processService.GetSnapshot(runner.FolderPath);
             try
             {
-                if (snapshot.HasWorker) return false;
+                if (snapshot.HasWorker || snapshot.Unknown) return false;
                 if (runner.Mode == RunnerMode.Service && !string.IsNullOrWhiteSpace(runner.ServiceName))
                 {
                     _serviceController.Stop(runner.ServiceName);
@@ -67,6 +67,9 @@ public sealed class RunnerControlService : IRunnerControlService
             return;
         }
 
+        // run.cmd (not Runner.Listener.exe) keeps the runner's own self-update loop working.
+        // Anything in the runner folder is writable by jobs, so starting it from an elevated
+        // Workbench runs job-controlled code elevated; prefer running Workbench unelevated.
         var runCmd = Path.Combine(runner.FolderPath, "run.cmd");
         if (!File.Exists(runCmd)) throw new FileNotFoundException("No se encuentra run.cmd.", runCmd);
 
@@ -79,7 +82,7 @@ public sealed class RunnerControlService : IRunnerControlService
         };
         psi.ArgumentList.Add("/c");
         psi.ArgumentList.Add("run.cmd");
-        Process.Start(psi);
+        using var _ = Process.Start(psi);
     }
 
     private void Stop(RunnerInfo runner)

@@ -47,8 +47,20 @@ public sealed class WindowsServiceController
         return Query(handles.Service);
     }
 
+    public static bool IsRunnerServiceName(string? serviceName) =>
+        !string.IsNullOrWhiteSpace(serviceName) &&
+        serviceName.StartsWith("actions.runner.", StringComparison.OrdinalIgnoreCase);
+
+    private static void EnsureRunnerService(string serviceName)
+    {
+        if (IsRunnerServiceName(serviceName)) return;
+        AppLogger.Error($"Refusing to control non-runner service '{serviceName}'.");
+        throw new InvalidOperationException($"'{serviceName}' is not a GitHub Actions runner service.");
+    }
+
     public void Start(string serviceName)
     {
+        EnsureRunnerService(serviceName);
         using var handles = Open(serviceName, ServiceStart | ServiceQueryStatus);
         var state = Query(handles.Service);
         if (state == NativeServiceState.Running) return;
@@ -62,6 +74,7 @@ public sealed class WindowsServiceController
 
     public void Stop(string serviceName)
     {
+        EnsureRunnerService(serviceName);
         using var handles = Open(serviceName, ServiceStop | ServiceQueryStatus);
         var state = Query(handles.Service);
         if (state == NativeServiceState.Stopped) return;

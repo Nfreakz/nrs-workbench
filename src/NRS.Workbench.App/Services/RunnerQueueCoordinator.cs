@@ -531,7 +531,8 @@ public sealed class RunnerQueueCoordinator
         {
             var index = (_lastScheduledIndex + offset) % ordered.Count;
             if (ordered[index].State == RunnerState.Stopped &&
-                _eligiblePaths.Contains(ordered[index].FolderPath)) return ordered[index];
+                _eligiblePaths.Contains(ordered[index].FolderPath) &&
+                !_pendingStarts.ContainsKey(ordered[index].FolderPath)) return ordered[index];
         }
         return null;
     }

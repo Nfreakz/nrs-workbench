@@ -136,6 +136,10 @@ public sealed class RunnerStatisticsService : IRunnerStatisticsService
             TotalFiles = candidates.Count
         });
 
+        var candidateKeys = candidates.Select(x => x.File.FullName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var stale in _cache.Keys.Where(key => !candidateKeys.Contains(key)).ToList())
+            _cache.TryRemove(stale, out _);
+
         var processed = 0;
         var options = new ParallelOptions
         {
@@ -231,7 +235,7 @@ public sealed class RunnerStatisticsService : IRunnerStatisticsService
             .Select(runner =>
             {
                 var runs = filtered
-                    .Where(x => string.Equals(x.RunnerAlias, runner.Alias, StringComparison.OrdinalIgnoreCase))
+                    .Where(x => string.Equals(RunnerFolderOf(x), NormalizePath(runner.FolderPath), StringComparison.OrdinalIgnoreCase))
                     .ToList();
                 var ok = runs.Count(x => x.Outcome == JobRunOutcome.Succeeded);
                 var ko = runs.Count(x => x.Outcome == JobRunOutcome.Failed);
@@ -384,6 +388,7 @@ public sealed class RunnerStatisticsService : IRunnerStatisticsService
             return cached.Run;
 
         ParsedRun? result;
+        var failed = false;
         try
         {
             using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read,
@@ -465,11 +470,17 @@ public sealed class RunnerStatisticsService : IRunnerStatisticsService
         {
             AppLogger.Error($"Could not read statistics log '{file.FullName}'", ex);
             result = null;
+            failed = true;
         }
 
-        _cache[key] = new ParsedFileCache(fingerprint, result);
+        if (!failed) _cache[key] = new ParsedFileCache(fingerprint, result);
         return result;
     }
+
+    // Worker logs live in <runner>/_diag, so the runner folder identifies the record
+    // even when two runners share an alias.
+    private static string RunnerFolderOf(JobRunRecord run) =>
+        NormalizePath(Path.GetDirectoryName(Path.GetDirectoryName(run.SourceFile)) ?? string.Empty);
 
     private static List<JobRunRecord> DeduplicateRuns(
         IReadOnlyList<JobRunRecord> runs,
@@ -484,7 +495,7 @@ public sealed class RunnerStatisticsService : IRunnerStatisticsService
 
         var identifiedGroups = runs
             .Where(x => !string.IsNullOrWhiteSpace(x.ExecutionId))
-            .GroupBy(x => $"{x.RunnerAlias}\u001f{x.ExecutionId}", StringComparer.OrdinalIgnoreCase);
+            .GroupBy(x => $"{RunnerFolderOf(x)}\u001f{x.ExecutionId}", StringComparer.OrdinalIgnoreCase);
 
         foreach (var group in identifiedGroups)
         {
