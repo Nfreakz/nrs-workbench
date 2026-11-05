@@ -22,9 +22,9 @@ NRS Workbench brings your local runners and Git working trees into one desktop a
 
 **Requirements:** Windows 10 or 11. The release ZIP contains a portable Windows x64 build. Inspecting local runners and repositories does not require a GitHub API token; repository actions use your existing Git installation and authentication. [Build from source](#local-build).
 
-**En español:** La versión v0.18.7 añade un espacio de trabajo portable para guardar la configuración en el disco de la aplicación y preparar runners interactivos detenidos al cambiar de ordenador. La migración entre equipos sigue pendiente de validación física independiente.
+**En español:** La versión v0.18.7 añade un espacio de trabajo portable que guarda la configuración junto a la aplicación y permite preparar runners interactivos detenidos al cambiar de ordenador. Antes de migrar registros existentes, prueba el procedimiento con un runner de prueba.
 
-**En català:** La versió v0.18.7 incorpora un espai de treball portable que desa la configuració al disc de l'aplicació i permet preparar runners interactius aturats en un altre ordinador. Encara falta validar independentment la migració física entre equips.
+**En català:** La versió v0.18.7 incorpora un espai de treball portable que desa la configuració al costat de l'aplicació i permet preparar runners interactius aturats en un altre ordinador. Abans de migrar registres existents, prova el procés amb un runner de prova.
 
 ## Who is NRS Workbench for?
 
@@ -32,7 +32,7 @@ NRS Workbench brings your local runners and Git working trees into one desktop a
 - **People managing several local Git repositories:** inspect working-tree state and use guarded Fetch, Pull, Push, Commit and local branch switching without jumping between folders.
 - **Small homelab and development setups:** keep host CPU, memory and disk usage visible next to runner activity, with an optional one- or two-runner queue to limit simultaneous listeners.
 
-The published **v0.18.7 ZIP** includes Portable Workspace, Maintenance Center, Runner Doctor, Feedback & Diagnostics and Smart Queue. Portable migration is opt-in, limited to stopped interactive GitHub.com runners and **not validated yet through an independent physical second-PC test**.
+The published **v0.18.7 ZIP** includes Portable Workspace, Maintenance Center, Runner Doctor, Feedback & Diagnostics and Smart Queue. Portable runner preparation is opt-in, limited to stopped interactive GitHub.com runners, and should first be tested with a disposable runner.
 
 **Try it:** [Download the published v0.18.7 Windows x64 ZIP](https://github.com/Nfreakz/nrs-workbench/releases/download/v0.18.7/NRSWorkbench-v0.18.7-win-x64.zip) · [Read setup and usage documentation](https://github.com/Nfreakz/nrs-workbench/wiki) · [Report a bug or suggest an improvement](https://github.com/Nfreakz/nrs-workbench/issues/new/choose)
 
