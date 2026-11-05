@@ -35,7 +35,7 @@ public sealed class GitHubRunnerRegistrationClient
             $"https://api.github.com/{target.ApiPrefix}/actions/runners/{agentId}",
             personalAccessToken);
         using var response = await _http.SendAsync(request, cancellationToken);
-        await EnsureSuccess(response, "read runner metadata");
+        EnsureSuccess(response, "read runner metadata");
 
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
         return ParseRemoteMetadata(json.RootElement);
@@ -57,7 +57,7 @@ public sealed class GitHubRunnerRegistrationClient
             $"https://api.github.com/{target.ApiPrefix}/actions/runners?name={encodedName}&per_page=100",
             personalAccessToken);
         using var response = await _http.SendAsync(request, cancellationToken);
-        await EnsureSuccess(response, "find runner by name");
+        EnsureSuccess(response, "find runner by name");
 
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
         var root = json.RootElement;
@@ -89,7 +89,7 @@ public sealed class GitHubRunnerRegistrationClient
             $"https://api.github.com/{target.ApiPrefix}/actions/runners/registration-token",
             personalAccessToken);
         using var response = await _http.SendAsync(request, cancellationToken);
-        await EnsureSuccess(response, "create runner registration token");
+        EnsureSuccess(response, "create runner registration token");
 
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
         var root = json.RootElement;
@@ -181,7 +181,7 @@ public sealed class GitHubRunnerRegistrationClient
         return request;
     }
 
-    private static async Task EnsureSuccess(HttpResponseMessage response, string operation)
+    private static void EnsureSuccess(HttpResponseMessage response, string operation)
     {
         if (response.IsSuccessStatusCode) return;
 
@@ -192,7 +192,6 @@ public sealed class GitHubRunnerRegistrationClient
             HttpStatusCode.NotFound => "The runner or GitHub target was not found, or the token cannot access it.",
             _ => "GitHub rejected the request."
         };
-        await Task.CompletedTask;
         throw new InvalidOperationException(
             $"Could not {operation}. GitHub returned {(int)response.StatusCode} {response.ReasonPhrase}. {hint}");
     }
