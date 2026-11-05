@@ -1,0 +1,188 @@
+name: Publish v0.18.7 Public Preview (one-time)
+
+# Trigger only from an intentionally created internal publication branch.
+# GITHUB_TOKEN-created tags do not trigger a second GitHub Actions workflow;
+# this job creates the annotated tag and uploads the release ZIP itself.
+on:
+  push:
+    branches:
+      - publish/v0.18.7
+
+concurrency:
+  group: nrs-v0187-one-time-publication
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release-v0187:
+    if: github.repository == 'Nfreakz/nrs-workbench'
+    runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: powershell
+    env:
+      RELEASE_TAG: v0.18.7
+      RELEASE_VERSION: 0.18.7
+      RELEASE_SOURCE_SHA: 70229481c01d4de469f9007ecd9938fa0be92c48
+    steps:
+      - name: Verify trusted trigger
+        run: |
+          if ($env:GITHUB_REF -ne 'refs/heads/publish/v0.18.7') {
+            throw "Unexpected publication trigger: $env:GITHUB_REF"
+          }
+          if ($env:GITHUB_REPOSITORY -ne 'Nfreakz/nrs-workbench') {
+            throw 'Unexpected repository.'
+          }
+
+      - name: Ensure local Git is on PATH
+        run: |
+          if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+            $gitCmd = 'C:\Program Files\Git\cmd'
+            $gitExe = Join-Path $gitCmd 'git.exe'
+            if (-not (Test-Path $gitExe)) { throw 'Git was not found.' }
+            $gitCmd | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            $env:PATH = "$gitCmd;$env:PATH"
+          }
+          git --version
+
+      - name: Checkout exact reviewed product commit
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: 70229481c01d4de469f9007ecd9938fa0be92c48
+          persist-credentials: false
+
+      - name: Verify immutable commit and version
+        run: |
+          $sha = (git rev-parse HEAD).Trim()
+          if ($sha -ne $env:RELEASE_SOURCE_SHA) { throw "Wrong source commit: $sha" }
+          [xml]$props = Get-Content -LiteralPath '.\Directory.Build.props'
+          $version = [string]$props.Project.PropertyGroup.Version
+          if ($version -ne $env:RELEASE_VERSION) { throw "Wrong version: $version" }
+          $notes = (.\scripts\get-release-notes.ps1 -Version $env:RELEASE_VERSION) -join "`n"
+          if ([string]::IsNullOrWhiteSpace($notes)) { throw "Missing release notes." }
+          Write-Host "Validated release $env:RELEASE_TAG from $sha"
+
+      - name: Build
+        run: dotnet build .\NRSWorkbench.sln -c Release
+
+      - name: Git safety and portable smoke tests
+        run: dotnet run --project .\tests\NRS.Workbench.SmokeTests\NRS.Workbench.SmokeTests.csproj -c Release
+
+      - name: Public source audit
+        run: .\scripts\public-audit.ps1
+
+      - name: Publish portable win-x64
+        run: .\scripts\publish-win-x64.ps1
+
+      - name: Package and verify
+        run: |
+          $name = "NRSWorkbench-$env:RELEASE_TAG-win-x64.zip"
+          if (-not (Test-Path -LiteralPath '.\dist\win-x64\NRSWorkbench.exe' -PathType Leaf)) {
+            throw 'Portable NRSWorkbench.exe was not generated.'
+          }
+          Compress-Archive -Path .\dist\win-x64\* -DestinationPath $name -Force
+          if ((Get-Item -LiteralPath $name).Length -lt 1MB) { throw 'Release ZIP too small.' }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip = [System.IO.Compression.ZipFile]::OpenRead((Join-Path $PWD $name))
+          try {
+            $exe = @($zip.Entries | Where-Object { $_.FullName -eq 'NRSWorkbench.exe' })
+            if ($exe.Count -ne 1 -or $exe[0].Length -lt 1MB) { throw 'ZIP lacks a valid EXE.' }
+          } finally { $zip.Dispose() }
+          Write-Host "Package: $name"
+          Write-Host "SHA256: $((Get-FileHash -LiteralPath $name -Algorithm SHA256).Hash)"
+          "PACKAGE=$name" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Create immutable tag and upload GitHub prerelease
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          $headers = @{
+            Authorization = "Bearer $env:GITHUB_TOKEN"
+            Accept = 'application/vnd.github+json'
+            'X-GitHub-Api-Version' = '2022-11-28'
+          }
+          $api = "https://api.github.com/repos/$env:GITHUB_REPOSITORY"
+          $tag = $env:RELEASE_TAG
+          $sha = $env:RELEASE_SOURCE_SHA
+
+          # Treat only an actual 404 as 'not found', never hide API errors.
+          function Get-OptionalJson([string]$uri) {
+            try {
+              return Invoke-RestMethod -Method Get -Uri $uri -Headers $headers -ErrorAction Stop
+            } catch {
+              $response = $_.Exception.Response
+              if ($null -ne $response -and [int]$response.StatusCode -eq 404) { return $null }
+              throw
+            }
+          }
+
+          function Post-Json([string]$uri, $value) {
+            $json = $value | ConvertTo-Json -Depth 8 -Compress
+            $bytes = [System.Text.Encoding]::UTF8.GetBytes($json)
+            return Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $bytes -ErrorAction Stop
+          }
+
+          $tagRef = Get-OptionalJson "$api/git/ref/tags/$tag"
+          if ($null -eq $tagRef) {
+            $tagObject = Post-Json "$api/git/tags" @{
+              tag = $tag
+              message = "NRS Workbench $tag Public Preview"
+              object = $sha
+              type = 'commit'
+            }
+            $tagRef = Post-Json "$api/git/refs" @{
+              ref = "refs/tags/$tag"
+              sha = $tagObject.sha
+            }
+            Write-Host "Created annotated tag $tag on $sha"
+          } else {
+            Write-Host "Existing tag $tag detected; verifying immutability."
+          }
+
+          if ($tagRef.object.type -ne 'tag') { throw 'Existing tag is not annotated.' }
+          $tagDetail = Invoke-RestMethod -Method Get -Uri "$api/git/tags/$($tagRef.object.sha)" -Headers $headers
+          if ($tagDetail.object.sha -ne $sha -or $tagDetail.object.type -ne 'commit') {
+            throw 'Tag points to an unapproved source commit. No tag move is allowed.'
+          }
+
+          $release = Get-OptionalJson "$api/releases/tags/$tag"
+          if ($null -eq $release) {
+            $notes = (.\scripts\get-release-notes.ps1 -Version $env:RELEASE_VERSION) -join "`n"
+            $notice = "Public Preview: portable runner migration across physical PCs has not been independently validated. Test only with disposable stopped interactive runners; do not migrate production runners without verified backups and testing."
+            $release = Post-Json "$api/releases" @{
+              tag_name = $tag
+              target_commitish = $sha
+              name = "NRS Workbench $tag Public Preview"
+              body = "$notice`n`n$notes"
+              draft = $false
+              prerelease = $true
+              generate_release_notes = $false
+            }
+            Write-Host "Created GitHub prerelease for $tag"
+          } else {
+            if ($release.draft -or -not $release.prerelease) { throw 'Existing release is not a public prerelease.' }
+            Write-Host "Reusing GitHub prerelease for $tag"
+          }
+
+          $assets = @($release.assets | Where-Object { $_.name -eq $env:PACKAGE })
+          if ($assets.Count -eq 0) {
+            $uploadBase = $release.upload_url -replace '\{\?name,label\}$', ''
+            $uploadUri = "{0}?name={1}" -f $uploadBase, [System.Uri]::EscapeDataString($env:PACKAGE)
+            Invoke-RestMethod -Method Post -Uri $uploadUri -Headers $headers -ContentType 'application/zip' -InFile $env:PACKAGE -ErrorAction Stop | Out-Null
+            Write-Host "Uploaded $env:PACKAGE"
+          } else {
+            Write-Host "Verified existing asset $env:PACKAGE"
+          }
+
+          $verified = Invoke-RestMethod -Method Get -Uri "$api/releases/tags/$tag" -Headers $headers
+          $asset = @($verified.assets | Where-Object { $_.name -eq $env:PACKAGE })
+          if ($verified.draft -or -not $verified.prerelease -or $asset.Count -ne 1 -or $asset[0].size -lt 1MB) {
+            throw 'Release verification failed; ZIP is missing or invalid.'
+          }
+          Write-Host "VERIFIED PUBLIC RELEASE: $($verified.html_url)"
+          Write-Host "VERIFIED ZIP: $($asset[0].browser_download_url)"
