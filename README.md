@@ -14,7 +14,7 @@ Project preview based on the v0.18.4 main interface. Runner names, repositories,
 
 **New in v0.18.7:** Portable Workspace keeps NRS Workbench settings under an adjacent `Data` folder and preserves same-volume runner/repository paths when a removable drive changes letter. A reviewed preparation flow supports stopped interactive GitHub.com runners on another Windows PC; service runners and automatic migration are not supported.
 
-**Portable Workspace caution:** physical second-PC runner re-registration has not been independently validated for this Public Preview. Test with a disposable stopped interactive runner before considering production use. Do not copy or expose GitHub tokens or runner credential files. [Portable Workspace setup and limits](docs/PORTABLE_WORKSPACE.md).
+**Portable Workspace:** runner preparation is optional and supports stopped interactive GitHub.com runners. Before using it on another PC, back up existing registrations and test the transfer with a disposable runner. Physical cross-PC runner re-registration is still awaiting independent validation. Never share GitHub tokens or runner credentials. [Setup and safeguards](docs/PORTABLE_WORKSPACE.md).
 
 NRS Workbench brings your local runners and Git working trees into one desktop app. In **v0.18.7**, check runner status and current jobs, inspect locally retained job history, review Runner Doctor checks, export sanitized diagnostics after previewing them, see host CPU, memory and disk usage, search and sort runners, review local repositories, switch between existing branches, and use guarded Fetch, Pull, Push and Commit actions. The interface is available in Spanish, English and Catalan.
 
