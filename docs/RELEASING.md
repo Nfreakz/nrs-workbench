@@ -19,6 +19,14 @@ Read `docs/WRITING_STYLE.md` before editing any public release text. Documentati
 11. Confirm the GitHub Wiki has been reviewed for the current version. If Wiki access is unavailable in the current tool session, do not claim it is updated; use the GitHub Wiki editor or another available GitHub interface that exposes the live Wiki, as was done when the Wiki was originally created.
 12. Obtain explicit approval before merging to main, creating a tag or publishing a release.
 
+## Verified 0.18.x close-out · 2026-11-05
+
+- v0.18.6 was published from annotated tag `v0.18.6` on the isolated Maintenance candidate commit, with Release #21 SUCCESS and `NRSWorkbench-v0.18.6-win-x64.zip`.
+- v0.18.7 was published from annotated tag `v0.18.7` on commit `70229481c01d4de469f9007ecd9938fa0be92c48`. [Publish #1](https://github.com/Nfreakz/nrs-workbench/actions/runs/42000544874) completed SUCCESS and verified `NRSWorkbench-v0.18.7-win-x64.zip` in GitHub Releases.
+- The v0.18.7 release used a temporary, strictly branch-scoped GitHub Actions workflow because the connected repository tools could not create annotated tags or dispatch workflows directly. The one-off publisher was retired in PR #56; future versions use the normal `.github/workflows/release.yml`.
+- Both runs used the repository-scoped self-hosted Windows X64 runner. No GitHub-hosted runners or Actions artifacts were used to deliver either product.
+- A physical second-PC re-registration with a disposable runner remains unverified. This limitation is disclosed in the v0.18.7 Public Preview release notes and user guide; do not mark the manual test completed retroactively.
+
 ## Published v0.18.1 and v0.18.2
 
 v0.18.1 and v0.18.2 were built, tested and published on 2026-09-26. Their
@@ -47,7 +55,7 @@ git tag -a v<approved-version> <approved-commit> -m "NRS Workbench v<approved-ve
 git push origin v<approved-version>
 ```
 
-For the current 0.18.x close-out, the documented candidates are intentionally separate: v0.18.6 is validated from its last pure maintenance commit, while v0.18.7 is validated from the Portable Workspace product baseline. Do not tag v0.18.6 from a later `main` that already contains v0.18.7.
+For the completed 0.18.x close-out, the published versions intentionally use separate immutable commits: v0.18.6 from the fixed Maintenance candidate and v0.18.7 from the integrated Portable Workspace candidate. Never move those existing tags.
 
 The `Release` workflow runs on the repository-scoped local self-hosted Windows x64 runner. It builds the solution, executes the Git and portable-settings smoke tests, runs the public source audit, publishes the self-contained `win-x64` application, creates the ZIP and uploads it to a GitHub prerelease using the workflow token.
 
