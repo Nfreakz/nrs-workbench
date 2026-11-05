@@ -283,9 +283,9 @@ public sealed class MainViewModel : ObservableObject
         MoveRunnerDownCommand = new RelayCommand(() => MoveSelectedRunner(1), () => CanMoveSelectedRunner(1));
     }
 
-    public async Task RefreshAsync()
+    public async Task<bool> RefreshAsync()
     {
-        if (!await _refreshGate.WaitAsync(0)) return;
+        if (!await _refreshGate.WaitAsync(0)) return false;
         try
         {
             StatusText = UiLanguage.Choose("Actualizando runners...", "Refreshing runners...");
@@ -318,6 +318,7 @@ public sealed class MainViewModel : ObservableObject
             StatusText = UiLanguage.Choose("Error al actualizar runners", "Could not refresh runners");
         }
         finally { _refreshGate.Release(); }
+        return true;
     }
 
     public bool EditSettings(Window owner)
@@ -362,10 +363,17 @@ public sealed class MainViewModel : ObservableObject
             }
             while (Runners.Count > ordered.Count) Runners.RemoveAt(Runners.Count - 1);
 
-            SelectedRunner = _preferredRunnerPath is null
+            var nextSelected = _preferredRunnerPath is null
                 ? Runners.FirstOrDefault()
                 : Runners.FirstOrDefault(runner =>
                     string.Equals(runner.FolderPath, _preferredRunnerPath, StringComparison.OrdinalIgnoreCase));
+            if (nextSelected is not null && _selectedRunner is not null && SamePath(nextSelected, _selectedRunner))
+            {
+                // Same runner, fresh record: update without rereading the log (keeps "Clear log").
+                _selectedRunner = nextSelected;
+                RaisePropertyChanged(nameof(SelectedRunner));
+            }
+            else SelectedRunner = nextSelected;
         }
         finally { _updatingRunnerView = false; }
 

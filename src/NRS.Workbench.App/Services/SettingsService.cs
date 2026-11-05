@@ -48,7 +48,9 @@ public sealed class SettingsService
             // v0.4.0-v0.4.4 could persist the build-output directory as the only
             // search root. Recover automatically when the configured roots do not
             // contain any runner but a top-level runner installation can be found.
-            if (!AnyConfiguredRootContainsRunner(settings))
+            // Skip when any configured root is missing (e.g. an unplugged USB drive):
+            // the configuration is not wrong, the volume is just not mounted.
+            if (settings.RunnerRoots.All(Directory.Exists) && !AnyConfiguredRootContainsRunner(settings))
             {
                 var detected = DetectRunnerRoots(settings.FolderPattern);
                 if (detected.Count > 0)
@@ -64,6 +66,7 @@ public sealed class SettingsService
         catch (Exception ex)
         {
             AppLogger.Error("Could not load settings", ex);
+            BackupUnreadableSettings();
             return CreateDefaults();
         }
     }
@@ -78,7 +81,23 @@ public sealed class SettingsService
             JsonOptions) ?? throw new InvalidOperationException("Could not prepare settings for persistence.");
         EncodeWorkspacePaths(persisted);
 
-        File.WriteAllText(SettingsPath, JsonSerializer.Serialize(persisted, JsonOptions));
+        PortableWorkspaceManifestStore.WriteAllTextAtomic(SettingsPath, JsonSerializer.Serialize(persisted, JsonOptions));
+    }
+
+    // A later Save would overwrite an unreadable settings.json with defaults; keep a copy first.
+    private void BackupUnreadableSettings()
+    {
+        try
+        {
+            if (!File.Exists(SettingsPath)) return;
+            var backup = SettingsPath + ".corrupt-" + DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+            File.Copy(SettingsPath, backup, overwrite: false);
+            AppLogger.Info($"Kept a copy of the unreadable settings file: {backup}");
+        }
+        catch (Exception backupEx)
+        {
+            AppLogger.Error("Could not back up the unreadable settings file", backupEx);
+        }
     }
 
     public void ExportPortableSettings(RunnerSettings settings, string destinationPath)
@@ -98,7 +117,7 @@ public sealed class SettingsService
 
         var directory = Path.GetDirectoryName(Path.GetFullPath(destinationPath));
         if (!string.IsNullOrWhiteSpace(directory)) Directory.CreateDirectory(directory);
-        File.WriteAllText(destinationPath, JsonSerializer.Serialize(envelope, JsonOptions));
+        PortableWorkspaceManifestStore.WriteAllTextAtomic(destinationPath, JsonSerializer.Serialize(envelope, JsonOptions));
     }
 
     public RunnerSettings ReadPortableSettings(string sourcePath)

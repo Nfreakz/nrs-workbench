@@ -30,6 +30,29 @@ internal static class RunnerQueueSmoke
         CustomQueuePoolIgnoresExcludedRunners();
         CustomQueuePoolCanStartSelectedStoppedRunner();
         ChangingQueuePoolAdmitsNewSelection();
+        PendingStartIsNotStartedAgain();
+    }
+
+    private static void PendingStartIsNotStartedAgain()
+    {
+        var control = new FakeRunnerControl();
+        var queue = new RunnerQueueCoordinator(control);
+        var settings = new RunnerSettings
+        {
+            RunnerQueueEnabled = true,
+            RunnerQueueLimit = 2,
+            RunnerQueueResourceGuardEnabled = false
+        };
+        var a = Runner("a", RunnerState.Stopped);
+        var b = Runner("b", RunnerState.Stopped);
+        var now = DateTimeOffset.UnixEpoch;
+
+        // Stale snapshots still report STOPPED while the requested starts are pending.
+        for (var second = 0; second < 3; second++)
+            queue.ReconcileAsync([a, b], settings, now.AddSeconds(second)).GetAwaiter().GetResult();
+
+        Assert(control.Started.Count == control.Started.Distinct().Count() && control.Started.Count <= 2,
+            "a runner with a pending start is never started again from a stale STOPPED snapshot");
     }
 
     private static void AllStoppedQueueBootstrapsAndLaterManualStopsAreRespected()

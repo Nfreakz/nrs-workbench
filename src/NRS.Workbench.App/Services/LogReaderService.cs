@@ -26,12 +26,16 @@ public sealed class LogReaderService : ILogReaderService
                 FileMode.Open,
                 FileAccess.Read,
                 FileShare.ReadWrite | FileShare.Delete);
+            const long tailBytes = 256 * 1024;
+            var seeked = stream.Length > tailBytes;
+            if (seeked) stream.Seek(stream.Length - tailBytes, SeekOrigin.Begin);
             using var reader = new StreamReader(
                 stream,
                 new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
                 detectEncodingFromByteOrderMarks: true);
 
             var queue = new Queue<string>(maxLines);
+            if (seeked) reader.ReadLine(); // drop the partial first line
             while (reader.ReadLine() is { } line)
             {
                 if (queue.Count == maxLines) queue.Dequeue();

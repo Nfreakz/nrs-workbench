@@ -38,11 +38,23 @@ public sealed class RunnerDiscoveryService : IRunnerDiscoveryService
             var metadata = ReadMetadata(folder);
             var snapshot = _processService.GetSnapshot(folder);
             var serviceName = ReadTextFile(Path.Combine(folder, ".service"));
+            var invalidService = !string.IsNullOrWhiteSpace(serviceName) && !WindowsServiceController.IsRunnerServiceName(serviceName);
+            if (invalidService)
+            {
+                AppLogger.Error($"Ignoring invalid service name '{serviceName}' in '{folder}'.");
+                serviceName = string.Empty;
+            }
             var mode = string.IsNullOrWhiteSpace(serviceName) ? RunnerMode.Interactive : RunnerMode.Service;
             var state = RunnerState.Unknown;
             var detail = string.Empty;
 
-            if (!metadata.Configured)
+            if (invalidService)
+            {
+                state = RunnerState.Error;
+                mode = RunnerMode.Unknown;
+                detail = "The .service file names a service that is not a GitHub Actions runner.";
+            }
+            else if (!metadata.Configured)
             {
                 state = RunnerState.Unregistered;
                 mode = RunnerMode.Unknown;

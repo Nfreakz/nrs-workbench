@@ -228,78 +228,71 @@ public sealed class PortableRunnerPreparationService
             remote.CustomLabels,
             remote.HasDefaultLabels);
 
-        try
+        // Pending metadata deliberately remains on disk on failure so a fresh registration
+        // token can be requested and the operation retried without credentials.
+        if (File.Exists(Path.Combine(candidate.FolderPath, ".runner")))
         {
-            if (File.Exists(Path.Combine(candidate.FolderPath, ".runner")))
-            {
-                await RunListenerAsync(
-                    candidate.FolderPath,
-                    ["remove", "--local"],
-                    environment: null,
-                    secretValues: [],
-                    cancellationToken);
-            }
-
-            var target = GitHubRunnerRegistrationClient.ParseTarget(registration.GitHubUrl);
-            var arguments = new List<string>
-            {
-                "configure",
-                "--unattended",
-                "--url", registration.GitHubUrl,
-                "--name", registration.AgentName,
-                "--work", registration.WorkFolder,
-                "--replace"
-            };
-
-            if (!target.IsRepository &&
-                !string.IsNullOrWhiteSpace(registration.PoolName) &&
-                !string.Equals(registration.PoolName, "Default", StringComparison.OrdinalIgnoreCase))
-            {
-                arguments.Add("--runnergroup");
-                arguments.Add(registration.PoolName);
-            }
-
-            if (remote.CustomLabels.Count > 0)
-            {
-                arguments.Add("--labels");
-                arguments.Add(string.Join(",", remote.CustomLabels));
-            }
-
-            if (!remote.HasDefaultLabels)
-                arguments.Add("--no-default-labels");
-            if (registration.DisableUpdate)
-                arguments.Add("--disableupdate");
-            if (registration.Ephemeral)
-                arguments.Add("--ephemeral");
-
             await RunListenerAsync(
                 candidate.FolderPath,
-                arguments,
-                new Dictionary<string, string>
-                {
-                    ["ACTIONS_RUNNER_INPUT_TOKEN"] = registrationToken.Token
-                },
-                [registrationToken.Token],
+                ["remove", "--local"],
+                environment: null,
+                secretValues: [],
                 cancellationToken);
-
-            var verified = PortableRunnerMetadataReader.Read(candidate.FolderPath)
-                           ?? throw new InvalidOperationException("Runner configuration completed but .runner could not be verified.");
-
-            _manifest.RecordPrepared(
-                candidate.FolderPath,
-                verified.GitHubUrl,
-                verified.AgentName);
-
-            return new PortableRunnerPreparationResult(
-                true,
-                UiLanguage.Choose("Preparado para este PC", "Prepared for this PC", "Preparat per a aquest PC"));
         }
-        catch
+
+        var target = GitHubRunnerRegistrationClient.ParseTarget(registration.GitHubUrl);
+        var arguments = new List<string>
         {
-            // Pending metadata deliberately remains on disk so a fresh registration
-            // token can be requested and the operation retried without credentials.
-            throw;
+            "configure",
+            "--unattended",
+            "--url", registration.GitHubUrl,
+            "--name", registration.AgentName,
+            "--work", registration.WorkFolder,
+            "--replace"
+        };
+
+        if (!target.IsRepository &&
+            !string.IsNullOrWhiteSpace(registration.PoolName) &&
+            !string.Equals(registration.PoolName, "Default", StringComparison.OrdinalIgnoreCase))
+        {
+            arguments.Add("--runnergroup");
+            arguments.Add(registration.PoolName);
         }
+
+        if (remote.CustomLabels.Count > 0)
+        {
+            arguments.Add("--labels");
+            arguments.Add(string.Join(",", remote.CustomLabels));
+        }
+
+        if (!remote.HasDefaultLabels)
+            arguments.Add("--no-default-labels");
+        if (registration.DisableUpdate)
+            arguments.Add("--disableupdate");
+        if (registration.Ephemeral)
+            arguments.Add("--ephemeral");
+
+        await RunListenerAsync(
+            candidate.FolderPath,
+            arguments,
+            new Dictionary<string, string>
+            {
+                ["ACTIONS_RUNNER_INPUT_TOKEN"] = registrationToken.Token
+            },
+            [registrationToken.Token],
+            cancellationToken);
+
+        var verified = PortableRunnerMetadataReader.Read(candidate.FolderPath)
+                       ?? throw new InvalidOperationException("Runner configuration completed but .runner could not be verified.");
+
+        _manifest.RecordPrepared(
+            candidate.FolderPath,
+            verified.GitHubUrl,
+            verified.AgentName);
+
+        return new PortableRunnerPreparationResult(
+            true,
+            UiLanguage.Choose("Preparado para este PC", "Prepared for this PC", "Preparat per a aquest PC"));
     }
 
     private IReadOnlyList<PortableRunnerCandidate> Discover(

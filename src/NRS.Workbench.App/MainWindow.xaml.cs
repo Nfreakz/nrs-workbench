@@ -114,7 +114,7 @@ public partial class MainWindow : Window
 
     private async Task RefreshAndUpdateTrayAsync()
     {
-        await _viewModel.RefreshAsync();
+        if (!await _viewModel.RefreshAsync()) return;
         var runners = _viewModel.AllRunners.ToList();
         _tray.Update(runners);
         ProcessStateTransitions(runners);

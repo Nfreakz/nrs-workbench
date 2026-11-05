@@ -385,12 +385,14 @@ public sealed class RepositoriesViewModel : ObservableObject
         if (SelectedRepository is null) return;
         try
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "wt.exe",
-                Arguments = $"-d \"{SelectedRepository.Path}\"",
-                UseShellExecute = true
-            });
+            // wt.exe treats ';' as a command separator even inside ArgumentList, so such
+            // paths go straight to the cmd.exe fallback (WorkingDirectory, no parsing).
+            if (SelectedRepository.Path.Contains(';'))
+                throw new InvalidOperationException("Path not safe for wt.exe arguments.");
+            var psi = new ProcessStartInfo { FileName = "wt.exe", UseShellExecute = false };
+            psi.ArgumentList.Add("-d");
+            psi.ArgumentList.Add(SelectedRepository.Path);
+            Process.Start(psi);
         }
         catch
         {

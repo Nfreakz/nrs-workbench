@@ -10,10 +10,14 @@ public static partial class SensitiveDataRedactor
     [GeneratedRegex(@"\b(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,})\b", RegexOptions.CultureInvariant)]
     private static partial Regex GitHubTokenRegex();
 
+    [GeneratedRegex(@"(?i)\b(?<scheme>Bearer|Basic|token)\s+[A-Za-z0-9._~+/=-]{20,}", RegexOptions.CultureInvariant)]
+    private static partial Regex AuthorizationValueRegex();
+
     public static string Redact(string? text)
     {
         if (string.IsNullOrEmpty(text)) return text ?? string.Empty;
         var redacted = GitHubTokenRegex().Replace(text, "[REDACTED_GITHUB_TOKEN]");
+        redacted = AuthorizationValueRegex().Replace(redacted, match => match.Groups["scheme"].Value + " [REDACTED]");
         redacted = UrlUserInfoRegex().Replace(redacted, match => match.Groups["scheme"].Value + "***@");
         return redacted;
     }

@@ -181,7 +181,8 @@ public sealed class GitService : IGitService
     {
         EnsureRepositoryUsable(repository);
         if (!repository.HasRemote) throw new InvalidOperationException(UiLanguage.Choose("Este repositorio no tiene remote 'origin'.", "This repository has no 'origin' remote."));
-        await RunAsync(repository.Path, ["fetch", "--prune"], allowFailure: false);
+        using var timeout = new CancellationTokenSource(NetworkTimeout);
+        await RunAsync(repository.Path, ["fetch", "--prune"], allowFailure: false, timeout.Token);
     }
 
     public async Task PullFastForwardAsync(GitRepositoryInfo repository)
@@ -210,7 +211,8 @@ public sealed class GitService : IGitService
                 "Pull bloqueado: hay commits locales nuevos desde la última actualización. Refresca el repositorio.",
                 "Pull blocked: new local commits appeared since the last refresh. Refresh the repository.",
                 "Pull bloquejat: han aparegut commits locals nous des de l'última actualització. Actualitza el repositori."));
-        await RunAsync(current.Path, ["pull", "--ff-only"], allowFailure: false);
+        using var timeout = new CancellationTokenSource(NetworkTimeout);
+        await RunAsync(current.Path, ["pull", "--ff-only"], allowFailure: false, timeout.Token);
     }
 
     public async Task PushAsync(GitRepositoryInfo repository)
@@ -234,7 +236,8 @@ public sealed class GitService : IGitService
                 "No hay commits locales pendientes de push.",
                 "There are no local commits to push.",
                 "No hi ha commits locals pendents de push."));
-        await RunAsync(current.Path, ["push"], allowFailure: false);
+        using var timeout = new CancellationTokenSource(NetworkTimeout);
+        await RunAsync(current.Path, ["push"], allowFailure: false, timeout.Token);
     }
 
     private static void EnsureBranchUnchanged(GitRepositoryInfo displayed, GitRepositoryInfo current)
@@ -515,6 +518,8 @@ public sealed class GitService : IGitService
         return results.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
+    private static readonly TimeSpan NetworkTimeout = TimeSpan.FromMinutes(2);
+
     private static async Task<GitCommandResult> RunAsync(string workingDirectory, IReadOnlyList<string> arguments, bool allowFailure, CancellationToken cancellationToken = default)
     {
         var psi = new ProcessStartInfo
@@ -529,6 +534,8 @@ public sealed class GitService : IGitService
             CreateNoWindow = true
         };
         foreach (var argument in arguments) psi.ArgumentList.Add(argument);
+        // Never block on a hidden terminal credential prompt; GCM GUI prompts still work.
+        psi.Environment["GIT_TERMINAL_PROMPT"] = "0";
 
         try
         {
@@ -552,9 +559,9 @@ public sealed class GitService : IGitService
                 }
 
                 throw new TimeoutException(UiLanguage.Choose(
-                    "Git ha tardado demasiado al inspeccionar este repositorio. Vuelve a intentarlo o revisa la carpeta manualmente.",
-                    "Git took too long while inspecting this repository. Try again or review the folder manually.",
-                    "Git ha trigat massa a inspeccionar aquest repositori. Torna-ho a provar o revisa la carpeta manualment."));
+                    $"Git ha tardado demasiado ('git {arguments[0]}'). Vuelve a intentarlo o revisa el repositorio manualmente.",
+                    $"Git took too long ('git {arguments[0]}'). Try again or review the repository manually.",
+                    $"Git ha trigat massa ('git {arguments[0]}'). Torna-ho a provar o revisa el repositori manualment."));
             }
             var result = new GitCommandResult(process.ExitCode, await stdoutTask, await stderrTask);
             if (!allowFailure && result.ExitCode != 0)

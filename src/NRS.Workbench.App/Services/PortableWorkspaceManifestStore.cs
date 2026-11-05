@@ -133,7 +133,11 @@ public sealed class PortableWorkspaceManifestStore
         foreach (var pending in Load().PendingRunners)
         {
             try { result.Add((PortablePathCodec.Decode(pending.Path, _portableRoot), pending)); }
-            catch { }
+            catch (Exception ex)
+            {
+                // Kept in the manifest (not removed); logged so the skipped entry is visible.
+                AppLogger.Error($"Could not decode a pending portable runner entry; it was skipped (agent '{pending.Registration?.AgentName}')", ex);
+            }
         }
         return result;
     }
@@ -162,11 +166,16 @@ public sealed class PortableWorkspaceManifestStore
     private void Save(PortableWorkspaceManifest manifest)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(_filePath)!);
-        var temporary = _filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        WriteAllTextAtomic(_filePath, JsonSerializer.Serialize(manifest, Options));
+    }
+
+    internal static void WriteAllTextAtomic(string path, string contents)
+    {
+        var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
-            File.WriteAllText(temporary, JsonSerializer.Serialize(manifest, Options));
-            File.Move(temporary, _filePath, overwrite: true);
+            File.WriteAllText(temporary, contents);
+            File.Move(temporary, path, overwrite: true);
         }
         finally
         {
