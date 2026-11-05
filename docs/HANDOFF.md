@@ -7,19 +7,19 @@
 - Do not use this repository's paths, credentials, runner registrations, deployment decisions or release tags for any other Neo RS application.
 - Default branch: `main`. Review its live HEAD, PRs, CI and Releases before modifying anything.
 
-## Current verified state · 2026-10-04
+## Current verified state · 2026-11-05
 
-- Product-code baseline for v0.18.7: `0e7688ab49276134a00018c27b60281cc7eb0b01` (merge of PR #41).
-- At the start of this handoff refresh, `main` and `qa-preview` both pointed to that baseline. Documentation-only commits may advance `main`; always verify the live branch before modifying code.
-- Application version at the v0.18.7 product baseline: `0.18.7`.
-- Open pull requests before this documentation refresh: none.
-- CI #544 for the v0.18.7 product baseline: SUCCESS.
-- Last pure v0.18.6 commit: `0c0202d0036bc23f23015b1d49b887e1cbbb1726`.
-- CI #542 for `0c0202d...`: SUCCESS.
-- Latest published release: [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5).
-- Published Windows asset: `NRSWorkbench-v0.18.5-win-x64.zip`, 71,433,124 bytes, SHA256 `7831f858b9a35de1624465a6ee8b5481220a42a3411bb19cdf41f3dc08cb0a2e`.
-- v0.18.6 and v0.18.7 are implemented but not published.
-- `docs/VISUAL_SYSTEM.md` remains the visual source of truth.
+- Repository: `Nfreakz/nrs-workbench`; default branch `main`.
+- `main` product-code baseline after PR #49: `77445785a8ddd32d43d22c5c21c54a7ca64873df`, app version `0.18.7`.
+- PR #47 (CI self-hosted policy), PR #48 (runner safety, Git/settings/logging fixes), and PR #49 (Maintenance scanning/UX) are merged.
+- CI #561: SUCCESS on PR #48 merge commit `85380478abeb39e98e173f1519d695bcff48b812`.
+- CI #562 was in progress when this handoff was prepared; verify the final conclusion on `77445785...` before choosing any v0.18.7 release candidate. Documentation-only commits may advance `main`.
+- v0.18.6 fixed release candidate: `317226dc3e1702341927455435f2675284ea2175`; `Directory.Build.props` reports `0.18.6`; CI #556 SUCCESS.
+- Earlier pure v0.18.6 commit `0c0202d0036bc23f23015b1d49b887e1cbbb1726` is superseded by the fixed candidate. Do not tag the old commit.
+- v0.18.7 earlier baseline `0e7688ab49276134a00018c27b60281cc7eb0b01` is superseded by later bug/security fixes and Maintenance integration. Do not tag the old commit.
+- `qa-preview` still points to the original `0c0202d...` candidate; it is **not** the current fixed release payload.
+- Last published release remains [v0.18.5 Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.5). No v0.18.6 or v0.18.7 tag/release existed when checked on 2026-11-05.
+- The live GitHub Wiki has not been verified during this update. Do not claim it is current.
 
 ## Release policy and constraints
 
@@ -45,11 +45,11 @@
 
 ## v0.18.6 · Maintenance Center
 
-Integrated and CI-green. Relevant merged PRs: #40, #42, #43, #44 and #45.
+Integrated and CI-green. Relevant merged PRs: #40, #42, #43, #44, #45 and #49.
 
 Release candidate commit:
 
-`0c0202d0036bc23f23015b1d49b887e1cbbb1726`
+`317226dc3e1702341927455435f2675284ea2175`
 
 Implemented scope:
 
@@ -63,6 +63,9 @@ Implemented scope:
 - Absolute, escaping or unsafe `workFolder` paths are not traversed.
 - Reparse points/junctions anywhere in runner → `_diag` or runner → workFolder chains block inventory and cleanup.
 - Cleanup reports files actually removed and bytes actually reclaimed.
+- Maintenance now streams partial scan results so its table does not remain blank while scanning large runner work folders.
+- `_work` inventory is bounded per runner, with incomplete measures labeled explicitly; no automatic `_work` deletion.
+- Complete detail text wraps across rows and the table indicates whether deletion is safe, affects history or is blocked.
 
 Publication gate still open:
 
@@ -74,17 +77,17 @@ Publication gate still open:
 6. Verify 5 MB rotation and five-archive cap.
 7. Verify escaped workFolder and intermediate reparse/junction paths are blocked.
 
-Do not create tag `v0.18.6` until these manual checks pass. When approved, the tag must point to `0c0202d0036bc23f23015b1d49b887e1cbbb1726`.
+Do not create tag `v0.18.6` until all remaining manual checks pass. When approved, the tag must point to `317226dc3e1702341927455435f2675284ea2175`, not the superseded original candidate. The reported manual preview confirms the initially empty Maintenance table now populates; the destructive safety checks were not independently confirmed in this session.
 
 ## v0.18.7 · Portable Workspace
 
 PR #41 is MERGED. Portable Workspace is now integrated in `main`.
 
-Product-code merge commit / release candidate:
+Current product-code candidate (recheck CI #562 before approval):
 
-`0e7688ab49276134a00018c27b60281cc7eb0b01`
+`77445785a8ddd32d43d22c5c21c54a7ca64873df`
 
-Documentation-only commits after this baseline do not change the v0.18.7 product payload. If any product-code fix is merged, establish and validate a new release candidate instead of silently tagging a later `main`.
+This candidate includes the original Portable Workspace changes plus PR #48 safety fixes and PR #49 Maintenance fixes. The previous `0e7688ab...` baseline is no longer the recommended release payload. If later code fixes merge, establish a new candidate and revalidate it.
 
 Implemented scope:
 
@@ -164,11 +167,12 @@ Never move a tag to recover a failed release. The workflow supports manual dispa
 
 ## Next action
 
-Close the 0.18.x line before starting v0.19.0:
+Close the 0.18.x line without reverting the November fixes:
 
-1. Complete v0.18.6 manual validation against `0c0202d...`.
-2. If it passes, tag/publish v0.18.6 from that exact commit.
-3. Complete v0.18.7 portable validation against `0e7688ab...` using disposable/test runners.
-4. Fix any bug found on a new branch from current `main`.
-5. When portable checks pass, tag/publish v0.18.7.
-6. Only then start v0.19.0 GitHub Actions Control.
+1. Verify CI #562 (and any later main CI) is green on the chosen v0.18.7 commit.
+2. Complete the remaining v0.18.6 Windows safety checks against `317226dc...`. User feedback already confirmed the incremental Maintenance scan displays results; other manual cleanup checks remain unconfirmed.
+3. If fully validated, create immutable tag `v0.18.6` on `317226dc3e1702341927455435f2675284ea2175` and verify the Windows ZIP prerelease asset.
+4. Complete a disposable-runner migration/second-PC test for v0.18.7; CI smoke tests do not replace a real GitHub runner preparation/retry check.
+5. If validated, create immutable tag `v0.18.7` on the approved current product-code commit (initial candidate `77445785a8ddd32d43d22c5c21c54a7ca64873df`) and verify the win-x64 prerelease ZIP.
+6. Update README, CHANGELOG release dates, HANDOFF and live Wiki after publication. Never claim a release exists merely because a tag or successful CI run exists.
+7. Keep GitHub-hosted runners disabled; only repository-scoped self-hosted Windows X64 jobs are allowed.
