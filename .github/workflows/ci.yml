@@ -101,6 +101,21 @@ jobs:
           }
           .\\scripts\\get-release-notes.ps1 -Version $version | Out-Null
 
+          # Regression: Windows PowerShell 5.1 must preserve UTF-8 release
+          # notes when building the GitHub release JSON request body.
+          foreach ($releaseVersion in @('0.18.6', '0.18.7')) {
+            $notes = (.\scripts\get-release-notes.ps1 -Version $releaseVersion) -join "`n"
+            if ($releaseVersion -eq '0.18.6' -and $notes -notmatch '[^\x00-\x7F]') {
+              throw "Expected non-ASCII release notes for v$releaseVersion."
+            }
+            $json = @{ tag_name = "v$releaseVersion"; body = $notes } | ConvertTo-Json
+            $bytes = [System.Text.Encoding]::UTF8.GetBytes($json)
+            $decoded = [System.Text.Encoding]::UTF8.GetString($bytes) | ConvertFrom-Json
+            if ($decoded.body -cne $notes) {
+              throw "UTF-8 release JSON round-trip failed for v$releaseVersion."
+            }
+          }
+
       - name: Setup Git identity for smoke tests
         run: |
           git config --global user.name "NRS Workbench CI"
