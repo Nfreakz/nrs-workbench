@@ -22,6 +22,20 @@
 - v0.18.7 remains unpublished and has no release tag as of this check.
 - The live GitHub Wiki has not been verified during this update. Do not claim it is current.
 
+## Publication status and handoff checkpoint · 2026-11-05
+
+Verified from GitHub after the user requested to publish v0.18.7 and move work to a new chat:
+
+- **v0.18.6 is actually published**: [Public Preview](https://github.com/Nfreakz/nrs-workbench/releases/tag/v0.18.6), asset `NRSWorkbench-v0.18.6-win-x64.zip`. Recovery Release #21: SUCCESS. The first Release #20 had failed when PowerShell 5.1 sent non-ASCII release-note JSON without UTF-8; PR #51 fixed it and CI #572 succeeded.
+- **v0.18.7 is NOT published yet**: no remote `refs/tags/v0.18.7`, no GitHub release or downloadable asset when last checked. Do not announce it as available.
+- Release-ready code, latest incorporated docs: `70229481c01d4de469f9007ecd9938fa0be92c48`, `Directory.Build.props` version `0.18.7`. This is a docs-only successor of `9c32e0837e96a4f3535ef7956fdb6583bd95ffb8` (CI #572 SUCCESS). CI #577 on the documentation branch: SUCCESS; CI #578 on `70229481...` was running at the checkpoint; confirm its final outcome before tagging.
+- The code baseline includes Portable Workspace, runner/Git/settings safety fixes from PR #48, responsive Maintenance UI from PR #49, and UTF-8 release tooling from PR #51. PR #52 updated README/CHANGELOG/ROADMAP after the actual v0.18.6 publication.
+- Manual **Portable Workspace migration on a second PC with a disposable interactive test runner** is not supported by evidence in this chat/repository. There are extensive automated smoke tests, but no real external migration check. The release policy explicitly says not to tag v0.18.7 until this manual test is complete.
+- **No GitHub Actions hosted runners**. CI and release remain on repository-scoped `[self-hosted, Windows, X64]`; no Actions artifacts used as distribution.
+- The connected GitHub app can edit code and merge PRs, but does not expose an action to create an annotated tag or manually dispatch a workflow. A user with a local Git checkout may run the two tag commands, after passing the manual gate and verifying current SHA and remote tag absence.
+- GitHub Wiki was not verified; update it separately after v0.18.7 release. Keep docs factual.
+- Repo health at checkpoint: no open PRs or issues. The new chat must refresh live status, as release or CI may have changed.
+
 ## Release policy and constraints
 
 - NRS Workbench remains Windows-only. The Linux spike was closed without merge.
@@ -166,11 +180,54 @@ Never move a tag to recover a failed release. The workflow supports manual dispa
 - Live GitHub Wiki has not been reverified in this handoff.
 - Before release, review `CHANGELOG.md`, `docs/TESTING.md`, `docs/RELEASING.md`, `docs/WRITING_STYLE.md` and affected user-facing documentation.
 
-## Next action
+## Next action: finish v0.18.7 then work on backlog
 
-1. Keep the published `v0.18.6` tag and ZIP unchanged; the workflow is repaired for UTF-8 release metadata.
-2. Before publishing `v0.18.7`, perform the real Portable Workspace second-PC and disposable interactive runner migration checks above. Do not use production runners to establish this gate.
-3. Verify latest CI on the approved product+release-tooling commit (initial candidate `9c32e0837e96a4f3535ef7956fdb6583bd95ffb8`; update for a newer documentation-only main commit if needed).
-4. If the real migration gate passes, create the immutable `v0.18.7` annotated tag on the exact approved 0.18.7 commit. Verify it does not already exist.
-5. Confirm GitHub Release workflow SUCCESS and the published `NRSWorkbench-v0.18.7-win-x64.zip` prerelease asset. Run only on repository-scoped self-hosted Windows X64.
-6. Update release date, README and GitHub Wiki to reflect v0.18.7 actually being downloadable; the live Wiki was not yet independently verified.
+### Blocker A: manual release gate
+
+Do **not** experiment with existing/production runners. Use a standalone copied application + disposable interactive runner:
+
+1. Test `NRSWorkbench.portable` activation and adjacent `Data` directory; restart the copy and verify it uses portable data instead of normal `%LOCALAPPDATA%`.
+2. Change the volume's drive letter and check same-volume runner/repository references and Smart Queue configuration still resolve.
+3. On a **second PC**, ensure stopped test runners are marked `Needs preparation`; active or service runners are blocked.
+4. Prepare one disposable offline interactive GitHub.com runner with an authorized short-lived PAT session, checking target/name/labels/workFolder and ability to run afterward. Do not use production credentials or tokens in logs/screenshots/chats.
+5. Verify invalid/insufficient permissions and online/busy runner state prevent local removal. Verify failed/interrupted migration can be retried with a fresh token, and no PAT/token/credential content is persisted in `Data` or logs.
+6. For complete coverage, run all 23 checks in `docs/TESTING.md`, including corrupt manifests, reparse paths, queue-enabled rejection and expiring tokens. Keep evidence and note what was not tested.
+
+### Blocker B: publication
+
+After Blocker A is approved, verify the exact commit and live GitHub CI. The initial release candidate with correct docs is `70229481c01d4de469f9007ecd9938fa0be92c48`; do not silently switch to an arbitrary HEAD.
+
+In the NRS Workbench repository's PowerShell checkout (the user previously used `G:\NRS Workbench`):
+
+```powershell
+git fetch origin --tags
+git show 70229481c01d4de469f9007ecd9938fa0be92c48:Directory.Build.props | Select-String '<Version>'
+git ls-remote --tags origin refs/tags/v0.18.7
+git tag -l v0.18.7
+```
+
+If the version is `0.18.7`, CI green, no tag exists, and Blocker A passed, run:
+
+```powershell
+git tag -a v0.18.7 70229481c01d4de469f9007ecd9938fa0be92c48 -m "NRS Workbench v0.18.7 Public Preview"
+git push origin refs/tags/v0.18.7
+```
+
+The tag push invokes `.github/workflows/release.yml` on the Windows self-hosted runner. If it fails, diagnose first: **never move or delete an existing release tag**. The workflow also supports `workflow_dispatch` on `main` with input `tag=v0.18.7` to recover without moving the tag.
+
+Consider v0.18.7 published **only after** Release workflow SUCCESS and a GitHub prerelease with `NRSWorkbench-v0.18.7-win-x64.zip` exists and can be downloaded.
+
+After publication, update README, CHANGELOG release date, HANDOFF, ROADMAP and live GitHub Wiki. Confirm asset SHA256/size and test extracted startup. Never report background tasks as completed without verification.
+
+### Priority backlog after 0.18.7
+
+1. **v0.19.0 GitHub Actions Control**: design read-only workflow/runs overview first; then explicitly authorized workflow dispatch, rerun and cancel actions with least-privilege permissions, clear confirmation and audit. See `docs/ROADMAP.md`.
+2. **Portable Workspace follow-up**: act on real manual migration bugs, safety corner cases and user-facing help, without adding service-runner migration unless separately scoped.
+3. **Performance and soak validation**: measure cold launch, idle CPU/RAM, logs, refresh stability, queue behavior with many runners, and the impact of scanning large `_work` trees. Do not make unsupported speed claims.
+4. **Docs/product polish**: verify live Wiki; refresh outdated screenshot (currently based on v0.18.4); keep install guidance and security/privacy explanations accurate.
+5. **Longer-term items**: separate product website/technical SEO project only if explicitly approved; GitLab provider only if supported by user demand; no assumption of a Linux port.
+6. **No active GitHub issues or PRs** were present when checked, but recheck rather than trusting this snapshot.
+
+### Continuity instruction to the next AI
+
+You are working **only** on NRS Workbench, repository `Nfreakz/nrs-workbench`. First reread this HANDOFF, `docs/RELEASING.md`, `docs/TESTING.md`, `docs/ROADMAP.md`, `CHANGELOG.md` and the live GitHub state. Never conflate this application's credentials, runners, versions, repo or deployment with other NeoRS apps. Respect the user's self-hosted Windows X64-only policy. Finish and verify v0.18.7 publication before embarking on v0.19.0. Do not infer manual migration testing or publication from a successful CI run.
