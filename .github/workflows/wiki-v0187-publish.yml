@@ -36,6 +36,20 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Validate Wiki publisher PowerShell syntax
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path '.\scripts\publish-wiki-v0187.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host "::error::$($_.Message)" }
+            throw 'Wiki publisher contains PowerShell syntax errors.'
+          }
+
       - name: Update only NRS Workbench Wiki pages
         env:
           GITHUB_TOKEN: ${{ github.token }}
