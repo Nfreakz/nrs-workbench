@@ -49,10 +49,11 @@ jobs:
         shell: powershell
         run: ./scripts/check-local-runners.ps1
 
-      - name: Verify local toolchain
-        run: |
-          dotnet --info
-          git --version
+      - name: Verify local toolchain (.NET SDK)
+        run: dotnet --info
+
+      - name: Verify local toolchain (Git)
+        run: git --version
 
       - name: Validate local launcher PowerShell syntax
         run: |
@@ -115,11 +116,6 @@ jobs:
               throw "UTF-8 release JSON round-trip failed for v$releaseVersion."
             }
           }
-
-      - name: Setup Git identity for smoke tests
-        run: |
-          git config --global user.name "NRS Workbench CI"
-          git config --global user.email "nrs-workbench-ci@example.invalid"
 
       - name: Restore
         run: dotnet restore .\NRSWorkbench.sln

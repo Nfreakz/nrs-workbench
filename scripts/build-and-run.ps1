@@ -13,6 +13,27 @@ function Test-IsAdministrator {
     return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
+function Invoke-GitQuiet {
+    # Runs a git query whose failure is expected and handled by the caller.
+    # Under $ErrorActionPreference = 'Stop', Windows PowerShell 5.1 turns any
+    # stderr output redirected with 2>$null into a terminating error, so the
+    # friendly messages below would never be reached. Relax the preference
+    # only around this call, discard stderr, and leave $LASTEXITCODE for the caller.
+    param([string[]]$GitArgs)
+
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = [string](& git -C $root @GitArgs 2>$null)
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousPreference
+    }
+    $global:LASTEXITCODE = $exitCode
+    return $output.Trim()
+}
+
 function Update-RepositorySafely {
     $gitMetadata = Join-Path $root '.git'
     if (-not (Test-Path -LiteralPath $gitMetadata)) {
@@ -25,14 +46,12 @@ function Update-RepositorySafely {
         throw 'Este checkout contiene .git pero Git no esta disponible en PATH. Instala Git for Windows para actualizar antes de compilar.'
     }
 
-    $insideWorkTree = [string](& git -C $root rev-parse --is-inside-work-tree 2>$null)
-    $insideWorkTree = $insideWorkTree.Trim()
+    $insideWorkTree = Invoke-GitQuiet @('rev-parse', '--is-inside-work-tree')
     if ($LASTEXITCODE -ne 0 -or $insideWorkTree -ne 'true') {
         throw 'La carpeta contiene metadatos Git pero no se puede validar como working tree.'
     }
 
-    $branch = [string](& git -C $root symbolic-ref --quiet --short HEAD 2>$null)
-    $branch = $branch.Trim()
+    $branch = Invoke-GitQuiet @('symbolic-ref', '--quiet', '--short', 'HEAD')
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($branch)) {
         throw 'El repositorio esta en detached HEAD. No se actualizara automaticamente para evitar cambiar de revision sin permiso.'
     }
@@ -45,8 +64,7 @@ function Update-RepositorySafely {
         throw "Hay cambios locales en '$branch'. RUN_ME_FIRST no hara pull ni descartara archivos. Guarda, haz commit o stash y vuelve a ejecutarlo."
     }
 
-    $upstream = [string](& git -C $root rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>$null)
-    $upstream = $upstream.Trim()
+    $upstream = Invoke-GitQuiet @('rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{upstream}')
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($upstream)) {
         throw "La rama '$branch' no tiene upstream configurado. No puedo garantizar que sea la ultima version sin elegir un remoto por ti."
     }

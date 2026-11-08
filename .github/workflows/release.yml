@@ -61,10 +61,23 @@ jobs:
           persist-credentials: false
           ref: ${{ env.RELEASE_TAG }}
 
-      - name: Verify local release toolchain
+      - name: Verify release tag matches Directory.Build.props version
         run: |
-          dotnet --info
-          git --version
+          [xml]$props = Get-Content -LiteralPath '.\Directory.Build.props'
+          $version = ([string]$props.Project.PropertyGroup.Version).Trim()
+          if ([string]::IsNullOrWhiteSpace($version)) {
+            throw "Directory.Build.props does not define Version."
+          }
+          if ("v$version" -ne $env:RELEASE_TAG) {
+            throw "Release tag $env:RELEASE_TAG does not match Directory.Build.props Version $version (expected tag v$version)."
+          }
+          Write-Host "Release tag $env:RELEASE_TAG matches Directory.Build.props Version $version."
+
+      - name: Verify local release toolchain (.NET SDK)
+        run: dotnet --info
+
+      - name: Verify local release toolchain (Git)
+        run: git --version
 
       - name: Build
         run: dotnet build .\NRSWorkbench.sln -c Release
