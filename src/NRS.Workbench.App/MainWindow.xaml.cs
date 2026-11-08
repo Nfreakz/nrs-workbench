@@ -79,6 +79,7 @@ public partial class MainWindow : Window
             RunResourceRefreshSafely();
             _resourceTimer.Start();
             await RunAutomaticRefreshAsync();
+            _ = CheckForUpdatesAsync();
         };
 
         StateChanged += (_, _) =>
@@ -95,6 +96,36 @@ public partial class MainWindow : Window
             _tray.Dispose();
         };
     }
+
+    /// <summary>
+    /// Fire-and-forget anonymous release check (api.github.com, once per 24 h). It
+    /// never blocks the UI and every failure ends as a log line.
+    /// </summary>
+    private async Task CheckForUpdatesAsync()
+    {
+        try
+        {
+            var update = await new UpdateCheckService(_settings).CheckIfDueAsync().ConfigureAwait(true);
+            if (update is null) return;
+            _viewModel.ShowUpdateNotice(update);
+            AppLogger.Info($"Update available: {update.TagName} ({update.ReleaseUrl})");
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Update check failed", ex);
+        }
+    }
+
+    private void UpdateOpen_Click(object sender, RoutedEventArgs e)
+    {
+        var url = string.IsNullOrWhiteSpace(_viewModel.UpdateReleaseUrl) ? UpdateCheckService.ReleasesPageUrl : _viewModel.UpdateReleaseUrl;
+        if (!ShellLauncher.TryOpen(url))
+            MessageBox.Show(this,
+                UiLanguage.Choose("No se pudo abrir la página de la versión en el navegador.", "Could not open the release page in the browser.", "No s'ha pogut obrir la pàgina de la versió al navegador."),
+                "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
+    }
+
+    private void UpdateDismiss_Click(object sender, RoutedEventArgs e) => _viewModel.DismissUpdateNotice();
 
     private void ReviewRecoveredQueueStops()
     {

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Json;
 using NRS.Workbench.Core.Models;
 
@@ -12,6 +13,13 @@ public sealed class SettingsService
         WriteIndented = true,
         PropertyNameCaseInsensitive = true
     };
+
+    // Settings are read from many places (CanExecute predicates, refresh ticks, every
+    // window). The parsed file is cached per settings path and shared by every
+    // SettingsService instance so the UI does not hit the disk on each call. Callers
+    // always receive a deep copy and can mutate it freely; Save() refreshes the cache.
+    private static readonly ConcurrentDictionary<string, RunnerSettings> Cache =
+        new(StringComparer.OrdinalIgnoreCase);
 
     private readonly string? _portableRoot;
 
@@ -28,6 +36,29 @@ public sealed class SettingsService
     }
 
     public RunnerSettings Load()
+    {
+        if (Cache.TryGetValue(SettingsPath, out var cached)) return Clone(cached);
+
+        var loaded = LoadFromDisk();
+        Cache[SettingsPath] = Clone(loaded);
+        return loaded;
+    }
+
+    /// <summary>
+    /// Drops the cached copy for this settings path so the next <see cref="Load"/>
+    /// reads settings.json again. Call it when the file is changed by other means
+    /// than <see cref="Save"/> (portable activation, external edits, tests).
+    /// </summary>
+    public void Invalidate() => Cache.TryRemove(SettingsPath, out _);
+
+    /// <summary>Drops every cached settings file.</summary>
+    public static void InvalidateAll() => Cache.Clear();
+
+    private static RunnerSettings Clone(RunnerSettings settings) =>
+        JsonSerializer.Deserialize<RunnerSettings>(JsonSerializer.Serialize(settings, JsonOptions), JsonOptions)
+        ?? throw new InvalidOperationException("Could not copy settings.");
+
+    private RunnerSettings LoadFromDisk()
     {
         try
         {
@@ -82,6 +113,7 @@ public sealed class SettingsService
         EncodeWorkspacePaths(persisted);
 
         PortableWorkspaceManifestStore.WriteAllTextAtomic(SettingsPath, JsonSerializer.Serialize(persisted, JsonOptions));
+        Cache[SettingsPath] = Clone(settings);
     }
 
     // A later Save would overwrite an unreadable settings.json with defaults; keep a copy first.
@@ -358,6 +390,7 @@ public sealed class SettingsService
         public bool RunnerQueueResourceGuardEnabled { get; set; } = true;
         public int RunnerQueueCpuStartThreshold { get; set; } = 85;
         public int RunnerQueueMemoryStartThreshold { get; set; } = 90;
+        public bool UpdateCheckEnabled { get; set; } = true;
 
         public static PortableSettingsData FromSettings(RunnerSettings settings) => new()
         {
@@ -381,7 +414,8 @@ public sealed class SettingsService
             RunnerQueueLimit = settings.RunnerQueueLimit,
             RunnerQueueResourceGuardEnabled = settings.RunnerQueueResourceGuardEnabled,
             RunnerQueueCpuStartThreshold = settings.RunnerQueueCpuStartThreshold,
-            RunnerQueueMemoryStartThreshold = settings.RunnerQueueMemoryStartThreshold
+            RunnerQueueMemoryStartThreshold = settings.RunnerQueueMemoryStartThreshold,
+            UpdateCheckEnabled = settings.UpdateCheckEnabled
         };
 
         public RunnerSettings ToSettings() => new()
@@ -406,7 +440,8 @@ public sealed class SettingsService
             RunnerQueueLimit = RunnerQueueLimit,
             RunnerQueueResourceGuardEnabled = RunnerQueueResourceGuardEnabled,
             RunnerQueueCpuStartThreshold = RunnerQueueCpuStartThreshold,
-            RunnerQueueMemoryStartThreshold = RunnerQueueMemoryStartThreshold
+            RunnerQueueMemoryStartThreshold = RunnerQueueMemoryStartThreshold,
+            UpdateCheckEnabled = UpdateCheckEnabled
         };
     }
 }

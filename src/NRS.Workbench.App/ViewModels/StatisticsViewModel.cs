@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using NRS.Workbench.App.Services;
 using NRS.Workbench.Core.Interfaces;
 using NRS.Workbench.Core.Models;
+using NRS.Workbench.Core.Services;
 
 namespace NRS.Workbench.App.ViewModels;
 
@@ -126,6 +127,40 @@ public sealed class StatisticsViewModel : ObservableObject
         _selectedPeriod = PeriodOptions[0];
         RefreshCommand = new AsyncRelayCommand(() => RefreshAsync());
     }
+
+    public static string DefaultCsvFileName => $"nrs-workbench-estadisticas-{DateTime.Now:yyyyMMdd}.csv";
+
+    /// <summary>
+    /// Writes the job history currently shown (already filtered by the selected
+    /// period) as UTF-8 CSV with BOM. Throws on I/O errors so the window can report them.
+    /// </summary>
+    public void ExportCsv(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("A destination path is required.", nameof(path));
+        var header = new[]
+        {
+            "Runner",
+            "Job",
+            UiLanguage.Choose("Repositorio/Workflow", "Repository/Workflow", "Repositori/Workflow"),
+            UiLanguage.Choose("Estado", "Status", "Estat"),
+            UiLanguage.Choose("Inicio", "Start", "Inici"),
+            UiLanguage.Choose("Duración (s)", "Duration (s)", "Durada (s)"),
+            UiLanguage.Choose("Archivo origen", "Source file", "Fitxer d'origen")
+        };
+        var csv = JobRunCsvExport.Build(RecentRuns.ToList(), header, OutcomeLabel);
+        var directory = Path.GetDirectoryName(Path.GetFullPath(path));
+        if (!string.IsNullOrWhiteSpace(directory)) Directory.CreateDirectory(directory);
+        File.WriteAllText(path, csv, CsvWriter.Utf8WithBom);
+        StatusText = UiLanguage.Choose($"Exportado: {path}", $"Exported: {path}", $"Exportat: {path}");
+    }
+
+    private static string OutcomeLabel(JobRunOutcome outcome) => outcome switch
+    {
+        JobRunOutcome.Succeeded => "OK",
+        JobRunOutcome.Failed => UiLanguage.Choose("FALLO", "FAILED", "ERROR"),
+        JobRunOutcome.Cancelled => UiLanguage.Choose("CANCELADO", "CANCELLED", "CANCEL·LAT"),
+        _ => UiLanguage.Choose("SIN CLASIFICAR", "UNCLASSIFIED", "SENSE CLASSIFICAR")
+    };
 
     public async Task RefreshAsync(CancellationToken cancellationToken = default)
     {

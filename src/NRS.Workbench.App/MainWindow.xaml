@@ -160,6 +160,7 @@
             <RowDefinition x:Name="DetailPanelRow" Height="195" MinHeight="0"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
@@ -794,8 +795,30 @@
             </Grid>
         </Border>
 
+        <!-- Update notice: filled only when the anonymous GitHub release check found a newer tag. -->
+        <Border Grid.Row="8" Visibility="{Binding UpdateNoticeVisibility}"
+                Background="{StaticResource AccentSoftBrush}" BorderBrush="#4B5A6D" BorderThickness="1" CornerRadius="8"
+                Padding="11,6" Margin="0,8,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="&#xE896;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,9,0"/>
+                <TextBlock Grid.Column="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
+                    <Run Text="{Binding UpdateNoticeText, Mode=OneWay}" FontWeight="SemiBold" Foreground="#D9DEE5"/><Run Text=" · " Foreground="#4A515B"/><Run Text="{local:Tr Source='Descárgala desde GitHub Releases.'}" Foreground="{StaticResource MutedBrush}"/>
+                </TextBlock>
+                <Button Grid.Column="2" Content="{local:Tr Source='Ver versión'}" Style="{StaticResource PrimaryToolbarButton}" Padding="10,4" Margin="8,0,0,0"
+                        Click="UpdateOpen_Click" ToolTip="{Binding UpdateReleaseUrl}"/>
+                <Button Grid.Column="3" Content="{local:Tr Source='Omitir'}" Style="{StaticResource ToolbarButton}" Padding="10,4" Margin="6,0,0,0"
+                        Click="UpdateDismiss_Click" ToolTip="{local:Tr Source='Oculta el aviso hasta la próxima comprobación.'}"/>
+            </Grid>
+        </Border>
+
         <!-- Footer -->
-        <Grid Grid.Row="8" Margin="2,8,2,0">
+        <Grid Grid.Row="9" Margin="2,8,2,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
                 <Ellipse Width="9" Height="9" Fill="#5AA878" Margin="0,1,8,0"/>

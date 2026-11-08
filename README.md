@@ -106,6 +106,10 @@ Desktop notifications are optional and local. They can report READY → BUSY job
 
 The notification-area icon is also kept available while desktop notifications are enabled, even when close-to-tray behavior itself is disabled. No external push service, telemetry or account integration is used.
 
+### Update notice
+
+On startup, at most once every 24 hours, NRS Workbench asks the public GitHub REST API (`api.github.com`, anonymous, no token, no machine data beyond a `NRSWorkbench/<version>` user agent) for the latest release of this repository. When a newer tag exists, a small dismissible banner appears above the footer and the **Acerca de** window shows the same information; the button opens the release page in the browser. Nothing is downloaded or installed automatically. The check can be disabled in **Configuración → Notificaciones** ("Comprobar nuevas versiones al iniciar") and any network failure is only written to the local log.
+
 ## Repositories module
 
 Version 0.12 adds the first **Repositories** workspace. Repositories are added explicitly by selecting a Git working tree or by scanning a folder chosen by the user; the application does not crawl every disk automatically. The selected paths are persisted in the existing local settings file.
@@ -181,6 +185,8 @@ Results are intentionally conservative: NRS Workbench only marks a job as succes
 The statistics are the scope of the **locally retained diagnostic history**, not a guaranteed lifetime total from GitHub. No GitHub API token is needed. A future optional API integration can add workflow-run-level counts and reconcile the local history without replacing the offline statistics path.
 
 On the first statistics load, NRS Workbench shows an `X/Y Worker logs` scan indicator and reads the retained history with a bounded parallel parser. Subsequent refreshes reuse the in-memory parsed-log cache when the underlying file has not changed.
+
+**Exportar CSV** saves the job history currently shown (respecting the selected period) as a UTF-8 CSV file with BOM: runner, job, repository/workflow, status, ISO 8601 local start, duration in seconds and the source Worker log. The export is written only to the file you choose; nothing leaves the machine.
 
 ## Security
 

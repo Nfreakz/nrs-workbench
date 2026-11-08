@@ -25,6 +25,32 @@ public partial class AboutWindow : Window
         RuntimeText.Text = RuntimeInformation.FrameworkDescription;
         SystemText.Text = RuntimeInformation.OSDescription;
         DataPathText.Text = _settings.SettingsDirectory;
+        ApplyUpdateStatus();
+    }
+
+    private void ApplyUpdateStatus()
+    {
+        var update = UpdateCheckService.AvailableUpdate;
+        if (update is not null)
+        {
+            var latest = $"{update.LatestVersion.Major}.{update.LatestVersion.Minor}.{update.LatestVersion.Build}";
+            UpdateStatusRun.Text = UiLanguage.Choose($"Nueva versión v{latest} disponible · ", $"New version v{latest} available · ", $"Nova versió v{latest} disponible · ");
+            UpdateLinkRun.Text = UiLanguage.Choose("Abrir en GitHub", "Open on GitHub", "Obre a GitHub");
+            UpdateLink.NavigateUri = Uri.TryCreate(update.ReleaseUrl, UriKind.Absolute, out var uri) ? uri : null;
+            return;
+        }
+
+        UpdateLinkRun.Text = string.Empty;
+        UpdateStatusRun.Text = _settings.Load().UpdateCheckEnabled
+            ? UiLanguage.Choose("No se conocen versiones más nuevas (comprobación anónima en api.github.com, una vez al día).", "No newer version is known (anonymous check on api.github.com, once a day).", "No es coneixen versions més noves (comprovació anònima a api.github.com, un cop al dia).")
+            : UiLanguage.Choose("Comprobación de versiones desactivada en Configuración.", "Version check disabled in Settings.", "Comprovació de versions desactivada a Configuració.");
+    }
+
+    private void UpdateLink_Click(object sender, RoutedEventArgs e)
+    {
+        var url = UpdateLink.NavigateUri?.AbsoluteUri ?? UpdateCheckService.ReleasesPageUrl;
+        if (!ShellLauncher.TryOpen(url))
+            MessageBox.Show(UiLanguage.Choose("No se pudo abrir la página de la versión en el navegador.", "Could not open the release page in the browser.", "No s'ha pogut obrir la pàgina de la versió al navegador."), "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
     private void Support_Click(object sender, RoutedEventArgs e)

@@ -21,6 +21,8 @@ internal static class Program
         RunSuite("runner folder discovery smoke suite", RunnerFolderDiscoverySmoke.Run);
         RunSuite("portable settings smoke suite", PortableSettingsSmoke.Run);
         RunSuite("localization smoke suite", LocalizationSmoke.Run);
+        RunSuite("settings cache smoke suite", SettingsCacheSmoke.Run);
+        RunSuite("csv export and update check smoke suite", CsvExportSmoke.Run);
         await RunSuiteAsync("maintenance smoke suite", MaintenanceSmoke.RunAsync);
         await RunSuiteAsync("portable workspace smoke suite", PortableWorkspaceSmoke.RunAsync);
 

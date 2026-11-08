@@ -192,8 +192,13 @@
                           IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBool}}"
                           ItemsSource="{Binding PeriodOptions}" SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
                           SelectionChanged="PeriodCombo_SelectionChanged"/>
-                <Button Style="{StaticResource ToolbarButton}" Command="{Binding RefreshCommand}" Margin="9,0,0,0">
+                <Button Style="{StaticResource ToolbarButton}" Command="{Binding RefreshCommand}" Margin="9,0,9,0">
                     <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE72C;"/><TextBlock Text="{local:Tr Source='Actualizar'}"/></StackPanel>
+                </Button>
+                <Button Style="{StaticResource ToolbarButton}" Click="ExportCsv_Click" Margin="0"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBool}}"
+                        ToolTip="{local:Tr Source='Guarda el historial de jobs del periodo seleccionado como CSV (UTF-8).'}">
+                    <StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE74E;"/><TextBlock Text="{local:Tr Source='Exportar CSV'}"/></StackPanel>
                 </Button>
             </StackPanel>
         </Grid>

@@ -43,6 +43,9 @@ public sealed class MainViewModel : ObservableObject
     private double _memoryPercent;
     private double _diskPercent;
     private string _dominantRunnerVersion = string.Empty;
+    private string _updateNoticeText = string.Empty;
+    private string _updateReleaseUrl = string.Empty;
+    private Visibility _updateNoticeVisibility = Visibility.Collapsed;
 
     public ObservableCollection<RunnerInfo> Runners { get; } = [];
     public IReadOnlyList<RunnerInfo> AllRunners => _allRunners;
@@ -216,6 +219,23 @@ public sealed class MainViewModel : ObservableObject
     public double DiskPercent { get => _diskPercent; private set => SetProperty(ref _diskPercent, value); }
     public string CpuCapacityText => UiLanguage.Choose($"{Environment.ProcessorCount} procesadores lógicos", $"{Environment.ProcessorCount} logical processors", $"{Environment.ProcessorCount} processadors lògics");
     public int RefreshIntervalSeconds => _settingsService.Load().RefreshIntervalSeconds;
+
+    public string UpdateNoticeText { get => _updateNoticeText; private set => SetProperty(ref _updateNoticeText, value); }
+    public string UpdateReleaseUrl { get => _updateReleaseUrl; private set => SetProperty(ref _updateReleaseUrl, value); }
+    public Visibility UpdateNoticeVisibility { get => _updateNoticeVisibility; private set => SetProperty(ref _updateNoticeVisibility, value); }
+
+    public void ShowUpdateNotice(UpdateCheckResult update)
+    {
+        var version = $"{update.LatestVersion.Major}.{update.LatestVersion.Minor}.{update.LatestVersion.Build}";
+        UpdateNoticeText = UiLanguage.Choose(
+            $"Nueva versión v{version} disponible",
+            $"New version v{version} available",
+            $"Nova versió v{version} disponible");
+        UpdateReleaseUrl = update.ReleaseUrl;
+        UpdateNoticeVisibility = Visibility.Visible;
+    }
+
+    public void DismissUpdateNotice() => UpdateNoticeVisibility = Visibility.Collapsed;
 
     public void UpdateSystemResources(SystemResourceSnapshot snapshot)
     {
