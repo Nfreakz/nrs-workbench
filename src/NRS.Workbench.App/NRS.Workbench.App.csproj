@@ -9,6 +9,10 @@
     <AssemblyName>NRSWorkbench</AssemblyName>
     <RootNamespace>NRS.Workbench.App</RootNamespace>
     <ApplicationIcon>Assets\NRSWorkbench.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- WFAC010: WinForms (used only for the tray icon) wants DPI mode set in code, but WPF
+         only honours Per-Monitor V2 through the manifest. -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets\NRSWorkbench.ico" />

@@ -10,6 +10,7 @@ namespace NRS.Workbench.App;
 public partial class StatisticsWindow : Window
 {
     private readonly StatisticsViewModel _viewModel;
+    private readonly CancellationTokenSource _closeCancellation = new();
     private bool _loaded;
 
     public StatisticsWindow(IRunnerStatisticsService statistics, Func<IReadOnlyList<RunnerInfo>> runnersProvider)
@@ -18,7 +19,7 @@ public partial class StatisticsWindow : Window
         SourceInitialized += (_, _) =>
         {
             WindowThemeService.ApplyDarkTitleBar(this);
-            FitToWorkArea();
+            WindowThemeService.FitToWorkArea(this);
         };
 
         var settings = new SettingsService();
@@ -28,23 +29,13 @@ public partial class StatisticsWindow : Window
         Loaded += async (_, _) =>
         {
             _loaded = true;
-            await _viewModel.RefreshAsync();
+            await _viewModel.RefreshAsync(_closeCancellation.Token);
         };
-    }
-
-    private void FitToWorkArea()
-    {
-        var workArea = SystemParameters.WorkArea;
-        const double margin = 24d;
-        var availableWidth = Math.Max(900d, workArea.Width - margin);
-        var availableHeight = Math.Max(650d, workArea.Height - margin);
-
-        MaxWidth = availableWidth;
-        MaxHeight = availableHeight;
-        MinWidth = Math.Min(MinWidth, availableWidth);
-        MinHeight = Math.Min(MinHeight, availableHeight);
-        Width = Math.Min(Width, availableWidth);
-        Height = Math.Min(Height, availableHeight);
+        Closed += (_, _) =>
+        {
+            _closeCancellation.Cancel();
+            _closeCancellation.Dispose();
+        };
     }
 
     private void About_Click(object sender, RoutedEventArgs e)
@@ -56,6 +47,6 @@ public partial class StatisticsWindow : Window
     private async void PeriodCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!_loaded || _viewModel is null) return;
-        await _viewModel.RefreshAsync();
+        await _viewModel.RefreshAsync(_closeCancellation.Token);
     }
 }

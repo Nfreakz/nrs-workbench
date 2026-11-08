@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using NRS.Workbench.App.Services;
@@ -489,13 +488,13 @@ public sealed class MainViewModel : ObservableObject
     private static void OpenPath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
-        Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+        ShellLauncher.TryOpen(path);
     }
 
     private static void OpenUrl(string? url)
     {
         if (string.IsNullOrWhiteSpace(url)) return;
-        Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+        ShellLauncher.TryOpen(url);
     }
 
     private void RaiseCounts()

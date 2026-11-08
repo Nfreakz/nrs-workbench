@@ -149,7 +149,7 @@ public sealed class RepositoriesViewModel : ObservableObject
             var info = await _git.InspectAsync(path);
             if (info.State == GitRepositoryState.Error)
             {
-                _dialogs.ShowError(info.ErrorMessage, "Repositorio Git");
+                _dialogs.ShowError(SensitiveDataRedactor.Redact(info.ErrorMessage), "Repositorio Git");
                 return;
             }
 
@@ -166,7 +166,7 @@ public sealed class RepositoriesViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLogger.Error("Could not add repository", ex);
-            _dialogs.ShowError(ex.Message, UiLanguage.Text("Añadir repositorio"));
+            _dialogs.ShowError(SensitiveDataRedactor.Redact(ex.Message), UiLanguage.Text("Añadir repositorio"));
         }
     }
 
@@ -194,7 +194,7 @@ public sealed class RepositoriesViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLogger.Error("Repository scan failed", ex);
-            _dialogs.ShowError(ex.Message, UiLanguage.Choose("Escanear repositorios", "Scan repositories"));
+            _dialogs.ShowError(SensitiveDataRedactor.Redact(ex.Message), UiLanguage.Choose("Escanear repositorios", "Scan repositories"));
             return 0;
         }
     }
@@ -396,33 +396,21 @@ public sealed class RepositoriesViewModel : ObservableObject
         }
         catch
         {
-            try
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "cmd.exe",
-                    WorkingDirectory = SelectedRepository.Path,
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception ex)
-            {
-                AppLogger.Error("Could not open terminal", ex);
+            if (!ShellLauncher.TryOpen("cmd.exe", SelectedRepository.Path))
                 _dialogs.ShowError("No se pudo abrir Windows Terminal ni cmd.exe.", "Terminal");
-            }
         }
     }
 
     private static void OpenPath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
-        Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+        ShellLauncher.TryOpen(path);
     }
 
     private static void OpenUrl(string? url)
     {
         if (string.IsNullOrWhiteSpace(url)) return;
-        Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+        ShellLauncher.TryOpen(url);
     }
 
     private void RaiseSummary()

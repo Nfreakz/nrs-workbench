@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,7 +17,11 @@ public partial class RunnerDoctorWindow : Window
         Func<Task<IReadOnlyList<RunnerInfo>>> runnerProvider)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
+        SourceInitialized += (_, _) =>
+        {
+            WindowThemeService.ApplyDarkTitleBar(this);
+            WindowThemeService.FitToWorkArea(this);
+        };
         _doctor = doctor;
         _runnerProvider = runnerProvider;
         Loaded += async (_, _) => await RefreshAsync();
@@ -133,7 +136,7 @@ public partial class RunnerDoctorWindow : Window
     private static void OpenPath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
-        Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+        ShellLauncher.TryOpen(path);
     }
 
     private void Close_Click(object sender, RoutedEventArgs e) => Close();

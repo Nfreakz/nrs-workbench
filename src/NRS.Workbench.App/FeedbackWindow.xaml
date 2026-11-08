@@ -69,7 +69,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Button Content="{local:Tr Source='Copiar'}" Style="{StaticResource ToolbarButton}" Click="CopyPreview_Click"/>
                 <Button Content="{local:Tr Source='Guardar ZIP...'}" Style="{StaticResource PrimaryToolbarButton}" Click="SaveBundle_Click"/>
-                <Button Content="{local:Tr Source='Cerrar'}" Style="{StaticResource ToolbarButton}" Margin="8,0,0,0" Click="Close_Click"/>
+                <Button Content="{local:Tr Source='Cerrar'}" Style="{StaticResource ToolbarButton}" Margin="8,0,0,0" Click="Close_Click" IsCancel="True"/>
             </StackPanel>
         </Grid>
     </Grid>

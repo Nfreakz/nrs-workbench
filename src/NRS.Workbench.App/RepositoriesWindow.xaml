@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:NRS.Workbench.App.Services"
         Title="{local:Tr Source='Repositorios · NRS Workbench'}" Icon="/Assets/NRSWorkbench.ico"
-        Width="1480" Height="860" MinWidth="1120" MinHeight="700"
+        Width="1480" Height="860" MinWidth="1120" MinHeight="620"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}"
         UseLayoutRounding="True" SnapsToDevicePixels="True">

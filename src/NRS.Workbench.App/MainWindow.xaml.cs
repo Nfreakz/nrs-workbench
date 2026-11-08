@@ -30,12 +30,17 @@ public partial class MainWindow : Window
     private readonly Dictionary<string, RunnerState> _previousStates = new(StringComparer.OrdinalIgnoreCase);
     private bool _stateSnapshotInitialized;
     private double _detailPanelExpandedHeight = 195d;
+    private AboutWindow? _aboutWindow;
 
     public MainWindow()
     {
         InitializeComponent();
         if (AppDataPaths.IsPreview) Title = "NRS Workbench · PREVIEW";
-        SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
+        SourceInitialized += (_, _) =>
+        {
+            WindowThemeService.ApplyDarkTitleBar(this);
+            WindowThemeService.FitToWorkArea(this);
+        };
 
         _settings = new SettingsService();
         var processService = new RunnerProcessService();
@@ -55,8 +60,8 @@ public partial class MainWindow : Window
         _tray = new TrayIconService(
             show: () => Dispatcher.Invoke(ShowFromTray),
             refresh: () => Dispatcher.Invoke(() => _viewModel.RefreshCommand.Execute(null)),
-            startAll: () => Dispatcher.Invoke(() => _viewModel.StartAllCommand.Execute(null)),
-            stopAll: () => Dispatcher.Invoke(() => _viewModel.StopAllCommand.Execute(null)),
+            startAll: () => Dispatcher.Invoke(() => { if (!TryActivateOtherWindow()) _viewModel.StartAllCommand.Execute(null); }),
+            stopAll: () => Dispatcher.Invoke(() => { if (!TryActivateOtherWindow()) _viewModel.StopAllCommand.Execute(null); }),
             about: () => Dispatcher.Invoke(ShowAbout),
             exit: () => Dispatcher.Invoke(ExitApplication));
 
@@ -78,7 +83,7 @@ public partial class MainWindow : Window
 
         StateChanged += (_, _) =>
         {
-            if (WindowState == WindowState.Minimized && _settings.Load().KeepInTray)
+            if (WindowState == WindowState.Minimized && TrayIsReachable(_settings.Load()))
                 HideToTray();
         };
 
@@ -313,7 +318,7 @@ public partial class MainWindow : Window
         {
             ApplyTimerInterval();
             ApplyTraySetting();
-            await RefreshAndUpdateTrayAsync();
+            await RunAutomaticRefreshAsync();
         }
     }
 
@@ -321,10 +326,33 @@ public partial class MainWindow : Window
 
     private void ShowAbout()
     {
+        if (_aboutWindow is not null)
+        {
+            _aboutWindow.Activate();
+            return;
+        }
+        if (TryActivateOtherWindow()) return;
         ShowFromTray();
-        var window = new AboutWindow { Owner = this };
-        window.ShowDialog();
+        _aboutWindow = new AboutWindow { Owner = this };
+        try { _aboutWindow.ShowDialog(); }
+        finally { _aboutWindow = null; }
     }
+
+    /// <summary>
+    /// Tray actions must not run behind a modal dialog (Settings, Commit, …). When
+    /// another window is open it is brought to the front instead and the action is skipped.
+    /// </summary>
+    private bool TryActivateOtherWindow()
+    {
+        var other = Application.Current.Windows.OfType<Window>()
+            .FirstOrDefault(window => !ReferenceEquals(window, this) && window.IsVisible);
+        if (other is null) return false;
+        other.Activate();
+        return true;
+    }
+
+    private static bool TrayIsReachable(RunnerSettings settings) =>
+        settings.KeepInTray || settings.NotificationsEnabled || settings.RunnerQueueEnabled;
 
     private void MainWindow_Closing(object? sender, CancelEventArgs e)
     {
@@ -336,8 +364,7 @@ public partial class MainWindow : Window
 
     private void HideToTray()
     {
-        var settings = _settings.Load();
-        if (!settings.KeepInTray && !settings.RunnerQueueEnabled) return;
+        if (!TrayIsReachable(_settings.Load())) return;
         ShowInTaskbar = false;
         Hide();
     }
@@ -355,6 +382,7 @@ public partial class MainWindow : Window
 
     private void ExitApplication()
     {
+        if (TryActivateOtherWindow()) return;
         if (_settings.Load().RunnerQueueEnabled &&
             MessageBox.Show(
                 UiLanguage.Choose("La cola necesita que NRS Workbench siga activo. Si sales, los runners que sigan conectados pueden continuar aceptando jobs sin el límite configurado hasta que los pares o vuelvas a abrir la app. ¿Salir de todos modos?", "The queue needs NRS Workbench to remain active. If you exit, connected runners may keep accepting jobs without the configured limit until you stop them or reopen the app. Exit anyway?"),
@@ -374,7 +402,6 @@ public partial class MainWindow : Window
 
     private void ApplyTraySetting()
     {
-        var settings = _settings.Load();
-        _tray.SetVisible(settings.KeepInTray || settings.NotificationsEnabled);
+        _tray.SetVisible(TrayIsReachable(_settings.Load()));
     }
 }

@@ -124,12 +124,12 @@ public sealed class StatisticsViewModel : ObservableObject
         _git = git;
         _settings = settings;
         _selectedPeriod = PeriodOptions[0];
-        RefreshCommand = new AsyncRelayCommand(RefreshAsync);
+        RefreshCommand = new AsyncRelayCommand(() => RefreshAsync());
     }
 
-    public async Task RefreshAsync()
+    public async Task RefreshAsync(CancellationToken cancellationToken = default)
     {
-        if (IsLoading) return;
+        if (IsLoading || cancellationToken.IsCancellationRequested) return;
         IsLoading = true;
         ScanProgress = 0;
         ScanDetail = UiLanguage.Choose("Preparando historial local...", "Preparing local history...");
@@ -163,7 +163,8 @@ public sealed class StatisticsViewModel : ObservableObject
                 StatusText = ScanDetail;
             });
 
-            var snapshot = await _statistics.GetSnapshotAsync(runners, SelectedPeriod.Period, progress);
+            var snapshot = await _statistics.GetSnapshotAsync(runners, SelectedPeriod.Period, progress, cancellationToken);
+            if (cancellationToken.IsCancellationRequested) return;
 
             TotalRuns = snapshot.TotalRuns;
             SucceededRuns = snapshot.SucceededRuns;
@@ -210,6 +211,10 @@ public sealed class StatisticsViewModel : ObservableObject
                     : UiLanguage.Choose("No hay jobs históricos disponibles para este periodo.", "No historical jobs available for this period.")
                 : UiLanguage.Choose($"{snapshot.TotalRuns:N0} jobs locales · {snapshot.RunnersWithActivity} runners con actividad", $"{snapshot.TotalRuns:N0} local jobs · {snapshot.RunnersWithActivity} active runners");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Window closed while scanning; nothing left to show.
+        }
         catch (Exception ex)
         {
             AppLogger.Error("Statistics refresh failed", ex);
@@ -253,7 +258,7 @@ public sealed class StatisticsViewModel : ObservableObject
                         Name = new DirectoryInfo(path).Name,
                         Path = path,
                         State = GitRepositoryState.Error,
-                        ErrorMessage = ex.Message
+                        ErrorMessage = SensitiveDataRedactor.Redact(ex.Message)
                     };
                 }
                 finally

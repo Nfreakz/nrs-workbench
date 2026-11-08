@@ -226,3 +226,14 @@ Manual checks:
 7. Configure a disposable runner with an absolute or `..`-escaping workFolder, or a workFolder root that is a reparse point. Maintenance must not traverse it and must report zero measured/reclaimable bytes.
 8. On a disposable runner, place a Windows junction/reparse point in an intermediate path segment leading to `_diag` or the configured workFolder. Maintenance must report zero measured/reclaimable bytes for that location and must not enumerate through the junction.
 
+
+## Manual checks for fix/ui-blockers
+
+1. Disable **Keep in tray** and **Notifications**, enable only **Smart Queue**. The tray icon must be visible, minimizing hides the window to the tray, and the tray **Show** action restores it.
+2. At 150% display scale on a 1366x768 screen, open **Settings**, **Repositories**, **Maintenance** and **Statistics**. Each window must fit the work area and the **Save/Cancel/Close** buttons must stay reachable without moving the window.
+3. Press **Esc** in Settings, Commit, Maintenance, Runner Doctor, About, Feedback and the local branch picker. Each dialog must close as if **Cancel/Close** had been clicked; **Enter** in Settings saves and in the branch picker confirms.
+4. In **Maintenance**, press **Scan** twice quickly or change the days filter during a scan. The button and filter must be disabled while scanning, only the latest results must be shown and the status must not flip back to "Scanning" once the last scan finished.
+5. In **Statistics**, the period combo must be disabled while loading; close the window during a long scan and verify no late UI update or error appears in the log.
+6. Start a **Commit & Push** on a slow remote and try to close the Commit window (X or Esc). The window must stay open until the push finishes and the buttons must be disabled meanwhile.
+7. Open **Settings** from the main window, then use the tray **About** or **Exit** action. The Settings window must be brought to the front instead of a second dialog or an exit prompt appearing; opening **About** twice must reuse the same window.
+8. Trigger a Git error (e.g. a remote URL with embedded credentials) from Commit or Repositories. The error dialog must show redacted credentials and must be owned by the active window (centered on it, not behind it).

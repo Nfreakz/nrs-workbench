@@ -6,8 +6,15 @@ namespace NRS.Workbench.App.Converters;
 
 public sealed class VersionAccentConverter : IMultiValueConverter
 {
-    private static readonly Brush NormalBrush = new SolidColorBrush(Color.FromRgb(0x9B, 0xA3, 0xAE));
-    private static readonly Brush MismatchBrush = new SolidColorBrush(Color.FromRgb(0xC5, 0x9A, 0x4A));
+    private static readonly Brush NormalBrush = Frozen(0x9B, 0xA3, 0xAE);
+    private static readonly Brush MismatchBrush = Frozen(0xC5, 0x9A, 0x4A);
+
+    private static Brush Frozen(byte r, byte g, byte b)
+    {
+        var brush = new SolidColorBrush(Color.FromRgb(r, g, b));
+        brush.Freeze();
+        return brush;
+    }
 
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {

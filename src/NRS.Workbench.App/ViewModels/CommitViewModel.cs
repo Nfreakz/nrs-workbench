@@ -34,6 +34,7 @@ public sealed class CommitViewModel : ObservableObject
             RaisePropertyChanged(nameof(RepositoryTitle));
             RaisePropertyChanged(nameof(BranchText));
             RaisePropertyChanged(nameof(CanPushAfterCommit));
+            RaisePropertyChanged(nameof(CanCommitAndPush));
         }
     }
 
@@ -64,7 +65,11 @@ public sealed class CommitViewModel : ObservableObject
     public bool IsBusy
     {
         get => _isBusy;
-        private set => SetProperty(ref _isBusy, value);
+        private set
+        {
+            if (!SetProperty(ref _isBusy, value)) return;
+            RaisePropertyChanged(nameof(CanCommitAndPush));
+        }
     }
 
     public string RepositoryTitle => Repository.Name;
@@ -72,6 +77,7 @@ public sealed class CommitViewModel : ObservableObject
     public bool HasConflicts => Changes.Any(x => x.IsConflict);
     public int SelectedCount => Changes.Count(x => x.IsSelected && !x.IsConflict);
     public bool CanPushAfterCommit => Repository.HasUpstream && Repository.Behind == 0 && Repository.ConflictCount == 0;
+    public bool CanCommitAndPush => !IsBusy && CanPushAfterCommit;
 
     public async Task InitializeAsync()
     {
@@ -96,7 +102,7 @@ public sealed class CommitViewModel : ObservableObject
         {
             AppLogger.Error("Could not load commit changes", ex);
             StatusText = UiLanguage.Choose("No se pudieron cargar los cambios.", "Could not load changes.");
-            DiffText = ex.Message;
+            DiffText = SensitiveDataRedactor.Redact(ex.Message);
         }
         finally { IsBusy = false; }
     }
@@ -118,7 +124,7 @@ public sealed class CommitViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLogger.Error("Could not load diff", ex);
-            DiffText = UiLanguage.Choose("No se pudo cargar el diff:\r\n", "Could not load diff:\r\n") + ex.Message;
+            DiffText = UiLanguage.Choose("No se pudo cargar el diff:\r\n", "Could not load diff:\r\n") + SensitiveDataRedactor.Redact(ex.Message);
         }
     }
 
@@ -191,7 +197,7 @@ public sealed class CommitViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLogger.Error(action, ex);
-            _dialogs.ShowError(ex.Message, action);
+            _dialogs.ShowError(SensitiveDataRedactor.Redact(ex.Message), action);
             StatusText = action + UiLanguage.Choose(" ha fallado.", " failed.");
             return false;
         }

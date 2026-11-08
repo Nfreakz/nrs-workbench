@@ -15,7 +15,11 @@ public partial class PortableWorkspaceWindow : Window
     public PortableWorkspaceWindow(SettingsService settingsService, RunnerSettings settings)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
+        SourceInitialized += (_, _) =>
+        {
+            WindowThemeService.ApplyDarkTitleBar(this);
+            WindowThemeService.FitToWorkArea(this);
+        };
         _settingsService = settingsService;
         _settings = settings;
         RunnerGrid.ItemsSource = _candidates;
