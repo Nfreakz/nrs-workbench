@@ -85,6 +85,9 @@ internal static class MaintenanceSmoke
             Assert(!busyDiag.IsCleanable && busyDiag.ReclaimableBytes == 0, "maintenance blocks diagnostic cleanup while a job is running (same predicate as cleanup)");
             runnerActive = false;
 
+            // The previous cleanup removed every old log; add one so READY has something cleanable.
+            File.WriteAllText(Path.Combine(diag, "Worker_ready_old.log"), new string('d', 110));
+            File.SetLastWriteTimeUtc(Path.Combine(diag, "Worker_ready_old.log"), old);
             var readyScan = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Ready, Mode = RunnerMode.Interactive }], 7);
             var readyDiag = readyScan.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));
             Assert(readyDiag.IsCleanable, "maintenance keeps _diag of a READY runner (no running job) cleanable");
