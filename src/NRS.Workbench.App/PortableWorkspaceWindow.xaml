@@ -94,14 +94,14 @@
                     <Button x:Name="PrepareButton" Content="{local:Tr Source='Preparar seleccionados'}"
                             Style="{StaticResource PrimaryToolbarButton}" Padding="14,8" Click="Prepare_Click"/>
                     <Button Content="{local:Tr Source='Cerrar'}" Style="{StaticResource ToolbarButton}"
-                            Padding="12,8" Margin="8,0,0,0" Click="Close_Click"/>
+                            Padding="12,8" Margin="8,0,0,0" Click="Close_Click" IsCancel="True"/>
                 </StackPanel>
             </Grid>
         </Grid>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button x:Name="InactiveCloseButton" Content="{local:Tr Source='Cerrar'}" Style="{StaticResource ToolbarButton}"
-                    Padding="12,8" Click="Close_Click"/>
+                    Padding="12,8" Click="Close_Click" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

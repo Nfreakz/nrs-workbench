@@ -64,7 +64,7 @@
                     ToolTip="{local:Tr Source='Apoyo voluntario a Neo RS. No concede derechos de uso comercial.'}"/>
             <Button Content="{local:Tr Source='Abrir datos'}" Style="{StaticResource ToolbarButton}" Click="OpenData_Click"/>
             <Button Content="{local:Tr Source='Copiar información'}" Style="{StaticResource ToolbarButton}" Click="CopyInfo_Click"/>
-            <Button Content="{local:Tr Source='Cerrar'}" Style="{StaticResource PrimaryToolbarButton}" Margin="0" Click="Close_Click"/>
+            <Button Content="{local:Tr Source='Cerrar'}" Style="{StaticResource PrimaryToolbarButton}" Margin="0" Click="Close_Click" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

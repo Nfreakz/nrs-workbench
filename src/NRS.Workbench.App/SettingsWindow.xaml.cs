@@ -16,7 +16,11 @@ public partial class SettingsWindow : Window
     public SettingsWindow(SettingsService settingsService)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
+        SourceInitialized += (_, _) =>
+        {
+            WindowThemeService.ApplyDarkTitleBar(this);
+            WindowThemeService.FitToWorkArea(this);
+        };
         _settingsService = settingsService;
         _workingSettings = _settingsService.Load();
         ApplySettingsToForm(_workingSettings);

@@ -14,7 +14,11 @@ public partial class RepositoriesWindow : Window
     public RepositoriesWindow(SettingsService settings)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
+        SourceInitialized += (_, _) =>
+        {
+            WindowThemeService.ApplyDarkTitleBar(this);
+            WindowThemeService.FitToWorkArea(this);
+        };
 
         _git = new GitService();
         _dialogs = new DialogService(settings);
@@ -62,7 +66,8 @@ public partial class RepositoriesWindow : Window
                 Owner = this,
                 Title = UiLanguage.Choose("Cambiar rama local", "Switch local branch"),
                 Width = 470,
-                Height = 210,
+                MinWidth = 470,
+                SizeToContent = SizeToContent.WidthAndHeight,
                 ResizeMode = ResizeMode.NoResize,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Background = (System.Windows.Media.Brush)FindResource("BgBrush"),
@@ -71,9 +76,13 @@ public partial class RepositoriesWindow : Window
             var content = new System.Windows.Controls.StackPanel { Margin = new Thickness(24) };
             content.Children.Add(new System.Windows.Controls.TextBlock { Text = $"{repository.Name}  ·  {repository.Branch}", FontWeight = FontWeights.SemiBold });
             content.Children.Add(picker);
-            var confirm = new System.Windows.Controls.Button { Content = UiLanguage.Choose("Revisar cambio", "Review switch"), Width = 130, HorizontalAlignment = HorizontalAlignment.Right };
+            var confirm = new System.Windows.Controls.Button { Content = UiLanguage.Choose("Revisar cambio", "Review switch"), Width = 130, IsDefault = true };
             confirm.Click += (_, _) => window.DialogResult = true;
-            content.Children.Add(confirm);
+            var cancel = new System.Windows.Controls.Button { Content = UiLanguage.Text("Cancelar"), Width = 110, IsCancel = true, Margin = new Thickness(8, 0, 0, 0) };
+            var buttons = new System.Windows.Controls.StackPanel { Orientation = System.Windows.Controls.Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+            buttons.Children.Add(confirm);
+            buttons.Children.Add(cancel);
+            content.Children.Add(buttons);
             window.Content = content;
             window.SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(window);
             if (window.ShowDialog() != true || picker.SelectedItem is not string target) return;

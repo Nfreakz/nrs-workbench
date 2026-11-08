@@ -18,7 +18,11 @@ public partial class FeedbackWindow : Window
     public FeedbackWindow(SettingsService settingsService)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
+        SourceInitialized += (_, _) =>
+        {
+            WindowThemeService.ApplyDarkTitleBar(this);
+            WindowThemeService.FitToWorkArea(this);
+        };
         _diagnostics = new DiagnosticBundleService(settingsService);
         RefreshPreview();
     }

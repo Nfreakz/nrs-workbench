@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:NRS.Workbench.App.Services"
         xmlns:models="clr-namespace:NRS.Workbench.Core.Models;assembly=NRS.Workbench.Core"
         Title="{local:Tr Source='Estadísticas · NRS Workbench'}" Icon="/Assets/NRSWorkbench.ico"
-        Width="1440" Height="980" MinWidth="1060" MinHeight="760"
+        Width="1440" Height="980" MinWidth="1060" MinHeight="650"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}"
         UseLayoutRounding="True" SnapsToDevicePixels="True">
@@ -189,6 +189,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="{local:Tr Source='Periodo runners'}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
                 <ComboBox x:Name="PeriodCombo" Style="{StaticResource StatsCombo}"
+                          IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBool}}"
                           ItemsSource="{Binding PeriodOptions}" SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
                           SelectionChanged="PeriodCombo_SelectionChanged"/>
                 <Button Style="{StaticResource ToolbarButton}" Command="{Binding RefreshCommand}" Margin="9,0,0,0">

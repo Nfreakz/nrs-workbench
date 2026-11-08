@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:NRS.Workbench.App.Services"
         xmlns:conv="clr-namespace:NRS.Workbench.App.Converters"
         xmlns:models="clr-namespace:NRS.Workbench.Core.Models;assembly=NRS.Workbench.Core"
-        Title="NRS Workbench" Icon="/Assets/NRSWorkbench.ico" Width="1580" Height="910" MinWidth="1240" MinHeight="760"
+        Title="NRS Workbench" Icon="/Assets/NRSWorkbench.ico" Width="1580" Height="910" MinWidth="1240" MinHeight="640"
         WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
     <Window.Resources>
@@ -363,11 +363,11 @@
             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <TextBlock Text="{local:Tr Source='Buscar runner'}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,9,0"/>
             <TextBox Grid.Column="1" Width="215" Height="29" VerticalAlignment="Center" VerticalContentAlignment="Center" Text="{Binding RunnerSearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="{local:Tr Source='Busca por nombre, destino, etiqueta o ruta'}"/>
-            <Button Grid.Column="2" Style="{StaticResource MainToolbarButton}" Command="{Binding ClearRunnerSearchCommand}" Content="✕" Padding="9,5" Margin="5,0,18,0" ToolTip="{local:Tr Source='Limpiar búsqueda'}"/>
+            <Button Grid.Column="2" Style="{StaticResource MainToolbarButton}" Command="{Binding ClearRunnerSearchCommand}" Content="✕" Padding="9,5" Margin="5,0,18,0" ToolTip="{local:Tr Source='Limpiar búsqueda'}" AutomationProperties.Name="{local:Tr Source='Limpiar búsqueda'}"/>
             <ComboBox Grid.Column="3" Style="{StaticResource RunnerSortCombo}" Width="182" Height="32" VerticalAlignment="Center" ItemsSource="{Binding SortOptions}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding SelectedSortMode, Mode=TwoWay}" ToolTip="{local:Tr Source='Orden de runners'}"/>
             <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="7,0,0,0">
-                <Button Style="{StaticResource MainToolbarButton}" Command="{Binding MoveRunnerUpCommand}" Content="↑" Padding="10,5" Margin="0,0,4,0" ToolTip="{local:Tr Source='Subir runner seleccionado en el orden manual'}"/>
-                <Button Style="{StaticResource MainToolbarButton}" Command="{Binding MoveRunnerDownCommand}" Content="↓" Padding="10,5" Margin="0" ToolTip="{local:Tr Source='Bajar runner seleccionado en el orden manual'}"/>
+                <Button Style="{StaticResource MainToolbarButton}" Command="{Binding MoveRunnerUpCommand}" Content="↑" Padding="10,5" Margin="0,0,4,0" ToolTip="{local:Tr Source='Subir runner seleccionado en el orden manual'}" AutomationProperties.Name="{local:Tr Source='Subir runner seleccionado en el orden manual'}"/>
+                <Button Style="{StaticResource MainToolbarButton}" Command="{Binding MoveRunnerDownCommand}" Content="↓" Padding="10,5" Margin="0" ToolTip="{local:Tr Source='Bajar runner seleccionado en el orden manual'}" AutomationProperties.Name="{local:Tr Source='Bajar runner seleccionado en el orden manual'}"/>
             </StackPanel>
             <TextBlock Grid.Column="5" Text="{Binding RunnerViewSummary}" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
         </Grid>
@@ -611,12 +611,12 @@
                                 </Border>
                                 <Button Style="{StaticResource MainToolbarButton}" Command="{Binding OpenFolderCommand}"
                                         Width="31" Height="29" MinHeight="0" Padding="0" Margin="0,0,5,0"
-                                        ToolTip="{local:Tr Source='Abrir carpeta'}">
+                                        ToolTip="{local:Tr Source='Abrir carpeta'}" AutomationProperties.Name="{local:Tr Source='Abrir carpeta'}">
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B7;" FontSize="13"/>
                                 </Button>
                                 <Button Style="{StaticResource MainToolbarButton}" Command="{Binding OpenGitHubCommand}"
                                         Width="31" Height="29" MinHeight="0" Padding="0" Margin="0"
-                                        ToolTip="{local:Tr Source='Abrir en GitHub'}">
+                                        ToolTip="{local:Tr Source='Abrir en GitHub'}" AutomationProperties.Name="{local:Tr Source='Abrir en GitHub'}">
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A7;" FontSize="13"/>
                                 </Button>
                             </StackPanel>

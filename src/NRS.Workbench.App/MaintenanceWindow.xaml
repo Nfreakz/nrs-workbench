@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:NRS.Workbench.App.Services"
         Title="{local:Tr Source='Mantenimiento · NRS Workbench'}" Icon="/Assets/NRSWorkbench.ico"
-        Width="1240" Height="760" MinWidth="980" MinHeight="640"
+        Width="1240" Height="760" MinWidth="980" MinHeight="600"
         WindowStartupLocation="CenterOwner" Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
     <Grid Margin="24">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -18,7 +18,7 @@
                 <ComboBox x:Name="DaysChoice" Width="90" SelectedValuePath="Tag" SelectionChanged="DaysChoice_SelectionChanged">
                     <ComboBoxItem Content="7" Tag="7"/><ComboBoxItem Content="30" Tag="30" IsSelected="True"/><ComboBoxItem Content="90" Tag="90"/><ComboBoxItem Content="180" Tag="180"/>
                 </ComboBox>
-                <Button Content="{local:Tr Source='Escanear'}" Style="{StaticResource ToolbarButton}" Margin="10,0,0,0" Padding="12,7" Click="Refresh_Click"/>
+                <Button x:Name="ScanButton" Content="{local:Tr Source='Escanear'}" Style="{StaticResource ToolbarButton}" Margin="10,0,0,0" Padding="12,7" Click="Refresh_Click"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1" Margin="0,0,0,14">
@@ -52,7 +52,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Button Content="{local:Tr Source='Abrir ubicación'}" Style="{StaticResource ToolbarButton}" Padding="12,7" Click="OpenLocation_Click"/>
                 <Button x:Name="CleanButton" Content="{local:Tr Source='Limpiar selección'}" Style="{StaticResource PrimaryToolbarButton}" Padding="14,7" Margin="8,0,0,0" Click="Clean_Click"/>
-                <Button Content="{local:Tr Source='Cerrar'}" Style="{StaticResource ToolbarButton}" Padding="12,7" Margin="8,0,0,0" Click="Close_Click"/>
+                <Button Content="{local:Tr Source='Cerrar'}" Style="{StaticResource ToolbarButton}" Padding="12,7" Margin="8,0,0,0" Click="Close_Click" IsCancel="True"/>
             </StackPanel>
         </Grid>
     </Grid>

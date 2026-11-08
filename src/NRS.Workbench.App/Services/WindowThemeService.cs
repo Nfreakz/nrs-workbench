@@ -30,4 +30,30 @@ public static class WindowThemeService
             // dark-title support differs between Windows builds.
         }
     }
+
+    /// <summary>
+    /// Clamps the window to the current work area so that dialogs stay reachable on
+    /// small or high-DPI-scaled displays (e.g. 1366x768 at 150%).
+    /// </summary>
+    public static void FitToWorkArea(Window window)
+    {
+        try
+        {
+            var workArea = SystemParameters.WorkArea;
+            const double margin = 24d;
+            var availableWidth = Math.Max(480d, workArea.Width - margin);
+            var availableHeight = Math.Max(400d, workArea.Height - margin);
+
+            window.MaxWidth = availableWidth;
+            window.MaxHeight = availableHeight;
+            window.MinWidth = Math.Min(window.MinWidth, availableWidth);
+            window.MinHeight = Math.Min(window.MinHeight, availableHeight);
+            if (!double.IsNaN(window.Width)) window.Width = Math.Min(window.Width, availableWidth);
+            if (!double.IsNaN(window.Height)) window.Height = Math.Min(window.Height, availableHeight);
+        }
+        catch
+        {
+            // Layout convenience only; never block a window from opening.
+        }
+    }
 }

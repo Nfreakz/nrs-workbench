@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:NRS.Workbench.App.Services"
         Title="{local:Tr Source='Runner Doctor · NRS Workbench'}" Icon="/Assets/NRSWorkbench.ico"
-        Width="1180" Height="760" MinWidth="980" MinHeight="650"
+        Width="1180" Height="760" MinWidth="980" MinHeight="600"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}">
     <Grid Margin="22">
@@ -147,7 +147,7 @@
                 <Button Content="{local:Tr Source='Abrir carpeta'}" Style="{StaticResource ToolbarButton}" Click="OpenFolder_Click"/>
                 <Button Content="{local:Tr Source='Abrir _diag'}" Style="{StaticResource ToolbarButton}" Click="OpenDiag_Click"/>
                 <Button Content="{local:Tr Source='Copiar resumen'}" Style="{StaticResource ToolbarButton}" Click="CopySummary_Click"/>
-                <Button Content="{local:Tr Source='Cerrar'}" Style="{StaticResource PrimaryToolbarButton}" Margin="0" Click="Close_Click"/>
+                <Button Content="{local:Tr Source='Cerrar'}" Style="{StaticResource PrimaryToolbarButton}" Margin="0" Click="Close_Click" IsCancel="True"/>
             </StackPanel>
         </Grid>
     </Grid>

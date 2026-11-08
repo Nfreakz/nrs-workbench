@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using NRS.Workbench.App.Services;
@@ -16,11 +15,20 @@ public partial class MaintenanceWindow : Window
     public MaintenanceWindow(MaintenanceService service, Func<IReadOnlyList<RunnerInfo>> runnerProvider)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
+        SourceInitialized += (_, _) =>
+        {
+            WindowThemeService.ApplyDarkTitleBar(this);
+            WindowThemeService.FitToWorkArea(this);
+        };
         _service = service;
         _runnerProvider = runnerProvider;
         Loaded += async (_, _) => await RefreshAsync();
-        Closed += (_, _) => _scanCancellation?.Cancel();
+        Closed += (_, _) =>
+        {
+            _scanCancellation?.Cancel();
+            _scanCancellation?.Dispose();
+            _scanCancellation = null;
+        };
     }
 
     private int SelectedDays => int.TryParse((DaysChoice.SelectedItem as ComboBoxItem)?.Tag?.ToString(), out var days) ? days : 30;
@@ -29,13 +37,16 @@ public partial class MaintenanceWindow : Window
     {
         _scanCancellation?.Cancel();
         _scanCancellation?.Dispose();
-        _scanCancellation = new CancellationTokenSource();
+        var cancellation = new CancellationTokenSource();
+        var token = cancellation.Token;
+        _scanCancellation = cancellation;
         SetBusy(true);
         StatusText.Text = UiLanguage.Choose("Escaneando almacenamiento…", "Scanning storage…", "Escanejant l'emmagatzematge…");
         try
         {
             var progress = new Progress<MaintenanceScanResult>(partial =>
             {
+                if (token.IsCancellationRequested) return;
                 _lastScan = partial;
                 MaintenanceGrid.ItemsSource = partial.Entries;
                 MeasuredText.Text = partial.TotalDisplay;
@@ -46,12 +57,14 @@ public partial class MaintenanceWindow : Window
                     $"Escanejant… {partial.Entries.Count} bloc(s) visibles");
             });
 
-            _lastScan = await _service.ScanAsync(
+            var result = await _service.ScanAsync(
                 _runnerProvider(),
                 SelectedDays,
-                _scanCancellation.Token,
+                token,
                 progress);
+            if (token.IsCancellationRequested) return;
 
+            _lastScan = result;
             MaintenanceGrid.ItemsSource = _lastScan.Entries;
             MeasuredText.Text = _lastScan.TotalDisplay;
             ReclaimableText.Text = _lastScan.ReclaimableDisplay;
@@ -60,14 +73,23 @@ public partial class MaintenanceWindow : Window
                 $"{_lastScan.Entries.Count} block(s) reviewed",
                 $"{_lastScan.Entries.Count} bloc(s) revisats");
         }
-        catch (OperationCanceledException) { StatusText.Text = UiLanguage.Choose("Escaneo cancelado", "Scan cancelled", "Escaneig cancel·lat"); }
+        catch (OperationCanceledException)
+        {
+            // A newer scan owns the UI; only report when the window itself cancelled.
+            if (ReferenceEquals(_scanCancellation, cancellation) || _scanCancellation is null)
+                StatusText.Text = UiLanguage.Choose("Escaneo cancelado", "Scan cancelled", "Escaneig cancel·lat");
+        }
         catch (Exception ex)
         {
+            if (token.IsCancellationRequested) return;
             AppLogger.Error("Maintenance scan failed", ex);
             StatusText.Text = UiLanguage.Choose("No se pudo completar el escaneo", "Could not complete the scan", "No s'ha pogut completar l'escaneig");
             MessageBox.Show(this, SensitiveDataRedactor.Redact(ex.Message), "NRS Workbench", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
-        finally { SetBusy(false); }
+        finally
+        {
+            if (ReferenceEquals(_scanCancellation, cancellation) || _scanCancellation is null) SetBusy(false);
+        }
     }
 
     private async void Refresh_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
@@ -114,10 +136,9 @@ public partial class MaintenanceWindow : Window
     private void OpenLocation_Click(object sender, RoutedEventArgs e)
     {
         if (MaintenanceGrid.SelectedItem is not MaintenanceEntry entry || string.IsNullOrWhiteSpace(entry.Location)) return;
-        try { if (Directory.Exists(entry.Location)) Process.Start(new ProcessStartInfo("explorer.exe", entry.Location) { UseShellExecute = true }); }
-        catch (Exception ex) { AppLogger.Error("Could not open maintenance location", ex); }
+        if (Directory.Exists(entry.Location)) ShellLauncher.TryOpen(entry.Location);
     }
 
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
-    private void SetBusy(bool busy) { CleanButton.IsEnabled = !busy; DaysChoice.IsEnabled = !busy; }
+    private void SetBusy(bool busy) { ScanButton.IsEnabled = !busy; CleanButton.IsEnabled = !busy; DaysChoice.IsEnabled = !busy; }
 }

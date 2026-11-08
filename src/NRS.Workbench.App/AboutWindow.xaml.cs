@@ -14,7 +14,11 @@ public partial class AboutWindow : Window
     public AboutWindow()
     {
         InitializeComponent();
-        SourceInitialized += (_, _) => WindowThemeService.ApplyDarkTitleBar(this);
+        SourceInitialized += (_, _) =>
+        {
+            WindowThemeService.ApplyDarkTitleBar(this);
+            WindowThemeService.FitToWorkArea(this);
+        };
 
         var version = Assembly.GetEntryAssembly()?.GetName().Version;
         VersionText.Text = UiLanguage.Choose("Versión ", "Version ") + (version is null ? UiLanguage.Choose("desconocida", "unknown") : $"{version.Major}.{version.Minor}.{version.Build}");

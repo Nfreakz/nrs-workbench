@@ -31,8 +31,8 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Style="{StaticResource ToolbarButton}" Click="SelectAll_Click"><TextBlock Text="{local:Tr Source='Seleccionar todo'}"/></Button>
-                <Button Style="{StaticResource ToolbarButton}" Click="SelectNone_Click" Margin="0"><TextBlock Text="{local:Tr Source='Ninguno'}"/></Button>
+                <Button Style="{StaticResource ToolbarButton}" Click="SelectAll_Click" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"><TextBlock Text="{local:Tr Source='Seleccionar todo'}"/></Button>
+                <Button Style="{StaticResource ToolbarButton}" Click="SelectNone_Click" Margin="0" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"><TextBlock Text="{local:Tr Source='Ninguno'}"/></Button>
             </StackPanel>
         </Grid>
 
@@ -117,9 +117,9 @@
                                Foreground="{StaticResource MutedBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,7,0,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
-                    <Button Style="{StaticResource ToolbarButton}" Click="Cancel_Click"><TextBlock Text="{local:Tr Source='Cancelar'}"/></Button>
-                    <Button Style="{StaticResource ToolbarButton}" Click="Commit_Click"><StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE73E;"/><TextBlock Text="Commit"/></StackPanel></Button>
-                    <Button Style="{StaticResource PrimaryToolbarButton}" Click="CommitPush_Click" IsEnabled="{Binding CanPushAfterCommit}" Margin="0"><StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE898;"/><TextBlock Text="Commit &amp; Push"/></StackPanel></Button>
+                    <Button Style="{StaticResource ToolbarButton}" Click="Cancel_Click" IsCancel="True" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"><TextBlock Text="{local:Tr Source='Cancelar'}"/></Button>
+                    <Button Style="{StaticResource ToolbarButton}" Click="Commit_Click" IsDefault="True" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"><StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE73E;"/><TextBlock Text="Commit"/></StackPanel></Button>
+                    <Button Style="{StaticResource PrimaryToolbarButton}" Click="CommitPush_Click" IsEnabled="{Binding CanCommitAndPush}" Margin="0"><StackPanel Orientation="Horizontal"><TextBlock Style="{StaticResource IconGlyph}" Text="&#xE898;"/><TextBlock Text="Commit &amp; Push"/></StackPanel></Button>
                 </StackPanel>
             </Grid>
         </Border>
