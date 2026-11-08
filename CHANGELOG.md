@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.18.8] - 2026-11-08
+
 ### Fixed
 - Maintenance: scan and cleanup now use the same runner-activity predicate. Only a running job (`Runner.Worker`) blocks `_diag` cleanup; a READY listener no longer makes rows look cleanable at scan time and then skipped at cleanup. The newest Runner/Worker logs remain protected.
 - Maintenance: a runner without a `_diag` folder (never ran, or root on a disconnected drive) is no longer reported as a reparse-point/unvalidatable path.
