@@ -44,6 +44,7 @@ public partial class SettingsWindow : Window
         NotifyJobCompletedCheck.IsChecked = settings.NotifyJobCompleted;
         NotifyRunnerIssuesCheck.IsChecked = settings.NotifyRunnerIssues;
         NotifyOnlyWhenHiddenCheck.IsChecked = settings.NotifyOnlyWhenHidden;
+        UpdateCheckEnabledCheck.IsChecked = settings.UpdateCheckEnabled;
         LanguageChoice.SelectedValue = settings.Language;
         RefreshQueueRunnerChoices(settings);
     }
@@ -161,6 +162,7 @@ public partial class SettingsWindow : Window
         _workingSettings.NotifyJobCompleted = NotifyJobCompletedCheck.IsChecked == true;
         _workingSettings.NotifyRunnerIssues = NotifyRunnerIssuesCheck.IsChecked == true;
         _workingSettings.NotifyOnlyWhenHidden = NotifyOnlyWhenHiddenCheck.IsChecked == true;
+        _workingSettings.UpdateCheckEnabled = UpdateCheckEnabledCheck.IsChecked == true;
         _workingSettings.Language = LanguageChoice.SelectedValue as string ?? "es";
         return true;
     }
@@ -313,6 +315,7 @@ public partial class SettingsWindow : Window
                 else automaticNotes.Add(UiLanguage.Choose($"Al guardar se reemplazará la lista local; {excluded.Count} registro(s) dejarán de figurar (no se borrarán carpetas).", $"Saving will replace the local list; {excluded.Count} registrations will be removed (no folders are deleted).", $"En desar se substituirà la llista local; {excluded.Count} registre(s) deixaran de figurar (no s\u0027esborrarà cap carpeta)."));
             }
 
+            imported.LastUpdateCheckUtc = _workingSettings.LastUpdateCheckUtc;
             _workingSettings = imported;
             ApplySettingsToForm(_workingSettings);
 

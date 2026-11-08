@@ -412,5 +412,14 @@
   "No se pudo cargar el diff:\r\n": "No s'ha pogut carregar el diff:\r\n",
   "\r\n\r\nNota: algún archivo tiene cambios staged y sin stage. Al estar seleccionado, se incluirá su contenido actual completo.": "\r\n\r\nNota: algun fitxer té canvis staged i sense stage. En estar seleccionat, s'inclourà el seu contingut actual complet.",
   "\r\n\r\n… diff truncado para mantener la interfaz fluida.": "\r\n\r\n… diff truncat per mantenir la interfície fluida.",
-  "Hay cambios ya staged que no están seleccionados. Para evitar incluirlos por accidente, el commit se ha bloqueado.\r\n\r\n": "Hi ha canvis ja staged que no estan seleccionats. Per evitar incloure'ls per accident, el commit s'ha bloquejat.\r\n\r\n"
+  "Hay cambios ya staged que no están seleccionados. Para evitar incluirlos por accidente, el commit se ha bloqueado.\r\n\r\n": "Hi ha canvis ja staged que no estan seleccionats. Per evitar incloure'ls per accident, el commit s'ha bloquejat.\r\n\r\n",
+  "Descárgala desde GitHub Releases.": "Descarrega-la des de GitHub Releases.",
+  "Ver versión": "Veure versió",
+  "Omitir": "Omet",
+  "Oculta el aviso hasta la próxima comprobación.": "Amaga l'avís fins a la propera comprovació.",
+  "Actualizaciones": "Actualitzacions",
+  "Comprobar nuevas versiones al iniciar (una vez al día, solo la API pública de GitHub)": "Comprovar noves versions en iniciar (un cop al dia, només l'API pública de GitHub)",
+  "Petición anónima a api.github.com sin token ni datos del equipo. Si hay una versión más nueva, aparece un aviso en la ventana principal.": "Petició anònima a api.github.com sense token ni dades de l'equip. Si hi ha una versió més nova, apareix un avís a la finestra principal.",
+  "Guarda el historial de jobs del periodo seleccionado como CSV (UTF-8).": "Desa l'historial de jobs del període seleccionat com a CSV (UTF-8).",
+  "Exportar CSV": "Exportar CSV"
 }

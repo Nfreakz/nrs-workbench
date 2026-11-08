@@ -24,6 +24,9 @@ public sealed class PortableWorkspaceService
             AppDataPaths.PortableDataDirectory,
             AppDataPaths.PortableVolumeRoot);
         portableSettings.Save(settings);
+        // The next launch reads this file from the portable Data folder; make sure no
+        // stale copy of it survives in the shared settings cache.
+        portableSettings.Invalidate();
 
         var store = new PortableWorkspaceManifestStore(
             AppDataPaths.PortableDataDirectory,

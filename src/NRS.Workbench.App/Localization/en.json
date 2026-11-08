@@ -289,5 +289,14 @@
   "RUNNER": "RUNNER",
   "Borrado: Seguro para borrar = datos de bajo riesgo. Borrar con precaución = reduce historial. No se puede borrar = solo inventario o runner protegido. _work nunca se borra automáticamente.": "Deletion: Safe to delete = low-risk data. Delete with caution = reduces history. Cannot delete = inventory only or protected runner. _work is never deleted automatically.",
   "Revisar runners tras reiniciar": "Review runners after restart",
-  "Hay runners pendientes de revisión tras reiniciar NRS Workbench.": "Some runners need review after NRS Workbench was restarted."
+  "Hay runners pendientes de revisión tras reiniciar NRS Workbench.": "Some runners need review after NRS Workbench was restarted.",
+  "Descárgala desde GitHub Releases.": "Download it from GitHub Releases.",
+  "Ver versión": "View release",
+  "Omitir": "Dismiss",
+  "Oculta el aviso hasta la próxima comprobación.": "Hides the notice until the next check.",
+  "Actualizaciones": "Updates",
+  "Comprobar nuevas versiones al iniciar (una vez al día, solo la API pública de GitHub)": "Check for new versions at startup (once a day, public GitHub API only)",
+  "Petición anónima a api.github.com sin token ni datos del equipo. Si hay una versión más nueva, aparece un aviso en la ventana principal.": "Anonymous request to api.github.com without a token or machine data. When a newer version exists, a notice appears in the main window.",
+  "Guarda el historial de jobs del periodo seleccionado como CSV (UTF-8).": "Saves the job history of the selected period as CSV (UTF-8).",
+  "Exportar CSV": "Export CSV"
 }

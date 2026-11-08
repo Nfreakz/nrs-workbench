@@ -14,6 +14,11 @@
 - Localization: adds missing English/Catalan texts (`BORRADO`, `RUNNER`, Maintenance footer legend, "Revisar runners tras reiniciar") and wraps Spanish-only log/status texts in `UiLanguage.Choose`.
 - Smoke tests: all suites run from `Main` through the same check/summary path (no module initializers) and a new localization smoke verifies every `{local:Tr}` key exists in `en.json` and `ca.json`.
 
+### Added
+- Adds an optional, anonymous **update notice**: once every 24 hours NRS Workbench queries the public GitHub Releases API (no token, no machine data) and shows a dismissible banner plus an About entry when a newer version exists. It can be disabled in Settings.
+- Adds **Exportar CSV** to the Statistics window: the job history of the selected period is saved as UTF-8 CSV (with BOM) with runner, job, repository/workflow, status, ISO 8601 local start, duration in seconds and source log.
+- Caches parsed `settings.json` in memory and shares it across the application, so refresh ticks and command predicates no longer re-read the file from disk; `Save` refreshes the cache and `Invalidate` forces a re-read.
+
 ## [0.18.7] - 2026-11-05
 
 ### Added

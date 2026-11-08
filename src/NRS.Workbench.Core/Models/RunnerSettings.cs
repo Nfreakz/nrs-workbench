@@ -23,4 +23,9 @@ public sealed class RunnerSettings
     public bool RunnerQueueResourceGuardEnabled { get; set; } = true;
     public int RunnerQueueCpuStartThreshold { get; set; } = 85;
     public int RunnerQueueMemoryStartThreshold { get; set; } = 90;
+
+    // Anonymous "is there a newer release?" check against the public GitHub API.
+    // Runs at most once per 24 h; no token is ever sent.
+    public bool UpdateCheckEnabled { get; set; } = true;
+    public DateTimeOffset? LastUpdateCheckUtc { get; set; }
 }
