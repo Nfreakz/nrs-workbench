@@ -39,14 +39,14 @@ public sealed class GitFileChange : INotifyPropertyChanged
     {
         get
         {
-            if (IsConflict) return "CONFLICTO";
-            if (IsUntracked) return "NUEVO";
-            if (IsRename) return "RENOMBRADO";
-            if (IndexStatus == 'D' || WorkTreeStatus == 'D') return "ELIMINADO";
-            if (IndexStatus == 'A' || WorkTreeStatus == 'A') return "AÑADIDO";
-            if (IsStaged && HasUnstagedChanges) return "STAGED + CAMBIOS";
+            if (IsConflict) return DisplayText.Choose("CONFLICTO", "CONFLICT", "CONFLICTE");
+            if (IsUntracked) return DisplayText.Choose("NUEVO", "NEW", "NOU");
+            if (IsRename) return DisplayText.Choose("RENOMBRADO", "RENAMED", "REANOMENAT");
+            if (IndexStatus == 'D' || WorkTreeStatus == 'D') return DisplayText.Choose("ELIMINADO", "DELETED", "ELIMINAT");
+            if (IndexStatus == 'A' || WorkTreeStatus == 'A') return DisplayText.Choose("AÑADIDO", "ADDED", "AFEGIT");
+            if (IsStaged && HasUnstagedChanges) return DisplayText.Choose("STAGED + CAMBIOS", "STAGED + CHANGED", "STAGED + CANVIS");
             if (IsStaged) return "STAGED";
-            return "MODIFICADO";
+            return DisplayText.Choose("MODIFICADO", "MODIFIED", "MODIFICAT");
         }
     }
 

@@ -1,4 +1,4 @@
-<Window x:Class="NRS.Workbench.App.RunnerDoctorWindow"
+<local:ThemedWindow x:Class="NRS.Workbench.App.RunnerDoctorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:NRS.Workbench.App.Services"
@@ -151,4 +151,4 @@
             </StackPanel>
         </Grid>
     </Grid>
-</Window>
+</local:ThemedWindow>

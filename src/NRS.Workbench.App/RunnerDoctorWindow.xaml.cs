@@ -6,7 +6,7 @@ using NRS.Workbench.Core.Models;
 
 namespace NRS.Workbench.App;
 
-public partial class RunnerDoctorWindow : Window
+public partial class RunnerDoctorWindow : ThemedWindow
 {
     private readonly RunnerDoctorService _doctor;
     private readonly Func<Task<IReadOnlyList<RunnerInfo>>> _runnerProvider;
@@ -17,11 +17,6 @@ public partial class RunnerDoctorWindow : Window
         Func<Task<IReadOnlyList<RunnerInfo>>> runnerProvider)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) =>
-        {
-            WindowThemeService.ApplyDarkTitleBar(this);
-            WindowThemeService.FitToWorkArea(this);
-        };
         _doctor = doctor;
         _runnerProvider = runnerProvider;
         Loaded += async (_, _) => await RefreshAsync();

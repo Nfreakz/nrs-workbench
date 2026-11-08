@@ -5,7 +5,7 @@ using NRS.Workbench.Core.Models;
 
 namespace NRS.Workbench.App;
 
-public partial class PortableWorkspaceWindow : Window
+public partial class PortableWorkspaceWindow : ThemedWindow
 {
     private readonly SettingsService _settingsService;
     private readonly RunnerSettings _settings;
@@ -15,11 +15,6 @@ public partial class PortableWorkspaceWindow : Window
     public PortableWorkspaceWindow(SettingsService settingsService, RunnerSettings settings)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) =>
-        {
-            WindowThemeService.ApplyDarkTitleBar(this);
-            WindowThemeService.FitToWorkArea(this);
-        };
         _settingsService = settingsService;
         _settings = settings;
         RunnerGrid.ItemsSource = _candidates;

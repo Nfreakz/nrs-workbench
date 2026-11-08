@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using NRS.Workbench.App.Services;
+using NRS.Workbench.Core.Models;
 
 namespace NRS.Workbench.App;
 
@@ -42,6 +43,7 @@ public partial class App : Application
         }
 
         UiLanguage.Select(new SettingsService().Load().Language);
+        DisplayText.Choose = UiLanguage.Choose;
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
             AppLogger.Error("Unhandled AppDomain exception", args.ExceptionObject as Exception);
 
@@ -94,6 +96,43 @@ public partial class App : Application
         };
 
         base.OnStartup(e);
+    }
+
+    /// <summary>
+    /// Applies a new UI language without restarting: {local:Tr} is resolved once per
+    /// window, so the main window is rebuilt and the old one (with its tray icon) closed.
+    /// The single-instance mutex and runtime session are untouched.
+    /// </summary>
+    public void ReloadUiLanguage(MainWindow current)
+    {
+        var previousMode = ShutdownMode;
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        try
+        {
+            var next = new MainWindow(current);
+            var bounds = current.WindowState == WindowState.Normal
+                ? new Rect(current.Left, current.Top, current.Width, current.Height)
+                : current.RestoreBounds;
+            if (!bounds.IsEmpty)
+            {
+                next.WindowStartupLocation = WindowStartupLocation.Manual;
+                next.Left = bounds.Left;
+                next.Top = bounds.Top;
+                next.Width = bounds.Width;
+                next.Height = bounds.Height;
+            }
+            if (current.WindowState == WindowState.Maximized) next.WindowState = WindowState.Maximized;
+            MainWindow = next;
+            // Settings is opened from the visible main window, so the new one is shown too.
+            next.Show();
+            current.CloseForReload();
+            next.Activate();
+            AppLogger.Info($"UI language switched to {UiLanguage.Current} without restart.");
+        }
+        finally
+        {
+            ShutdownMode = previousMode;
+        }
     }
 
     public void RecordRuntimeHeartbeat() => _runtimeSession?.Heartbeat();

@@ -11,5 +11,6 @@ public sealed record DailyActivityPoint
     public double RelativeHeight { get; init; }
 
     public string DayLabel => Date.ToString("dd/MM");
-    public string Tooltip => $"{Date:dd/MM/yyyy}\n{TotalRuns:N0} jobs · {SucceededRuns:N0} OK · {FailedRuns:N0} fallos · {CancelledRuns:N0} cancelados";
+    public string Tooltip => $"{Date:dd/MM/yyyy}\n{TotalRuns:N0} jobs · {SucceededRuns:N0} OK · {FailedRuns:N0} " +
+        DisplayText.Choose("fallos", "failures", "errors") + $" · {CancelledRuns:N0} " + DisplayText.Choose("cancelados", "cancelled", "cancel·lats");
 }

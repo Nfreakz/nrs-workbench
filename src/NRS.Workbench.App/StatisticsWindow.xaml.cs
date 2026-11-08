@@ -8,7 +8,7 @@ using NRS.Workbench.Core.Models;
 
 namespace NRS.Workbench.App;
 
-public partial class StatisticsWindow : Window
+public partial class StatisticsWindow : ThemedWindow
 {
     private readonly StatisticsViewModel _viewModel;
     private readonly IDialogService _dialogs;
@@ -18,11 +18,6 @@ public partial class StatisticsWindow : Window
     public StatisticsWindow(IRunnerStatisticsService statistics, Func<IReadOnlyList<RunnerInfo>> runnersProvider)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) =>
-        {
-            WindowThemeService.ApplyDarkTitleBar(this);
-            WindowThemeService.FitToWorkArea(this);
-        };
 
         var settings = new SettingsService();
         _dialogs = new DialogService(settings);

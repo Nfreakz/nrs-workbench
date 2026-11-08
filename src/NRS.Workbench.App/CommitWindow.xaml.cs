@@ -7,18 +7,13 @@ using NRS.Workbench.Core.Models;
 
 namespace NRS.Workbench.App;
 
-public partial class CommitWindow : Window
+public partial class CommitWindow : ThemedWindow
 {
     private readonly CommitViewModel _viewModel;
 
     public CommitWindow(IGitService git, GitRepositoryInfo repository, IDialogService dialogs)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) =>
-        {
-            WindowThemeService.ApplyDarkTitleBar(this);
-            WindowThemeService.FitToWorkArea(this);
-        };
         _viewModel = new CommitViewModel(git, repository, dialogs);
         DataContext = _viewModel;
         Loaded += async (_, _) => await _viewModel.InitializeAsync();

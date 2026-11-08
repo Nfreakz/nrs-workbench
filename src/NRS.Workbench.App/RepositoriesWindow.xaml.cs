@@ -5,7 +5,7 @@ using NRS.Workbench.Core.Interfaces;
 
 namespace NRS.Workbench.App;
 
-public partial class RepositoriesWindow : Window
+public partial class RepositoriesWindow : ThemedWindow
 {
     private readonly RepositoriesViewModel _viewModel;
     private readonly IGitService _git;
@@ -14,11 +14,6 @@ public partial class RepositoriesWindow : Window
     public RepositoriesWindow(SettingsService settings)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) =>
-        {
-            WindowThemeService.ApplyDarkTitleBar(this);
-            WindowThemeService.FitToWorkArea(this);
-        };
 
         _git = new GitService();
         _dialogs = new DialogService(settings);

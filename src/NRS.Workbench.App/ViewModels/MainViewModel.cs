@@ -340,6 +340,9 @@ public sealed class MainViewModel : ObservableObject
         return true;
     }
 
+    /// <summary>Selects this runner on the next refresh (used when the window is rebuilt).</summary>
+    public void PreferRunner(string? folderPath) => _preferredRunnerPath = folderPath;
+
     public bool EditSettings(Window owner)
     {
         var changed = _dialogs.EditSettings(owner);

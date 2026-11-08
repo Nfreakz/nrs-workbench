@@ -7,7 +7,7 @@ using NRS.Workbench.Core.Models;
 
 namespace NRS.Workbench.App;
 
-public partial class SettingsWindow : Window
+public partial class SettingsWindow : ThemedWindow
 {
     private readonly SettingsService _settingsService;
     private readonly List<CheckBox> _runnerQueueChecks = [];
@@ -16,11 +16,6 @@ public partial class SettingsWindow : Window
     public SettingsWindow(SettingsService settingsService)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) =>
-        {
-            WindowThemeService.ApplyDarkTitleBar(this);
-            WindowThemeService.FitToWorkArea(this);
-        };
         _settingsService = settingsService;
         _workingSettings = _settingsService.Load();
         ApplySettingsToForm(_workingSettings);
@@ -301,7 +296,8 @@ public partial class SettingsWindow : Window
                     this,
                     UiLanguage.Choose(
                         $"El archivo aporta {addedCount} repositorio(s) nuevo(s), pero no incluye {excluded.Count} repositorio(s) configurado(s) actualmente en este PC:{Environment.NewLine}{Environment.NewLine}{preview}{Environment.NewLine}{Environment.NewLine}Sí: reemplazar la lista local por la importada (no se borran carpetas).{Environment.NewLine}No: conservar los repositorios locales y añadir los del archivo.{Environment.NewLine}Cancelar: descartar la importación sin cambiar la configuración.",
-                        $"The file adds {addedCount} repositories, but omits {excluded.Count} repositories currently configured on this PC:{Environment.NewLine}{Environment.NewLine}{preview}{Environment.NewLine}{Environment.NewLine}Yes: replace the local list (no folders are deleted).{Environment.NewLine}No: keep local repositories and add those from the file.{Environment.NewLine}Cancel: discard the import without changing settings."),
+                        $"The file adds {addedCount} repositories, but omits {excluded.Count} repositories currently configured on this PC:{Environment.NewLine}{Environment.NewLine}{preview}{Environment.NewLine}{Environment.NewLine}Yes: replace the local list (no folders are deleted).{Environment.NewLine}No: keep local repositories and add those from the file.{Environment.NewLine}Cancel: discard the import without changing settings.",
+                        $"El fitxer aporta {addedCount} repositori(s) nou(s), però no inclou {excluded.Count} repositori(s) configurat(s) actualment en aquest PC:{Environment.NewLine}{Environment.NewLine}{preview}{Environment.NewLine}{Environment.NewLine}Sí: substituir la llista local per la importada (no s\u0027esborra cap carpeta).{Environment.NewLine}No: conservar els repositoris locals i afegir-hi els del fitxer.{Environment.NewLine}Cancel·lar: descartar la importació sense canviar la configuració."),
                     UiLanguage.Choose("Revisar repositorios antes de importar", "Review repositories before importing"),
                     MessageBoxButton.YesNoCancel,
                     MessageBoxImage.Warning,

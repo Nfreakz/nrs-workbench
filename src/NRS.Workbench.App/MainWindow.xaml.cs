@@ -11,7 +11,7 @@ using NRS.Workbench.Core.Models;
 
 namespace NRS.Workbench.App;
 
-public partial class MainWindow : Window
+public partial class MainWindow : ThemedWindow
 {
     private readonly MainViewModel _viewModel;
     private readonly DispatcherTimer _timer;
@@ -32,15 +32,17 @@ public partial class MainWindow : Window
     private double _detailPanelExpandedHeight = 195d;
     private AboutWindow? _aboutWindow;
 
-    public MainWindow()
+    public MainWindow() : this(null) { }
+
+    /// <summary>
+    /// <paramref name="previous"/> is the window being replaced after a language change:
+    /// the Smart Queue coordinator (in-memory pause, rotation and ownership state) and the
+    /// notification baseline are carried over instead of being rebuilt from the journal.
+    /// </summary>
+    internal MainWindow(MainWindow? previous)
     {
         InitializeComponent();
         if (AppDataPaths.IsPreview) Title = "NRS Workbench · PREVIEW";
-        SourceInitialized += (_, _) =>
-        {
-            WindowThemeService.ApplyDarkTitleBar(this);
-            WindowThemeService.FitToWorkArea(this);
-        };
 
         _settings = new SettingsService();
         var processService = new RunnerProcessService();
@@ -49,13 +51,20 @@ public partial class MainWindow : Window
         _statistics = new RunnerStatisticsService();
         IRunnerDiscoveryService discovery = new RunnerDiscoveryService(_settings, processService, serviceController, progress);
         IRunnerControlService control = new RunnerControlService(processService, serviceController);
-        _runnerQueue = new RunnerQueueCoordinator(control,
+        _runnerQueue = previous?._runnerQueue ?? new RunnerQueueCoordinator(control,
             new FileRunnerQueueStateStore(_settings.SettingsDirectory));
         ILogReaderService logs = new LogReaderService();
         var dialogs = new DialogService(_settings);
 
         _viewModel = new MainViewModel(discovery, control, logs, _settings, dialogs);
         DataContext = _viewModel;
+        if (previous is not null)
+        {
+            _viewModel.PreferRunner(previous._viewModel.SelectedRunner?.FolderPath);
+            foreach (var pair in previous._previousStates) _previousStates[pair.Key] = pair.Value;
+            _stateSnapshotInitialized = previous._stateSnapshotInitialized;
+            _latestResources = previous._latestResources;
+        }
 
         _tray = new TrayIconService(
             show: () => Dispatcher.Invoke(ShowFromTray),
@@ -344,8 +353,15 @@ public partial class MainWindow : Window
 
     private async void Settings_Click(object sender, RoutedEventArgs e)
     {
+        var previousLanguage = UiLanguage.Current;
         if (_viewModel.EditSettings(this))
         {
+            UiLanguage.Select(_settings.Load().Language);
+            if (UiLanguage.Current != previousLanguage)
+            {
+                ((App)Application.Current).ReloadUiLanguage(this);
+                return;
+            }
             ApplyTimerInterval();
             ApplyTraySetting();
             await RunAutomaticRefreshAsync();
@@ -421,6 +437,13 @@ public partial class MainWindow : Window
                 MessageBoxImage.Warning,
                 MessageBoxResult.No) != MessageBoxResult.Yes)
             return;
+        _allowExit = true;
+        Close();
+    }
+
+    /// <summary>Closes this window for a rebuild: no hide-to-tray, tray icon disposed in Closed.</summary>
+    internal void CloseForReload()
+    {
         _allowExit = true;
         Close();
     }

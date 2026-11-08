@@ -1,4 +1,4 @@
-<Window x:Class="NRS.Workbench.App.RepositoriesWindow"
+<local:ThemedWindow x:Class="NRS.Workbench.App.RepositoriesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:NRS.Workbench.App.Services"
@@ -93,14 +93,14 @@
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
-                                    <TextBlock Text="{Binding StateLabel, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding StateLabel}" FontSize="11" FontWeight="Bold"/>
                                 </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="{local:Tr Source='REPOSITORIO'}" Binding="{Binding Name}" Width="180"/>
                     <DataGridTextColumn Header="BRANCH" Binding="{Binding Branch}" Width="135"/>
-                    <DataGridTextColumn Header="{local:Tr Source='CAMBIOS'}" Binding="{Binding ChangeSummary, Converter={StaticResource LocalizedText}}" Width="110"/>
+                    <DataGridTextColumn Header="{local:Tr Source='CAMBIOS'}" Binding="{Binding ChangeSummary}" Width="110"/>
                     <DataGridTextColumn Header="AHEAD" Binding="{Binding AheadDisplay}" Width="70"/>
                     <DataGridTextColumn Header="BEHIND" Binding="{Binding BehindDisplay}" Width="72"/>
                     <DataGridTextColumn Header="{local:Tr Source='ÚLTIMO COMMIT'}" Binding="{Binding LastCommitDisplay}" Width="2*"/>
@@ -121,7 +121,7 @@
                             <TextBlock Text="{Binding SelectedRepository.Name, TargetNullValue='Selecciona un repositorio'}" FontSize="22" FontWeight="Bold"/>
                             <TextBlock Text="{Binding SelectedRepository.Path}" Foreground="#7894B8" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
-                        <TextBlock Grid.Column="1" Text="{Binding SelectedRepository.StateLabel, Converter={StaticResource LocalizedText}}" Foreground="#C59A4A" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding SelectedRepository.StateLabel}" Foreground="#C59A4A" FontWeight="Bold" VerticalAlignment="Center"/>
                     </Grid>
                     <Separator Grid.Row="1" Margin="0,13" Background="#303640"/>
                     <Grid Grid.Row="2">
@@ -253,4 +253,4 @@
             </StackPanel>
         </Grid>
     </Grid>
-</Window>
+</local:ThemedWindow>

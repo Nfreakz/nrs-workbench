@@ -19,13 +19,13 @@ public sealed record JobRunRecord
     public int SourceLogCount { get; init; } = 1;
 
     public string StartedAtDisplay => StartedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
-    public string JobDisplay => string.IsNullOrWhiteSpace(JobName) ? "Job de GitHub Actions" : JobName;
+    public string JobDisplay => string.IsNullOrWhiteSpace(JobName) ? DisplayText.Choose("Job de GitHub Actions", "GitHub Actions job", "Job de GitHub Actions") : JobName;
     public string OutcomeDisplay => Outcome switch
     {
         JobRunOutcome.Succeeded => "OK",
-        JobRunOutcome.Failed => "FALLO",
-        JobRunOutcome.Cancelled => "CANCELADO",
-        _ => "SIN CLASIFICAR"
+        JobRunOutcome.Failed => DisplayText.Choose("FALLO", "FAILED", "ERROR"),
+        JobRunOutcome.Cancelled => DisplayText.Choose("CANCELADO", "CANCELLED", "CANCEL·LAT"),
+        _ => DisplayText.Choose("SIN CLASIFICAR", "UNCLASSIFIED", "SENSE CLASSIFICAR")
     };
     public string DurationDisplay => FormatDuration(Duration);
     public string IdentityDisplay => string.IsNullOrWhiteSpace(ExecutionId) ? "—" : ExecutionId;

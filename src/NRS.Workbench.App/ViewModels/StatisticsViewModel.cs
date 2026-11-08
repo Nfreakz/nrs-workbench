@@ -194,7 +194,7 @@ public sealed class StatisticsViewModel : ObservableObject
                 }
 
                 var runner = string.IsNullOrWhiteSpace(value.RunnerAlias) ? string.Empty : $" · {value.RunnerAlias}";
-                ScanDetail = UiLanguage.Choose($"Analizando {value.ProcessedFiles:N0}/{value.TotalFiles:N0} logs{runner}", $"Analyzing {value.ProcessedFiles:N0}/{value.TotalFiles:N0} logs{runner}");
+                ScanDetail = UiLanguage.Choose($"Analizando {value.ProcessedFiles:N0}/{value.TotalFiles:N0} logs{runner}", $"Analyzing {value.ProcessedFiles:N0}/{value.TotalFiles:N0} logs{runner}", $"Analitzant {value.ProcessedFiles:N0}/{value.TotalFiles:N0} logs{runner}");
                 StatusText = ScanDetail;
             });
 
@@ -223,7 +223,7 @@ public sealed class StatisticsViewModel : ObservableObject
             RunsLast24Hours = snapshot.RunsLast24Hours;
             JobsPerDay = snapshot.JobsPerDayDisplay;
             PeakDay = snapshot.PeakDayDisplay;
-            AuditText = UiLanguage.Choose($"Worker logs: {snapshot.WorkerLogsScanned:N0} · Jobs únicos: {snapshot.TotalRuns:N0} · Duplicados: {snapshot.DuplicateLogsDiscarded:N0} · Con ID: {snapshot.StableIdentityRuns:N0}", $"Worker logs: {snapshot.WorkerLogsScanned:N0} · Unique jobs: {snapshot.TotalRuns:N0} · Duplicates: {snapshot.DuplicateLogsDiscarded:N0} · With ID: {snapshot.StableIdentityRuns:N0}");
+            AuditText = UiLanguage.Choose($"Worker logs: {snapshot.WorkerLogsScanned:N0} · Jobs únicos: {snapshot.TotalRuns:N0} · Duplicados: {snapshot.DuplicateLogsDiscarded:N0} · Con ID: {snapshot.StableIdentityRuns:N0}", $"Worker logs: {snapshot.WorkerLogsScanned:N0} · Unique jobs: {snapshot.TotalRuns:N0} · Duplicates: {snapshot.DuplicateLogsDiscarded:N0} · With ID: {snapshot.StableIdentityRuns:N0}", $"Worker logs: {snapshot.WorkerLogsScanned:N0} · Jobs únics: {snapshot.TotalRuns:N0} · Duplicats: {snapshot.DuplicateLogsDiscarded:N0} · Amb ID: {snapshot.StableIdentityRuns:N0}");
 
             DailyActivity.Clear();
             foreach (var point in snapshot.DailyActivity) DailyActivity.Add(point);
@@ -239,12 +239,12 @@ public sealed class StatisticsViewModel : ObservableObject
             ScanProgress = 100;
             ScanDetail = snapshot.TotalRuns == 0
                 ? UiLanguage.Choose("Historial analizado.", "History analyzed.")
-                : UiLanguage.Choose($"{snapshot.TotalRuns:N0} jobs locales auditados.", $"{snapshot.TotalRuns:N0} local jobs audited.");
+                : UiLanguage.Choose($"{snapshot.TotalRuns:N0} jobs locales auditados.", $"{snapshot.TotalRuns:N0} local jobs audited.", $"{snapshot.TotalRuns:N0} jobs locals auditats.");
             StatusText = snapshot.TotalRuns == 0
                 ? snapshot.ActiveRuns > 0
-                    ? UiLanguage.Choose($"Sin historial finalizado · {snapshot.ActiveRuns} job(s) en curso", $"No completed history · {snapshot.ActiveRuns} jobs in progress")
+                    ? UiLanguage.Choose($"Sin historial finalizado · {snapshot.ActiveRuns} job(s) en curso", $"No completed history · {snapshot.ActiveRuns} jobs in progress", $"Sense historial finalitzat · {snapshot.ActiveRuns} job(s) en curs")
                     : UiLanguage.Choose("No hay jobs históricos disponibles para este periodo.", "No historical jobs available for this period.")
-                : UiLanguage.Choose($"{snapshot.TotalRuns:N0} jobs locales · {snapshot.RunnersWithActivity} runners con actividad", $"{snapshot.TotalRuns:N0} local jobs · {snapshot.RunnersWithActivity} active runners");
+                : UiLanguage.Choose($"{snapshot.TotalRuns:N0} jobs locales · {snapshot.RunnersWithActivity} runners con actividad", $"{snapshot.TotalRuns:N0} local jobs · {snapshot.RunnersWithActivity} active runners", $"{snapshot.TotalRuns:N0} jobs locals · {snapshot.RunnersWithActivity} runners amb activitat");
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -352,11 +352,11 @@ public sealed class StatisticsViewModel : ObservableObject
             .FirstOrDefault();
         RepositoryMostChanged = mostChanged is null
             ? "—"
-            : UiLanguage.Choose($"{mostChanged.Name} · {mostChanged.ChangeCount} cambio{(mostChanged.ChangeCount == 1 ? string.Empty : "s")}", $"{mostChanged.Name} · {mostChanged.ChangeCount} changes");
+            : UiLanguage.Choose($"{mostChanged.Name} · {mostChanged.ChangeCount} cambio{(mostChanged.ChangeCount == 1 ? string.Empty : "s")}", $"{mostChanged.Name} · {mostChanged.ChangeCount} changes", $"{mostChanged.Name} · {mostChanged.ChangeCount} canvi{(mostChanged.ChangeCount == 1 ? string.Empty : "s")}");
 
         RepositoryStatusText = rows.Count == 0
             ? UiLanguage.Choose("Sin repositorios configurados.", "No repositories configured.")
-            : UiLanguage.Choose($"{rows.Count} repos · {RepositoryCleanCount} clean · {RepositoryChangesCount} con cambios · {RepositoryAttentionCount} con atención", $"{rows.Count} repos · {RepositoryCleanCount} clean · {RepositoryChangesCount} changed · {RepositoryAttentionCount} need attention");
+            : UiLanguage.Choose($"{rows.Count} repos · {RepositoryCleanCount} clean · {RepositoryChangesCount} con cambios · {RepositoryAttentionCount} con atención", $"{rows.Count} repos · {RepositoryCleanCount} clean · {RepositoryChangesCount} changed · {RepositoryAttentionCount} need attention", $"{rows.Count} repos · {RepositoryCleanCount} clean · {RepositoryChangesCount} amb canvis · {RepositoryAttentionCount} requereixen atenció");
     }
 }
 

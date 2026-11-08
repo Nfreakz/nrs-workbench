@@ -1,4 +1,4 @@
-<Window x:Class="NRS.Workbench.App.StatisticsWindow"
+<local:ThemedWindow x:Class="NRS.Workbench.App.StatisticsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:NRS.Workbench.App.Services"
@@ -319,7 +319,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="3,0" ToolTip="{Binding Tooltip, Converter={StaticResource LocalizedText}}">
+                                <Grid Margin="3,0" ToolTip="{Binding Tooltip}">
                                     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                                     <ProgressBar Grid.Row="0" Minimum="0" Maximum="100" Value="{Binding RelativeHeight, Mode=OneWay}" Orientation="Vertical"
                                                  Width="18" HorizontalAlignment="Center" Foreground="#6F91C4" Background="#20252B" BorderThickness="0"/>
@@ -435,7 +435,7 @@
                         <DataGridTemplateColumn Header="{local:Tr Source='FIAB.'}" Width="76">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding ReliabilityDisplay}" FontWeight="SemiBold" ToolTip="{Binding ReliabilityLabel, Converter={StaticResource LocalizedText}}">
+                                    <TextBlock Text="{Binding ReliabilityDisplay}" FontWeight="SemiBold" ToolTip="{Binding ReliabilityLabel}">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Foreground" Value="#9FA7B0"/>
@@ -499,7 +499,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border x:Name="OutcomeBadge" Background="#242931" BorderBrush="#4A515B" BorderThickness="1" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
-                                        <TextBlock x:Name="OutcomeText" Text="{Binding OutcomeDisplay, Converter={StaticResource LocalizedText}}" FontSize="11" FontWeight="Bold" Foreground="#D6DBE1"/>
+                                        <TextBlock x:Name="OutcomeText" Text="{Binding OutcomeDisplay}" FontSize="11" FontWeight="Bold" Foreground="#D6DBE1"/>
                                     </Border>
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding Outcome}" Value="{x:Static models:JobRunOutcome.Succeeded}"><Setter TargetName="OutcomeBadge" Property="Background" Value="#24362C"/><Setter TargetName="OutcomeBadge" Property="BorderBrush" Value="#56846A"/><Setter TargetName="OutcomeText" Property="Foreground" Value="#67AF87"/></DataTrigger>
@@ -545,4 +545,4 @@
             </StackPanel>
         </Grid>
     </Grid>
-</Window>
+</local:ThemedWindow>

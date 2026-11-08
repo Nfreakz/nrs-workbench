@@ -16,30 +16,34 @@ public sealed record RunnerProgress
     public int HistoricalRuns { get; init; }
     public string EstimateMethod { get; init; } = string.Empty;
 
-    public string PhaseDisplay => string.IsNullOrWhiteSpace(Phase) ? "Ejecutando job" : Phase;
-    public string JobDisplay => string.IsNullOrWhiteSpace(JobName) ? "Job de GitHub Actions" : JobName;
-    public string PercentDisplay => HasEstimate ? $"{Percent:N0}% EST." : "EN CURSO";
+    public string PhaseDisplay => string.IsNullOrWhiteSpace(Phase) ? DisplayText.Choose("Ejecutando job", "Running job", "Executant el job") : Phase;
+    public string JobDisplay => string.IsNullOrWhiteSpace(JobName) ? DisplayText.Choose("Job de GitHub Actions", "GitHub Actions job", "Job de GitHub Actions") : JobName;
+    public string PercentDisplay => HasEstimate ? $"{Percent:N0}% EST." : DisplayText.Choose("EN CURSO", "IN PROGRESS", "EN CURS");
 
     public string ConfidenceDisplay => !HasEstimate ? string.Empty : HistoricalRuns switch
     {
-        >= 4 => "ALTA",
-        >= 2 => "MEDIA",
-        _ => "BAJA"
+        >= 4 => DisplayText.Choose("ALTA", "HIGH", "ALTA"),
+        >= 2 => DisplayText.Choose("MEDIA", "AVERAGE", "MITJANA"),
+        _ => DisplayText.Choose("BAJA", "LOW", "BAIXA")
     };
 
     public string StepsDisplay
     {
         get
         {
-            if (TotalSteps is > 0) return $"{Math.Min(CompletedSteps, TotalSteps.Value)}/{TotalSteps.Value} pasos";
-            if (CompletedSteps == 1) return "1 paso completado";
-            if (CompletedSteps > 1) return $"{CompletedSteps} pasos completados";
-            return "Analizando actividad";
+            if (TotalSteps is > 0)
+            {
+                var done = $"{Math.Min(CompletedSteps, TotalSteps.Value)}/{TotalSteps.Value}";
+                return DisplayText.Choose($"{done} pasos", $"{done} steps", $"{done} passos");
+            }
+            if (CompletedSteps == 1) return DisplayText.Choose("1 paso completado", "1 step completed", "1 pas completat");
+            if (CompletedSteps > 1) return DisplayText.Choose($"{CompletedSteps} pasos completados", $"{CompletedSteps} steps completed", $"{CompletedSteps} passos completats");
+            return DisplayText.Choose("Analizando actividad", "Analyzing activity", "Analitzant l'activitat");
         }
     }
 
     public string ElapsedDisplay => FormatDuration(Elapsed);
-    public string RemainingDisplay => EstimatedRemaining is null ? string.Empty : $"~{FormatDuration(EstimatedRemaining)} restante";
+    public string RemainingDisplay => EstimatedRemaining is null ? string.Empty : DisplayText.Choose($"~{FormatDuration(EstimatedRemaining)} restante", $"~{FormatDuration(EstimatedRemaining)} remaining", $"~{FormatDuration(EstimatedRemaining)} restant");
 
     public string MetaDisplay
     {
@@ -58,10 +62,12 @@ public sealed record RunnerProgress
         {
             var parts = new List<string>();
             if (TotalSteps is > 0) parts.Add($"{Math.Min(CompletedSteps, TotalSteps.Value)}/{TotalSteps.Value}");
-            else if (CompletedSteps > 0) parts.Add($"{CompletedSteps} proceso{(CompletedSteps == 1 ? "" : "s")}");
+            else if (CompletedSteps > 0) parts.Add(CompletedSteps == 1
+                ? DisplayText.Choose("1 proceso", "1 process", "1 procés")
+                : DisplayText.Choose($"{CompletedSteps} procesos", $"{CompletedSteps} processes", $"{CompletedSteps} processos"));
             if (!string.IsNullOrWhiteSpace(RemainingDisplay)) parts.Add(RemainingDisplay);
             else if (!string.IsNullOrWhiteSpace(ElapsedDisplay)) parts.Add(ElapsedDisplay);
-            return parts.Count == 0 ? "Analizando" : string.Join(" · ", parts);
+            return parts.Count == 0 ? DisplayText.Choose("Analizando", "Analyzing", "Analitzant") : string.Join(" · ", parts);
         }
     }
 
@@ -69,9 +75,12 @@ public sealed record RunnerProgress
     {
         get
         {
-            if (!HasEstimate) return "Sin historial comparable todavía";
-            var source = string.IsNullOrWhiteSpace(EstimateMethod) ? "Estimación local" : EstimateMethod;
-            return $"{source} · confianza {ConfidenceDisplay} · {HistoricalRuns} ejecución{(HistoricalRuns == 1 ? "" : "es")} comparable{(HistoricalRuns == 1 ? "" : "s")}";
+            if (!HasEstimate) return DisplayText.Choose("Sin historial comparable todavía", "No comparable history yet", "Encara no hi ha historial comparable");
+            var source = string.IsNullOrWhiteSpace(EstimateMethod) ? DisplayText.Choose("Estimación local", "Local estimate", "Estimació local") : EstimateMethod;
+            var runs = HistoricalRuns == 1
+                ? DisplayText.Choose("1 ejecución comparable", "1 comparable run", "1 execució comparable")
+                : DisplayText.Choose($"{HistoricalRuns} ejecuciones comparables", $"{HistoricalRuns} comparable runs", $"{HistoricalRuns} execucions comparables");
+            return $"{source} · {DisplayText.Choose("confianza", "confidence", "confiança")} {ConfidenceDisplay} · {runs}";
         }
     }
 
