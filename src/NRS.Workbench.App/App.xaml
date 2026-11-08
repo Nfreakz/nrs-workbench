@@ -5,7 +5,6 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <conv:LocalizedTextConverter x:Key="LocalizedText"/>
             <conv:InverseBoolConverter x:Key="InverseBool"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/DarkTheme.xaml"/>

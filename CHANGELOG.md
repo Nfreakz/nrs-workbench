@@ -12,11 +12,15 @@
 - Unhandled-exception handlers always log the exception; only the error dialog is throttled.
 - Statistics: the neutral trend `→ 0,0 pp` is formatted with the current culture like the other trend texts.
 - Localization: adds missing English/Catalan texts (`BORRADO`, `RUNNER`, Maintenance footer legend, "Revisar runners tras reiniciar") and wraps Spanish-only log/status texts in `UiLanguage.Choose`.
+- Localization: job, step and repository names read from runner logs or typed by the user are no longer translated (a job called "Deploy pasos" no longer shows as "Deploy steps"). Fixed labels from the models are chosen per language at the source and the regex-based `LocalizedTextConverter` is removed.
+- Commands: an exception escaping an async command is logged and shown as a plain error message instead of reaching the global "unexpected error" dialog.
 - Smoke tests: all suites run from `Main` through the same check/summary path (no module initializers) and a new localization smoke verifies every `{local:Tr}` key exists in `en.json` and `ca.json`.
 
 ### Added
 - Adds an optional, anonymous **update notice**: once every 24 hours NRS Workbench queries the public GitHub Releases API (no token, no machine data) and shows a dismissible banner plus an About entry when a newer version exists. It can be disabled in Settings.
 - Adds **Exportar CSV** to the Statistics window: the job history of the selected period is saved as UTF-8 CSV (with BOM) with runner, job, repository/workflow, status, ISO 8601 local start, duration in seconds and source log.
+- Changing the **language** in Settings now applies immediately: the main window is rebuilt in the new language (Smart Queue state, tray and selected runner preserved) without restarting the app.
+- All windows share a `ThemedWindow` base (dark title bar and fit-to-work-area in one place).
 - Caches parsed `settings.json` in memory and shares it across the application, so refresh ticks and command predicates no longer re-read the file from disk; `Save` refreshes the cache and `Invalidate` forces a re-read.
 
 ## [0.18.7] - 2026-11-05

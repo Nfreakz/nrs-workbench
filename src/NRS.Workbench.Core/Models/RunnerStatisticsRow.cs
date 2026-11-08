@@ -23,7 +23,7 @@ public sealed record RunnerStatisticsRow
     public string ReliabilityDisplay => TechnicalRuns == 0 ? "—" : $"{ReliabilityRate:N1}%";
     public string CancellationRateDisplay => KnownRuns == 0 ? "—" : $"{CancellationRate:N1}%";
     public string WorkloadShareDisplay => TotalRuns == 0 ? "—" : $"{WorkloadShare:N1}%";
-    public string ReliabilityLabel => TechnicalRuns < 5 ? "SIN DATOS" : ReliabilityRate >= 90d ? "ALTA" : ReliabilityRate >= 75d ? "MEDIA" : "BAJA";
+    public string ReliabilityLabel => TechnicalRuns < 5 ? DisplayText.Choose("SIN DATOS", "NO DATA", "SENSE DADES") : ReliabilityRate >= 90d ? DisplayText.Choose("ALTA", "HIGH", "ALTA") : ReliabilityRate >= 75d ? DisplayText.Choose("MEDIA", "AVERAGE", "MITJANA") : DisplayText.Choose("BAJA", "LOW", "BAIXA");
     public string ReliabilityKind => TechnicalRuns < 5 ? "Unknown" : ReliabilityRate >= 90d ? "High" : ReliabilityRate >= 75d ? "Medium" : "Low";
     public string Trend24hDisplay => Trend24h is null ? "—" : Math.Abs(Trend24h.Value) < 0.05d ? $"→ {0d:N1} pp" : Trend24h.Value > 0d ? $"↑ +{Trend24h.Value:N1} pp" : $"↓ {Trend24h.Value:N1} pp";
     public string Trend24hKind => Trend24h is null ? "Unknown" : Math.Abs(Trend24h.Value) < 0.05d ? "Flat" : Trend24h.Value > 0d ? "Up" : "Down";

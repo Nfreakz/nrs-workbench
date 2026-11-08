@@ -22,9 +22,9 @@ public sealed record RunnerInfo
     public string PidDisplay => ListenerPid?.ToString() ?? string.Empty;
     public string ModeDisplay => Mode switch
     {
-        RunnerMode.Interactive => "Interactivo",
-        RunnerMode.Service => "Servicio",
-        _ => "Desconocido"
+        RunnerMode.Interactive => DisplayText.Choose("Interactivo", "Interactive", "Interactiu"),
+        RunnerMode.Service => DisplayText.Choose("Servicio", "Service", "Servei"),
+        _ => DisplayText.Choose("Desconocido", "Unknown", "Desconegut")
     };
     public string RamDisplay => RamBytes <= 0 ? string.Empty : $"{RamBytes / 1024d / 1024d:N0} MB";
     public string UptimeDisplay

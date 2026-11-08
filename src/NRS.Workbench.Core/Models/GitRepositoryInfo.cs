@@ -29,18 +29,18 @@ public sealed class GitRepositoryInfo
     public string StateLabel => State switch
     {
         GitRepositoryState.Clean => "CLEAN",
-        GitRepositoryState.Changes => "CAMBIOS",
+        GitRepositoryState.Changes => DisplayText.Choose("CAMBIOS", "CHANGES", "CANVIS"),
         GitRepositoryState.Ahead => "AHEAD",
         GitRepositoryState.Behind => "BEHIND",
         GitRepositoryState.Diverged => "DIVERGED",
-        GitRepositoryState.Conflict => "CONFLICTO",
-        GitRepositoryState.NoRemote => "SIN REMOTE",
+        GitRepositoryState.Conflict => DisplayText.Choose("CONFLICTO", "CONFLICT", "CONFLICTE"),
+        GitRepositoryState.NoRemote => DisplayText.Choose("SIN REMOTE", "NO REMOTE", "SENSE REMOT"),
         _ => "ERROR"
     };
 
     public string ChangeSummary => ChangeCount == 0
-        ? "Sin cambios"
-        : $"{ChangeCount} cambio{(ChangeCount == 1 ? string.Empty : "s")}";
+        ? DisplayText.Choose("Sin cambios", "No changes", "Sense canvis")
+        : ChangeCount == 1 ? DisplayText.Choose("1 cambio", "1 change", "1 canvi") : DisplayText.Choose($"{ChangeCount} cambios", $"{ChangeCount} changes", $"{ChangeCount} canvis");
 
     public string AheadDisplay => Ahead > 0 ? $"↑ {Ahead}" : "—";
     public string BehindDisplay => Behind > 0 ? $"↓ {Behind}" : "—";

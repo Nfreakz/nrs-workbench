@@ -6,7 +6,7 @@ using NRS.Workbench.App.Services;
 
 namespace NRS.Workbench.App;
 
-public partial class FeedbackWindow : Window
+public partial class FeedbackWindow : ThemedWindow
 {
     private static readonly string RepositoryUrl = ResolveRepositoryUrl();
     private static readonly string BugUrl = RepositoryUrl + "/issues/new?template=bug_report.yml";
@@ -18,11 +18,6 @@ public partial class FeedbackWindow : Window
     public FeedbackWindow(SettingsService settingsService)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) =>
-        {
-            WindowThemeService.ApplyDarkTitleBar(this);
-            WindowThemeService.FitToWorkArea(this);
-        };
         _diagnostics = new DiagnosticBundleService(settingsService);
         RefreshPreview();
     }

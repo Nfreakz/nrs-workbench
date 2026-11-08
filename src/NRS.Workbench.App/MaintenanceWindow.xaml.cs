@@ -5,7 +5,7 @@ using NRS.Workbench.Core.Models;
 
 namespace NRS.Workbench.App;
 
-public partial class MaintenanceWindow : Window
+public partial class MaintenanceWindow : ThemedWindow
 {
     private readonly MaintenanceService _service;
     private readonly Func<IReadOnlyList<RunnerInfo>> _runnerProvider;
@@ -15,11 +15,6 @@ public partial class MaintenanceWindow : Window
     public MaintenanceWindow(MaintenanceService service, Func<IReadOnlyList<RunnerInfo>> runnerProvider)
     {
         InitializeComponent();
-        SourceInitialized += (_, _) =>
-        {
-            WindowThemeService.ApplyDarkTitleBar(this);
-            WindowThemeService.FitToWorkArea(this);
-        };
         _service = service;
         _runnerProvider = runnerProvider;
         Loaded += async (_, _) => await RefreshAsync();
