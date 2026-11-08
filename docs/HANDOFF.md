@@ -67,7 +67,7 @@ Implemented scope:
 - Workbench/PREVIEW log cleanup is low-risk and selected by default.
 - Old runner `_diag` cleanup is opt-in.
 - Newest Runner and Worker logs are always preserved.
-- BUSY runners cannot be cleaned.
+- Runners with a running job (`Runner.Worker` active) cannot be cleaned; a READY listener alone does not block `_diag` cleanup (scan and cleanup share the same predicate).
 - Runner `_work` is measured but never deleted automatically.
 - Absolute, escaping or unsafe `workFolder` paths are not traversed.
 - Reparse points/junctions anywhere in runner → `_diag` or runner → workFolder chains block inventory and cleanup.
@@ -81,7 +81,7 @@ Post-release additional manual coverage (not independently witnessed in this ses
 1. Validate Maintenance UI on Windows.
 2. Verify Workbench/PREVIEW logs and `_diag` opt-in behavior.
 3. Verify `_work` remains inventory-only.
-4. Verify BUSY cleanup is blocked.
+4. Verify cleanup is blocked while a job is running and allowed for a READY (idle) runner.
 5. Verify newest Runner/Worker logs survive cleanup.
 6. Verify 5 MB rotation and five-archive cap.
 7. Verify escaped workFolder and intermediate reparse/junction paths are blocked.

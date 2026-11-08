@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using NRS.Workbench.App.Services;
 using NRS.Workbench.Core.Models;
 
@@ -6,7 +5,6 @@ namespace NRS.Workbench.SmokeTests;
 
 internal static class PortableSettingsSmoke
 {
-    [ModuleInitializer]
     internal static void Run()
     {
         var root = Path.Combine(Path.GetTempPath(), "nrs-workbench-portable-settings-" + Guid.NewGuid().ToString("N"));

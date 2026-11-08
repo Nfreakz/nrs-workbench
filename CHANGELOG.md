@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Fixed
+- Maintenance: scan and cleanup now use the same runner-activity predicate. Only a running job (`Runner.Worker`) blocks `_diag` cleanup; a READY listener no longer makes rows look cleanable at scan time and then skipped at cleanup. The newest Runner/Worker logs remain protected.
+- Maintenance: a runner without a `_diag` folder (never ran, or root on a disconnected drive) is no longer reported as a reparse-point/unvalidatable path.
+- Maintenance: the Workbench log description now matches the real retention (active log plus up to 5 archives).
+- Single instance: a second NRS Workbench process for the same data directory now shows a message and exits instead of starting; the runtime session marker treats a still-running previous process as another instance rather than an unclean shutdown.
+- Diagnostic sanitizer: user and machine names are replaced on whole-token boundaries (case-insensitive) regardless of their length.
+- Runner Doctor: no longer duplicates a problem already listed by the checks into the status detail.
+- Unhandled-exception handlers always log the exception; only the error dialog is throttled.
+- Statistics: the neutral trend `→ 0,0 pp` is formatted with the current culture like the other trend texts.
+- Localization: adds missing English/Catalan texts (`BORRADO`, `RUNNER`, Maintenance footer legend, "Revisar runners tras reiniciar") and wraps Spanish-only log/status texts in `UiLanguage.Choose`.
+- Smoke tests: all suites run from `Main` through the same check/summary path (no module initializers) and a new localization smoke verifies every `{local:Tr}` key exists in `en.json` and `ca.json`.
+
 ## [0.18.7] - 2026-11-05
 
 ### Added

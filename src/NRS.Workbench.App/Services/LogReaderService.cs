@@ -10,13 +10,13 @@ public sealed class LogReaderService : ILogReaderService
         try
         {
             var diag = Path.Combine(runnerFolder, "_diag");
-            if (!Directory.Exists(diag)) return "No hay carpeta _diag para este runner.";
+            if (!Directory.Exists(diag)) return UiLanguage.Choose("No hay carpeta _diag para este runner.", "This runner has no _diag folder.", "No hi ha carpeta _diag per a aquest runner.");
 
             var file = new DirectoryInfo(diag)
                 .EnumerateFiles("*.log", SearchOption.TopDirectoryOnly)
                 .OrderByDescending(x => x.LastWriteTimeUtc)
                 .FirstOrDefault();
-            if (file is null) return "No hay logs disponibles.";
+            if (file is null) return UiLanguage.Choose("No hay logs disponibles.", "No logs available.", "No hi ha logs disponibles.");
 
             // GitHub Runner keeps the active log open while it is writing to it.
             // Open it explicitly with sharing enabled so the manager can tail/read
@@ -49,17 +49,17 @@ public sealed class LogReaderService : ILogReaderService
         catch (IOException ex)
         {
             AppLogger.Error($"Could not read logs for '{runnerFolder}'", ex);
-            return UiLanguage.Choose("El log está temporalmente ocupado. Se reintentará en la próxima actualización.", "The log is temporarily busy. It will be retried at the next refresh.");
+            return UiLanguage.Choose("El log está temporalmente ocupado. Se reintentará en la próxima actualización.", "The log is temporarily busy. It will be retried at the next refresh.", "El log està temporalment ocupat. Es tornarà a intentar a la propera actualització.");
         }
         catch (UnauthorizedAccessException ex)
         {
             AppLogger.Error($"Access denied reading logs for '{runnerFolder}'", ex);
-            return "No se puede leer el log por permisos. Ejecuta NRS Workbench como administrador.";
+            return UiLanguage.Choose("No se puede leer el log por permisos. Ejecuta NRS Workbench como administrador.", "The log cannot be read due to permissions. Run NRS Workbench as administrator.", "No es pot llegir el log per permisos. Executa NRS Workbench com a administrador.");
         }
         catch (Exception ex)
         {
             AppLogger.Error($"Could not read logs for '{runnerFolder}'", ex);
-            return $"No se pudo leer el log: {ex.Message}";
+            return UiLanguage.Choose($"No se pudo leer el log: {ex.Message}", $"Could not read the log: {ex.Message}", $"No s'ha pogut llegir el log: {ex.Message}");
         }
     }
 }

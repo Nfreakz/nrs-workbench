@@ -284,5 +284,10 @@
   "El token de acceso de GitHub se usa solo durante esta operación y no se guarda en settings, Data ni el manifiesto portable.": "The GitHub access token is used only for this operation and is not stored in settings, Data or the portable manifest.",
   "Token de acceso de GitHub para esta sesión": "GitHub access token for this session",
   "Para repositorios necesita Administration: write; para organizaciones, Self-hosted runners: write.": "Repositories need Administration: write; organizations need Self-hosted runners: write.",
-  "Crear token en GitHub": "Create token on GitHub"
+  "Crear token en GitHub": "Create token on GitHub",
+  "BORRADO": "DELETION",
+  "RUNNER": "RUNNER",
+  "Borrado: Seguro para borrar = datos de bajo riesgo. Borrar con precaución = reduce historial. No se puede borrar = solo inventario o runner protegido. _work nunca se borra automáticamente.": "Deletion: Safe to delete = low-risk data. Delete with caution = reduces history. Cannot delete = inventory only or protected runner. _work is never deleted automatically.",
+  "Revisar runners tras reiniciar": "Review runners after restart",
+  "Hay runners pendientes de revisión tras reiniciar NRS Workbench.": "Some runners need review after NRS Workbench was restarted."
 }

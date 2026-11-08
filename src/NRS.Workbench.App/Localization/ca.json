@@ -404,5 +404,13 @@
   "El token de acceso de GitHub se usa solo durante esta operación y no se guarda en settings, Data ni el manifiesto portable.": "El token d'accés de GitHub s'utilitza només durant aquesta operació i no es desa a settings, Data ni al manifest portable.",
   "Token de acceso de GitHub para esta sesión": "Token d'accés de GitHub per a aquesta sessió",
   "Para repositorios necesita Administration: write; para organizaciones, Self-hosted runners: write.": "Per a repositoris cal Administration: write; per a organitzacions, Self-hosted runners: write.",
-  "Crear token en GitHub": "Crear token a GitHub"
+  "Crear token en GitHub": "Crear token a GitHub",
+  "BORRADO": "ESBORRAT",
+  "RUNNER": "RUNNER",
+  "Borrado: Seguro para borrar = datos de bajo riesgo. Borrar con precaución = reduce historial. No se puede borrar = solo inventario o runner protegido. _work nunca se borra automáticamente.": "Esborrat: Segur per esborrar = dades de baix risc. Esborra amb precaució = redueix l'historial. No es pot esborrar = només inventari o runner protegit. _work mai no s'esborra automàticament.",
+  "Configuración exportada.\n\nEl archivo contiene rutas y preferencias, pero no credenciales, tokens ni archivos internos de los runners.\n\nLas rutas locales pueden revelar nombres de carpetas o de usuario. Revísalo antes de compartir el archivo.": "Configuració exportada.\n\nEl fitxer conté rutes i preferències, però no credencials, tokens ni fitxers interns dels runners.\n\nLes rutes locals poden revelar noms de carpetes o d'usuari. Revisa'l abans de compartir el fitxer.",
+  "No se pudo cargar el diff:\r\n": "No s'ha pogut carregar el diff:\r\n",
+  "\r\n\r\nNota: algún archivo tiene cambios staged y sin stage. Al estar seleccionado, se incluirá su contenido actual completo.": "\r\n\r\nNota: algun fitxer té canvis staged i sense stage. En estar seleccionat, s'inclourà el seu contingut actual complet.",
+  "\r\n\r\n… diff truncado para mantener la interfaz fluida.": "\r\n\r\n… diff truncat per mantenir la interfície fluida.",
+  "Hay cambios ya staged que no están seleccionados. Para evitar incluirlos por accidente, el commit se ha bloqueado.\r\n\r\n": "Hi ha canvis ja staged que no estan seleccionats. Per evitar incloure'ls per accident, el commit s'ha bloquejat.\r\n\r\n"
 }

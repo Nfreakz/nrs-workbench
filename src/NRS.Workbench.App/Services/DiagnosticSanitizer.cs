@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace NRS.Workbench.App.Services;
 
 public static class DiagnosticSanitizer
@@ -25,15 +27,28 @@ public static class DiagnosticSanitizer
         foreach (var path in sensitivePaths ?? [])
             Add(replacements, path, "<CONFIGURED_PATH>", 5);
 
-        Add(replacements, machineName, "<MACHINE>", 3);
-        Add(replacements, userName, "<USER>", 3);
-
         foreach (var item in replacements
                      .DistinctBy(item => item.Value, StringComparer.OrdinalIgnoreCase)
                      .OrderByDescending(item => item.Value.Length))
             result = result.Replace(item.Value, item.Replacement, StringComparison.OrdinalIgnoreCase);
 
+        // User/machine names are replaced as whole tokens (no minimum length) so a short
+        // name is still redacted without mangling unrelated words that merely contain it.
+        result = ReplaceToken(result, machineName, "<MACHINE>");
+        result = ReplaceToken(result, userName, "<USER>");
+
         return result;
+    }
+
+    private static string ReplaceToken(string text, string? name, string replacement)
+    {
+        var normalized = name?.Trim();
+        if (string.IsNullOrEmpty(normalized)) return text;
+        return Regex.Replace(
+            text,
+            $@"(?<![A-Za-z0-9]){Regex.Escape(normalized)}(?![A-Za-z0-9])",
+            replacement,
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     }
 
     private static void Add(List<(string Value, string Replacement)> items, string? value, string replacement, int minLength)

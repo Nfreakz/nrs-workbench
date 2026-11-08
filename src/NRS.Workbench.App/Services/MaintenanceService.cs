@@ -65,7 +65,7 @@ public sealed class MaintenanceService
     {
         _settingsDirectory = settingsDirectory;
         _now = now ?? (() => DateTimeOffset.Now);
-        _isRunnerActive = isRunnerActive ?? IsRunnerActive;
+        _isRunnerActive = isRunnerActive ?? HasRunningJob;
     }
 
     public Task<MaintenanceScanResult> ScanAsync(
@@ -132,9 +132,9 @@ public sealed class MaintenanceService
             Id = "workbench-logs",
             Category = UiLanguage.Choose("Logs de NRS Workbench", "NRS Workbench logs", "Logs de NRS Workbench"),
             Detail = UiLanguage.Choose(
-                "El log activo rota a 5 MB y conserva hasta 5 archivos. Puedes vaciar el historial local cuando ya no lo necesites.",
-                "The active log rotates at 5 MB and keeps up to 5 files. You can clear local history when it is no longer needed.",
-                "El log actiu rota als 5 MB i conserva fins a 5 fitxers. Pots buidar l'historial local quan ja no el necessitis."),
+                "El log activo rota a 5 MB y se conservan el log activo más hasta 5 archivos históricos. Puedes vaciar el historial local cuando ya no lo necesites.",
+                "The active log rotates at 5 MB and the active log plus up to 5 archives are kept. You can clear local history when it is no longer needed.",
+                "El log actiu rota als 5 MB i es conserven el log actiu més fins a 5 fitxers històrics. Pots buidar l'historial local quan ja no el necessitis."),
             Location = folder, FileCount = files.Count, TotalBytes = total, ReclaimableBytes = total,
             Risk = MaintenanceRisk.Safe, RiskLabel = UiLanguage.Choose("Seguro", "Safe", "Segur"),
             IsCleanable = true, IsSelected = true, CandidateFiles = files
@@ -162,6 +162,9 @@ public sealed class MaintenanceService
     private void AddRunnerDiagnostics(List<MaintenanceEntry> entries, RunnerInfo runner, int olderThanDays)
     {
         var folder = Path.Combine(runner.FolderPath, "_diag");
+
+        // No _diag yet (runner never ran) or root on an unplugged drive: nothing to inventory.
+        if (!Directory.Exists(folder)) return;
 
         if (!IsSafeCleanupDirectory(folder, runner.FolderPath))
         {
@@ -192,7 +195,8 @@ public sealed class MaintenanceService
         if (newestWorker is not null) protectedPaths.Add(newestWorker);
         if (newestRunner is not null) protectedPaths.Add(newestRunner);
 
-        var candidates = runner.State == RunnerState.Busy
+        var jobRunning = _isRunnerActive(runner.FolderPath);
+        var candidates = jobRunning
             ? new List<string>()
             : files.Where(x => SafeLastWriteUtc(x) < cutoff && !protectedPaths.Contains(x)).ToList();
 
@@ -200,8 +204,8 @@ public sealed class MaintenanceService
         {
             Id = "diag:" + runner.FolderPath,
             Category = UiLanguage.Choose($"Diagnósticos · {runner.Alias}", $"Diagnostics · {runner.Alias}", $"Diagnòstics · {runner.Alias}"),
-            Detail = runner.State == RunnerState.Busy
-                ? UiLanguage.Choose("Runner BUSY: limpieza bloqueada hasta que termine el job.", "Runner is BUSY: cleanup is blocked until the job finishes.", "Runner BUSY: la neteja queda bloquejada fins que acabi el job.")
+            Detail = jobRunning
+                ? UiLanguage.Choose("Job en ejecución (Runner.Worker activo): limpieza bloqueada hasta que termine.", "Job running (Runner.Worker active): cleanup is blocked until it finishes.", "Job en execució (Runner.Worker actiu): la neteja queda bloquejada fins que acabi.")
                 : UiLanguage.Choose(
                     $"Logs de más de {olderThanDays} días. Siempre se conservan los Runner/Worker más recientes. Limpiar Worker antiguos reduce estadísticas y referencias de estimación.",
                     $"Logs older than {olderThanDays} days. The newest Runner/Worker logs are always kept. Removing old Worker logs reduces statistics and estimation references.",
@@ -449,10 +453,12 @@ public sealed class MaintenanceService
         catch { return false; }
     }
 
-    private static bool IsRunnerActive(string runnerFolder)
+    // Shared scan/cleanup predicate: only a running job (Runner.Worker) blocks _diag cleanup.
+    // A READY listener does not; its newest Runner_*/Worker_* logs are protected separately.
+    private static bool HasRunningJob(string runnerFolder)
     {
         var snapshot = new RunnerProcessService().GetSnapshot(runnerFolder);
-        try { return snapshot.HasListener || snapshot.HasWorker; }
+        try { return snapshot.HasWorker; }
         finally
         {
             snapshot.Listener?.Dispose();

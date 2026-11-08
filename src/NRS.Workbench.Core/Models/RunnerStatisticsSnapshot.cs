@@ -39,7 +39,7 @@ public sealed record RunnerStatisticsSnapshot
     public string SuccessRateDisplay => KnownRuns == 0 ? "—" : $"{SuccessRate:N1}%";
     public string ReliabilityRateDisplay => TechnicalRuns == 0 ? "—" : $"{ReliabilityRate:N1}%";
     public string CancellationRateDisplay => KnownRuns == 0 ? "—" : $"{CancellationRate:N1}%";
-    public string Trend24hDisplay => Trend24h is null ? "—" : Math.Abs(Trend24h.Value) < 0.05d ? "→ 0,0 pp" : Trend24h.Value > 0d ? $"↑ +{Trend24h.Value:N1} pp" : $"↓ {Trend24h.Value:N1} pp";
+    public string Trend24hDisplay => Trend24h is null ? "—" : Math.Abs(Trend24h.Value) < 0.05d ? $"→ {0d:N1} pp" : Trend24h.Value > 0d ? $"↑ +{Trend24h.Value:N1} pp" : $"↓ {Trend24h.Value:N1} pp";
     public string Trend24hKind => Trend24h is null ? "Unknown" : Math.Abs(Trend24h.Value) < 0.05d ? "Flat" : Trend24h.Value > 0d ? "Up" : "Down";
     public string TotalDurationDisplay => JobRunRecord.FormatDuration(TotalDuration);
     public string AverageDurationDisplay => TotalRuns == 0 ? "—" : JobRunRecord.FormatDuration(AverageDuration);

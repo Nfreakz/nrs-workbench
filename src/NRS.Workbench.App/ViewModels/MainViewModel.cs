@@ -93,7 +93,7 @@ public sealed class MainViewModel : ObservableObject
     public string DominantRunnerVersion => _dominantRunnerVersion;
 
     public string RunnerViewSummary => string.IsNullOrWhiteSpace(RunnerSearchText)
-        ? UiLanguage.Choose($"{TotalCount} runners", $"{TotalCount} runners")
+        ? UiLanguage.Choose($"{TotalCount} runners", $"{TotalCount} runners", $"{TotalCount} runners")
         : UiLanguage.Choose($"{Runners.Count} de {TotalCount} runners", $"{Runners.Count} of {TotalCount} runners", $"{Runners.Count} de {TotalCount} runners");
 
     public RunnerInfo? SelectedRunner
