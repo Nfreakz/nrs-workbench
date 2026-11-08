@@ -15,10 +15,26 @@ public sealed record UpdateCheckResult(Version LatestVersion, string TagName, st
 /// </summary>
 public sealed class UpdateCheckService
 {
-    public const string RepositoryOwner = "Nfreakz";
-    public const string RepositoryName = "nrs-workbench";
-    public const string ReleasesPageUrl = $"https://github.com/{RepositoryOwner}/{RepositoryName}/releases";
-    private const string ApiBase = $"https://api.github.com/repos/{RepositoryOwner}/{RepositoryName}";
+    // Repository comes from the RepositoryUrl assembly metadata (Directory.Build.props),
+    // like FeedbackWindow, so no account name is hardcoded in source.
+    private static readonly string RepositoryPath = ResolveRepositoryPath();
+    public static string ReleasesPageUrl => $"https://github.com/{RepositoryPath}/releases";
+    private static string ApiBase => $"https://api.github.com/repos/{RepositoryPath}";
+
+    private static string ResolveRepositoryPath()
+    {
+        var value = typeof(UpdateCheckService).Assembly
+            .GetCustomAttributes<AssemblyMetadataAttribute>()
+            .FirstOrDefault(attribute => string.Equals(attribute.Key, "RepositoryUrl", StringComparison.Ordinal))
+            ?.Value;
+        if (Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+            string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase))
+            return uri.AbsolutePath.Trim('/');
+        return string.Empty;
+    }
+
+    /// <summary>False when the build carries no GitHub RepositoryUrl; the check is then skipped.</summary>
+    public static bool IsConfigured => RepositoryPath.Count(c => c == '/') == 1;
     private static readonly TimeSpan MinimumInterval = TimeSpan.FromHours(24);
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(10);
     private const long MaxResponseBytes = 512 * 1024;
@@ -63,7 +79,7 @@ public sealed class UpdateCheckService
         try
         {
             var settings = _settings.Load();
-            if (!settings.UpdateCheckEnabled) return null;
+            if (!settings.UpdateCheckEnabled || !IsConfigured) return null;
             var now = DateTimeOffset.UtcNow;
             if (settings.LastUpdateCheckUtc is { } last && last <= now && now - last < MinimumInterval) return null;
 
