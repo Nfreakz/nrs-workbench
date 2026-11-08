@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using NRS.Workbench.App.Services;
 using NRS.Workbench.Core.Models;
@@ -7,7 +6,6 @@ namespace NRS.Workbench.SmokeTests;
 
 internal static class SettingsLoadSafetySmoke
 {
-    [ModuleInitializer]
     internal static void Run()
     {
         var root = Path.Combine(Path.GetTempPath(), "nrs-workbench-settings-load-" + Guid.NewGuid().ToString("N"));

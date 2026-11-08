@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using NRS.Workbench.App.Services;
 using NRS.Workbench.Core.Interfaces;
 using NRS.Workbench.Core.Models;
@@ -7,7 +6,6 @@ namespace NRS.Workbench.SmokeTests;
 
 internal static class RunnerQueueSmoke
 {
-    [ModuleInitializer]
     internal static void Run()
     {
         AllStoppedQueueBootstrapsAndLaterManualStopsAreRespected();
@@ -51,8 +49,8 @@ internal static class RunnerQueueSmoke
         for (var second = 0; second < 3; second++)
             queue.ReconcileAsync([a, b], settings, now.AddSeconds(second)).GetAwaiter().GetResult();
 
-        Assert(control.Started.Count == control.Started.Distinct().Count() && control.Started.Count <= 2,
-            "a runner with a pending start is never started again from a stale STOPPED snapshot");
+        Assert(control.Started.Count == 2 && control.Started.Distinct().Count() == 2,
+            $"a runner with a pending start is never started again from a stale STOPPED snapshot (started={control.Started.Count})");
     }
 
     private static void AllStoppedQueueBootstrapsAndLaterManualStopsAreRespected()

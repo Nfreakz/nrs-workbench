@@ -163,13 +163,12 @@ public partial class MainWindow : Window
 
     private static void ReportRecurringFault(string context, Exception exception, FaultBurstThrottle throttle)
     {
-        var decision = throttle.Register(DateTimeOffset.UtcNow);
-        if (!decision.ShouldReport) return;
-
-        if (decision.SuppressedSinceLastReport > 0)
-            AppLogger.Info($"{context}: suppressed {decision.SuppressedSinceLastReport} repeated failure(s) during cooldown.");
-
+        // Every failure is logged; the throttle only marks bursts so repeated faults are easy to spot.
         AppLogger.Error(context, exception);
+
+        var decision = throttle.Register(DateTimeOffset.UtcNow);
+        if (decision.ShouldReport && decision.SuppressedSinceLastReport > 0)
+            AppLogger.Info($"{context}: {decision.SuppressedSinceLastReport} repeated failure(s) during the previous cooldown.");
     }
 
     private async void QueuePause_Click(object sender, RoutedEventArgs e)

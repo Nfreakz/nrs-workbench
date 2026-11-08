@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Windows;
 using NRS.Workbench.App.Services;
 
@@ -7,10 +9,27 @@ public partial class App : Application
 {
     private readonly FaultBurstThrottle _uiFaultDialogs = new(TimeSpan.FromMinutes(1));
     private RuntimeSessionTracker? _runtimeSession;
+    private Mutex? _singleInstanceMutex;
 
     protected override void OnStartup(StartupEventArgs e)
     {
         AppLogger.Initialize();
+        if (!TryAcquireSingleInstance())
+        {
+            AppLogger.Info("Another NRS Workbench instance is already running for this data directory; exiting.");
+            UiLanguage.Select(new SettingsService().Load().Language);
+            MessageBox.Show(
+                UiLanguage.Choose(
+                    "NRS Workbench ya se está ejecutando. Usa la ventana o el icono de la bandeja de la instancia abierta.",
+                    "NRS Workbench is already running. Use the window or tray icon of the open instance.",
+                    "NRS Workbench ja s'està executant. Fes servir la finestra o la icona de la safata de la instància oberta."),
+                "NRS Workbench",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            Shutdown();
+            return;
+        }
+
         _runtimeSession = new RuntimeSessionTracker(AppDataPaths.SettingsDirectory);
         var previousSession = _runtimeSession.BeginSession(AppDataPaths.IsPreview);
         if (previousSession is not null)
@@ -34,11 +53,12 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
+            // Always log the exception; only the dialog is throttled.
+            AppLogger.Error("Unhandled UI exception", args.Exception);
+
             var decision = _uiFaultDialogs.Register(DateTimeOffset.UtcNow);
             if (!decision.ShouldReport)
             {
-                if (decision.SuppressedSinceLastReport == 1 || decision.SuppressedSinceLastReport % 20 == 0)
-                    AppLogger.Error($"Suppressed repeated UI error dialog ({decision.SuppressedSinceLastReport} in current cooldown)", args.Exception);
                 args.Handled = true;
                 return;
             }
@@ -46,7 +66,6 @@ public partial class App : Application
             if (decision.SuppressedSinceLastReport > 0)
                 AppLogger.Info($"Suppressed {decision.SuppressedSinceLastReport} repeated UI error dialog(s) during the previous cooldown.");
 
-            AppLogger.Error("Unhandled UI exception", args.Exception);
             var choice = MessageBox.Show(
                 UiLanguage.Choose(
                     $"Se ha producido un error inesperado.\n\n{SensitiveDataRedactor.Redact(args.Exception.Message)}\n\nEl detalle se ha guardado en el log local. ¿Abrir Feedback y diagnóstico para revisarlo o exportarlo?",
@@ -79,10 +98,39 @@ public partial class App : Application
 
     public void RecordRuntimeHeartbeat() => _runtimeSession?.Heartbeat();
 
+    // One mutex per data directory, so PREVIEW and portable copies do not collide with the normal profile.
+    private bool TryAcquireSingleInstance()
+    {
+        try
+        {
+            var directory = Path.GetFullPath(AppDataPaths.SettingsDirectory)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                .ToUpperInvariant();
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(directory)))[..32];
+            _singleInstanceMutex = new Mutex(initiallyOwned: true, "Local\\NRSWorkbench-" + hash, out var createdNew);
+            if (createdNew) return true;
+            _singleInstanceMutex.Dispose();
+            _singleInstanceMutex = null;
+            return false;
+        }
+        catch (Exception ex)
+        {
+            // Never block startup because of the guard itself.
+            AppLogger.Error("Single-instance check failed; continuing without it", ex);
+            return true;
+        }
+    }
+
     protected override void OnExit(ExitEventArgs e)
     {
         _runtimeSession?.EndSession();
-        AppLogger.Info("NRS Workbench clean shutdown");
+        if (_singleInstanceMutex is not null)
+        {
+            try { _singleInstanceMutex.ReleaseMutex(); } catch { }
+            _singleInstanceMutex.Dispose();
+            _singleInstanceMutex = null;
+        }
+        if (_runtimeSession is not null) AppLogger.Info("NRS Workbench clean shutdown");
         base.OnExit(e);
     }
 }

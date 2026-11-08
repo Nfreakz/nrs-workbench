@@ -79,9 +79,21 @@ internal static class MaintenanceSmoke
             Assert(File.Exists(Path.Combine(diag, "Worker_candidate.log")) && newestGuardResult.FailedFiles == 0,
                 "maintenance preserves the newest Worker log again at cleanup time");
 
+            runnerActive = true;
             var busy = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Busy, Mode = RunnerMode.Interactive }], 7);
             var busyDiag = busy.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));
-            Assert(!busyDiag.IsCleanable && busyDiag.ReclaimableBytes == 0, "maintenance blocks diagnostic cleanup while runner is BUSY");
+            Assert(!busyDiag.IsCleanable && busyDiag.ReclaimableBytes == 0, "maintenance blocks diagnostic cleanup while a job is running (same predicate as cleanup)");
+            runnerActive = false;
+
+            var readyScan = await service.ScanAsync([new RunnerInfo { Alias = "maintenance", FolderPath = runner, State = RunnerState.Ready, Mode = RunnerMode.Interactive }], 7);
+            var readyDiag = readyScan.Entries.Single(x => x.Id.StartsWith("diag:", StringComparison.Ordinal));
+            Assert(readyDiag.IsCleanable, "maintenance keeps _diag of a READY runner (no running job) cleanable");
+
+            var neverRan = Path.Combine(root, "runner-never-ran");
+            Directory.CreateDirectory(neverRan);
+            var neverRanScan = await service.ScanAsync([new RunnerInfo { Alias = "never-ran", FolderPath = neverRan, State = RunnerState.Stopped, Mode = RunnerMode.Interactive }], 30);
+            Assert(!neverRanScan.Entries.Any(x => x.Id.StartsWith("diag:", StringComparison.Ordinal)),
+                "maintenance reports no _diag row (not a reparse warning) when _diag does not exist");
 
             var unsafeRunner = Path.Combine(root, "runner-unsafe-work");
             var outsideWork = Path.Combine(root, "outside-work");

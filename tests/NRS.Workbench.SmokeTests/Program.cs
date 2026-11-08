@@ -14,8 +14,15 @@ internal static class Program
         Console.WriteLine("NRS Workbench public-readiness smoke tests");
         Console.WriteLine("=====================================================");
 
-        await MaintenanceSmoke.RunAsync();
-        await PortableWorkspaceSmoke.RunAsync();
+        // Every suite runs through the same Check/summary path so one failure never hides the rest
+        // and the exit code reflects all of them.
+        RunSuite("runner queue smoke suite", RunnerQueueSmoke.Run);
+        RunSuite("settings load safety smoke suite", SettingsLoadSafetySmoke.Run);
+        RunSuite("runner folder discovery smoke suite", RunnerFolderDiscoverySmoke.Run);
+        RunSuite("portable settings smoke suite", PortableSettingsSmoke.Run);
+        RunSuite("localization smoke suite", LocalizationSmoke.Run);
+        await RunSuiteAsync("maintenance smoke suite", MaintenanceSmoke.RunAsync);
+        await RunSuiteAsync("portable workspace smoke suite", PortableWorkspaceSmoke.RunAsync);
 
         if (!GitAvailable())
         {
@@ -470,6 +477,18 @@ internal static class Program
             start = i + 1;
         }
         if (start < source.Length) yield return new ArraySegment<byte>(source, start, source.Length - start);
+    }
+
+    private static void RunSuite(string name, Action suite)
+    {
+        try { suite(); Check(name, true); }
+        catch (Exception ex) { Fail(name, ex.Message); }
+    }
+
+    private static async Task RunSuiteAsync(string name, Func<Task> suite)
+    {
+        try { await suite(); Check(name, true); }
+        catch (Exception ex) { Fail(name, ex.Message); }
     }
 
     private static void Check(string name, bool condition, string? detail = null)

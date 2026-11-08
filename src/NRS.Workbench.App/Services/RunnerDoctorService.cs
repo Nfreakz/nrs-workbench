@@ -140,7 +140,13 @@ public sealed class RunnerDoctorService
 
         var lastWorker = AddDiagnosticsCheck(runner, checks);
 
-        if (!string.IsNullOrWhiteSpace(runner.StatusDetail))
+        // StatusDetail usually repeats a problem already reported above (same text, or the service check).
+        var serviceTitle = UiLanguage.Choose("Servicio de Windows", "Windows service", "Servei de Windows");
+        var statusDetailAlreadyReported = checks.Any(x =>
+            x.Severity == RunnerDoctorSeverity.Problem &&
+            (string.Equals(x.Detail.Trim(), runner.StatusDetail.Trim(), StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(x.Title, serviceTitle, StringComparison.Ordinal)));
+        if (!string.IsNullOrWhiteSpace(runner.StatusDetail) && !statusDetailAlreadyReported)
             checks.Add(Problem(UiLanguage.Choose("Detalle del estado", "State detail", "Detall de l'estat"), runner.StatusDetail));
 
         return new RunnerDoctorReport(runner, checks, lastWorker);

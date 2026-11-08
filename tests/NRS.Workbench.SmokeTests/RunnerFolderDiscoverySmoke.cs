@@ -1,11 +1,9 @@
-using System.Runtime.CompilerServices;
 using NRS.Workbench.App.Services;
 
 namespace NRS.Workbench.SmokeTests;
 
 internal static class RunnerFolderDiscoverySmoke
 {
-    [ModuleInitializer]
     internal static void Run()
     {
         var root = Path.Combine(Path.GetTempPath(), "nrs-runner-discovery-" + Guid.NewGuid().ToString("N"));

@@ -18,6 +18,7 @@ public sealed class RuntimeSessionTracker
     private readonly bool _portableMode;
     private RuntimeSessionSnapshot? _current;
     private DateTimeOffset _lastPersistedHeartbeat;
+    private bool _ownsMarker;
 
     public RuntimeSessionTracker(
         string settingsDirectory,
@@ -54,6 +55,14 @@ public sealed class RuntimeSessionTracker
             AppLogger.Error("Could not read previous runtime session marker", ex);
         }
 
+        if (previous is not null && IsProcessStillRunning(previous))
+        {
+            // Not an unclean shutdown: the owner of the marker is still alive. Leave its marker alone.
+            AppLogger.Info(
+                $"Another NRS Workbench instance is still running (pid={previous.ProcessId}, session={previous.SessionId}); runtime marker not overwritten.");
+            return null;
+        }
+
         var now = DateTimeOffset.Now;
         _current = new RuntimeSessionSnapshot(
             Guid.NewGuid().ToString("N"),
@@ -63,8 +72,25 @@ public sealed class RuntimeSessionTracker
             preview,
             _machineFingerprint);
         _lastPersistedHeartbeat = now;
+        _ownsMarker = true;
         Persist();
         return previous;
+    }
+
+    private static bool IsProcessStillRunning(RuntimeSessionSnapshot previous)
+    {
+        if (previous.ProcessId <= 0 || previous.ProcessId == Environment.ProcessId) return false;
+        try
+        {
+            using var process = System.Diagnostics.Process.GetProcessById(previous.ProcessId);
+            if (process.HasExited) return false;
+            // A reused PID belongs to a newer process; the marker owner started before it wrote the marker.
+            return process.StartTime <= previous.StartedAt.LocalDateTime;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public void Heartbeat()
@@ -81,6 +107,8 @@ public sealed class RuntimeSessionTracker
     public void EndSession()
     {
         _current = null;
+        if (!_ownsMarker) return;
+        _ownsMarker = false;
         try
         {
             if (File.Exists(_statePath)) File.Delete(_statePath);
