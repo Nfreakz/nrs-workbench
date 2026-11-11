@@ -2,7 +2,11 @@
 
 ## [Unreleased]
 
-## [0.18.8] - 2026-11-08
+## [0.18.8] - 2026-11-11
+
+### Fixed (runners)
+- Runners updated to 2.338+ (where `bin` is a link to `bin.<version>`) are detected again. Since 0.18.7 they were shown as STOPPED while running, and starting them again created a second listener that GitHub rejected with "A session for this runner already exists".
+- Starting a runner that already has a running listener, or that was started less than 60 seconds ago, is now ignored and logged instead of launching a duplicate.
 
 ### Fixed
 - Maintenance: scan and cleanup now use the same runner-activity predicate. Only a running job (`Runner.Worker`) blocks `_diag` cleanup; a READY listener no longer makes rows look cleanable at scan time and then skipped at cleanup. The newest Runner/Worker logs remain protected.
