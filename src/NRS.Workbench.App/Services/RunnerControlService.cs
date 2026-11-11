@@ -9,6 +9,14 @@ public sealed class RunnerControlService : IRunnerControlService
     private readonly RunnerProcessService _processService;
     private readonly WindowsServiceController _serviceController;
 
+    // run.cmd needs several seconds (file unblock + listener start) before Runner.Listener.exe
+    // is visible, so a second start in that window would not see the first one. Remember
+    // recent interactive starts per folder and refuse duplicates: two listeners with the same
+    // registration make GitHub answer "A session for this runner already exists".
+    private static readonly TimeSpan StartGracePeriod = TimeSpan.FromSeconds(60);
+    private readonly Dictionary<string, DateTime> _recentStarts = new(StringComparer.OrdinalIgnoreCase);
+    private readonly object _startLock = new();
+
     public RunnerControlService(RunnerProcessService processService, WindowsServiceController serviceController)
     {
         _processService = processService;
@@ -72,6 +80,28 @@ public sealed class RunnerControlService : IRunnerControlService
         // Workbench runs job-controlled code elevated; prefer running Workbench unelevated.
         var runCmd = Path.Combine(runner.FolderPath, "run.cmd");
         if (!File.Exists(runCmd)) throw new FileNotFoundException("No se encuentra run.cmd.", runCmd);
+
+        lock (_startLock)
+        {
+            var now = DateTime.UtcNow;
+            if (_recentStarts.TryGetValue(runner.FolderPath, out var startedAt) && now - startedAt < StartGracePeriod)
+            {
+                AppLogger.Info($"Start ignored: {runner.Alias} was started {(now - startedAt).TotalSeconds:0} s ago.");
+                return;
+            }
+
+            var snapshot = _processService.GetSnapshot(runner.FolderPath);
+            var alreadyRunning = snapshot.HasListener;
+            snapshot.Listener?.Dispose();
+            foreach (var worker in snapshot.Workers) worker.Dispose();
+            if (alreadyRunning)
+            {
+                AppLogger.Info($"Start ignored: {runner.Alias} already has a running listener.");
+                return;
+            }
+
+            _recentStarts[runner.FolderPath] = now;
+        }
 
         var psi = new ProcessStartInfo
         {

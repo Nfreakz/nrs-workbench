@@ -20,8 +20,10 @@ public sealed class RunnerProcessService
 {
     public RunnerProcessSnapshot GetSnapshot(string runnerFolder)
     {
-        var expectedListener = Normalize(Path.Combine(runnerFolder, "bin", "Runner.Listener.exe"));
-        var expectedWorker = Normalize(Path.Combine(runnerFolder, "bin", "Runner.Worker.exe"));
+        // Runner 2.338+ updates by turning "bin" into a link to "bin.<version>", and Windows
+        // reports the resolved image path (…\bin.2.338.2\Runner.Listener.exe). Match on the
+        // runner folder plus the file name, not on the literal "bin" path.
+        var folder = Normalize(runnerFolder) + Path.DirectorySeparatorChar;
         Process? listener = null;
         var workers = new List<Process>();
         long ram = 0;
@@ -30,7 +32,7 @@ public sealed class RunnerProcessService
 
         foreach (var process in Process.GetProcessesByName("Runner.Listener"))
         {
-            var belongs = BelongsTo(process, expectedListener);
+            var belongs = BelongsTo(process, folder, "Runner.Listener.exe");
             if (belongs is null) unknown = true;
             if (belongs != true) { process.Dispose(); continue; }
             listener = process;
@@ -41,7 +43,7 @@ public sealed class RunnerProcessService
 
         foreach (var process in Process.GetProcessesByName("Runner.Worker"))
         {
-            var belongs = BelongsTo(process, expectedWorker);
+            var belongs = BelongsTo(process, folder, "Runner.Worker.exe");
             if (belongs is null) unknown = true;
             if (belongs != true) { process.Dispose(); continue; }
             workers.Add(process);
@@ -52,11 +54,17 @@ public sealed class RunnerProcessService
     }
 
     // null = path could not be determined (e.g. a service runner under another account).
-    private static bool? BelongsTo(Process process, string expectedExecutable)
+    private static bool? BelongsTo(Process process, string runnerFolderWithSeparator, string fileName)
     {
         var actual = GetImagePath(process);
         if (string.IsNullOrWhiteSpace(actual)) return null;
-        return string.Equals(Normalize(actual), expectedExecutable, StringComparison.OrdinalIgnoreCase);
+        var path = Normalize(actual);
+        if (!string.Equals(Path.GetFileName(path), fileName, StringComparison.OrdinalIgnoreCase)) return false;
+        if (!path.StartsWith(runnerFolderWithSeparator, StringComparison.OrdinalIgnoreCase)) return false;
+        // Only <runner>\bin\X or <runner>\bin.<version>\X, never a nested runner folder.
+        var relativeDir = Path.GetDirectoryName(path.Substring(runnerFolderWithSeparator.Length)) ?? string.Empty;
+        return relativeDir.Equals("bin", StringComparison.OrdinalIgnoreCase) ||
+               relativeDir.StartsWith("bin.", StringComparison.OrdinalIgnoreCase) && !relativeDir.Contains(Path.DirectorySeparatorChar);
     }
 
     private static string? GetImagePath(Process process)
